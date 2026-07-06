@@ -1,0 +1,28 @@
+import type { ProductFormValues, ProductStatus } from "./types";
+
+export const defaultProductValues: ProductFormValues = {
+  title: "",
+  handle: "",
+  description: "",
+  descriptionHtml: "",
+  price: 0,
+  compareAtPrice: null,
+  sku: "",
+  inventory: 0,
+  availableForSale: true,
+  status: "ACTIVE" as ProductStatus,
+  seoTitle: "",
+  seoDescription: "",
+  images: [],
+  featuredImage: "",
+  productType: "",
+  categoryId: "",
+  subcategoryId: "",
+  vendor: "MM Laptop Center",
+  tags: [],
+  collectionIds: [],
+  isFeatured: false,
+  variations: [],
+  details: [],
+  certificates: [],
+};
