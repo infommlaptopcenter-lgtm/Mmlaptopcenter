@@ -126,10 +126,10 @@ export function Footer() {
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-[#d8a928] shrink-0" />
-                <span>info@mmlaptopcenter.com</span>
+                <span>info.mmlaptopcenter@gmail.com</span>
               </div>
               <div className="pt-2">
-                <span className="text-xs text-gray-500">Founder: Mudasser Meer</span>
+                <span className="text-xs text-gray-500">Founder: Mudassir Meer</span>
               </div>
             </div>
           </div>
