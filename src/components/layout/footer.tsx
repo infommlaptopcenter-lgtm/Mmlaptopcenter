@@ -118,7 +118,7 @@ export function Footer() {
             <div className="space-y-4 text-sm text-gray-600">
               <div className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-[#d8a928] shrink-0" />
-                <span>Sardri Bazar Charsadda Mardan Road KPK Pakistan | All Pakistan delivery available</span>
+                <span>Sardheri Bazar Charsadda Mardan Road KPK Pakistan | All Pakistan delivery available</span>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-[#d8a928] shrink-0" />
