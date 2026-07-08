@@ -78,7 +78,7 @@ const Testimonials = () => {
       >
         {testimonials.map((t, i) => (
           <SwiperSlide key={i}>
-            <div className="rounded-xl border border-[#d8a928]/20 bg-[#fcf5e8] p-6 h-full">
+            <div className="rounded-xl border border-[#d8a928]/20 bg-[#f4f1e8] p-6 h-full">
               <div className="flex gap-1 mb-3">
                 {Array.from({ length: 5 }).map((_, j) => (
                   <span key={j} className="text-[#d8a928] text-lg">★</span>

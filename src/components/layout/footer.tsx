@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export function Footer() {
   return (
-    <footer className=" bg-[#d8a928]/20 border-t border-[#d8a928]/30">
+    <footer className="bg-[#f4f1e8] border-t border-[#d8a928]/30">
       <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
           {/* Brand / Logo */}
