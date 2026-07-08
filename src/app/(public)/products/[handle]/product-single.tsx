@@ -255,6 +255,8 @@ export function ProductSingle({ data }: Props) {
 
     return { hasDiscount, savedAmount, savedPct, displayPrice, compareAt };
   }, [displayPrice, selectedVariant?.compareAtPrice]);
+  const hasDescriptionHtml = Boolean(data.descriptionHtml?.trim());
+  const hasDescription = Boolean(data.description?.trim());
 
   return (
     <ProductProvider data={data}>
@@ -550,10 +552,18 @@ export function ProductSingle({ data }: Props) {
                    </TabsList>
 
                    <TabsContent value="description" className="p-4">
-                     <div
-                       className="prose prose-sm max-w-none text-[#5A5E55] text-xs"
-                       dangerouslySetInnerHTML={{ __html: data.descriptionHtml || "" }}
-                     />
+                     {hasDescriptionHtml ? (
+                       <div
+                         className="prose prose-sm max-w-none text-[#5A5E55] text-xs"
+                         dangerouslySetInnerHTML={{ __html: data.descriptionHtml || "" }}
+                       />
+                     ) : hasDescription ? (
+                       <p className="whitespace-pre-line text-xs leading-relaxed text-[#5A5E55]">
+                         {data.description}
+                       </p>
+                     ) : (
+                       <p className="text-xs text-[#5A5E55]">No description available.</p>
+                     )}
                    </TabsContent>
 
                    <TabsContent value="specs" className="p-4">

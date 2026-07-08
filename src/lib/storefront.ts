@@ -115,6 +115,12 @@ function parseStringArray(value: Prisma.JsonValue | null | undefined): string[] 
   return value.filter((item): item is string => typeof item === "string");
 }
 
+function uniqueStrings(values: Array<string | null | undefined>): string[] {
+  return values.filter((value, index, all): value is string => {
+    return typeof value === "string" && value.trim().length > 0 && all.indexOf(value) === index;
+  });
+}
+
 function toMoney(amount: number | null | undefined): MoneyV2 {
   return {
     amount: Number(amount ?? 0).toFixed(2),
@@ -145,7 +151,7 @@ function buildProductCardNode(product: {
   images: Prisma.JsonValue;
   tags: Prisma.JsonValue;
 }): ProductCardNode {
-  const imageUrls = parseStringArray(product.images);
+  const imageUrls = uniqueStrings([product.featuredImage, ...parseStringArray(product.images)]);
   const images = imageUrls
     .map((url, index) => toImage(url, `${product.id}-image-${index}`))
     .filter((image): image is StorefrontImage => Boolean(image));
@@ -239,15 +245,12 @@ async function buildProductNode(product: {
     price: number;
   }>;
 }) {
-  const imageUrls = parseStringArray(product.images);
+  const imageUrls = uniqueStrings([product.featuredImage, ...parseStringArray(product.images)]);
   const images = imageUrls
     .map((url, index) => toImage(url, `${product.id}-image-${index}`))
     .filter((image): image is StorefrontImage => Boolean(image));
 
-  const fallbackImage = toImage(
-    product.featuredImage ?? PLACEHOLDER_IMAGE,
-    `${product.id}-featured`,
-  );
+  const fallbackImage = toImage(PLACEHOLDER_IMAGE, `${product.id}-featured`);
   if (fallbackImage && !images.length) {
     images.push(fallbackImage);
   }
