@@ -31,17 +31,6 @@ const productSchema = z.object({
     description: z.string().optional(),
     image: z.string().optional(),
   })).default([]),
-  certificates: z.array(z.object({
-    id: z.string(),
-    title: z.string().min(1, "Certificate title is required"),
-    description: z.string().optional(),
-    image: z.string().optional(),
-  })).default([]),
-  variations: z.array(z.object({
-    name: z.string().min(1, "Variation name is required"),
-    value: z.string().min(1, "Variation value is required"),
-    price: z.number().min(0, "Variation price must be positive"),
-  })).default([]),
 });
 
 export async function GET(
@@ -54,7 +43,6 @@ export async function GET(
     
     const product = await prisma.product.findUnique({
       where: { id },
-      include: { variations: true },
     });
 
     if (!product) {
@@ -81,7 +69,7 @@ export async function PUT(
     
     const body = await request.json();
     const validated = productSchema.parse(body);
-    const { variations, details, certificates, ...productData } = validated;
+    const { details, ...productData } = validated;
 
     if (!productData.categoryId) delete (productData as any).categoryId;
     if (!productData.subcategoryId) delete (productData as any).subcategoryId;
@@ -99,17 +87,6 @@ export async function PUT(
       data: {
         ...productData,
         details: details,
-        certificates: certificates,
-        variations: {
-          deleteMany: {},
-          ...(variations?.length ? {
-            create: variations.map((v) => ({
-              name: v.name,
-              value: v.value,
-              price: v.price,
-            })),
-          } : {}),
-        },
       },
     });
 

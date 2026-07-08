@@ -1,6 +1,6 @@
 "use client";
 
-import { FaInfoCircle, FaPlus, FaTrash } from "react-icons/fa";
+import { FaArrowDown, FaArrowUp, FaInfoCircle, FaPlus, FaTrash } from "react-icons/fa";
 import { AdminImageUpload } from "@/components/admin/image-upload";
 import type { SaveableSectionProps } from "./section-types";
 import type { ProductDetail } from "./types";
@@ -11,6 +11,16 @@ export function DetailsSection({
 }: SaveableSectionProps & { savingDetails: boolean; saveDetails: () => Promise<void> }) {
   const updateDetail = (id: string, field: keyof ProductDetail, value: string) => setValues((v) => ({ ...v, details: v.details.map((d) => (d.id === id ? { ...d, [field]: value } : d)) }));
   const removeDetail = (id: string) => setValues((v) => ({ ...v, details: v.details.filter((d) => d.id !== id) }));
+  const moveDetail = (index: number, direction: -1 | 1) => {
+    setValues((current) => {
+      const nextIndex = index + direction;
+      if (nextIndex < 0 || nextIndex >= current.details.length) return current;
+      const details = [...current.details];
+      const [detail] = details.splice(index, 1);
+      details.splice(nextIndex, 0, detail);
+      return { ...current, details };
+    });
+  };
 
   return (
     <div className="col-span-1 rounded-xl border border-[#d8a928]/20 bg-[#fcf5e8]/60 p-4 lg:col-span-2 md:p-6">
@@ -19,7 +29,17 @@ export function DetailsSection({
         <button type="button" onClick={() => setValues((v) => ({ ...v, details: [...v.details, { id: generateId(), title: "", description: "", image: "" }] }))} className="flex items-center gap-2 whitespace-nowrap rounded-lg bg-[#f6a45d] px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#d8861f] hover:shadow-md"><FaPlus className="h-4 w-4" />Add Detail</button>
       </div>
       <div className="space-y-4">
-        {values.details.map((detail, idx) => <DetailCard key={detail.id} detail={detail} index={idx} updateDetail={updateDetail} removeDetail={removeDetail} />)}
+        {values.details.map((detail, idx) => (
+          <DetailCard
+            key={detail.id}
+            detail={detail}
+            index={idx}
+            total={values.details.length}
+            updateDetail={updateDetail}
+            removeDetail={removeDetail}
+            moveDetail={moveDetail}
+          />
+        ))}
         {values.details.length === 0 && <EmptyDetails />}
       </div>
       {mode === "edit" && values.details.length > 0 && <SaveDetailsButton saving={savingDetails} onClick={saveDetails} />}
@@ -27,14 +47,32 @@ export function DetailsSection({
   );
 }
 
-function DetailCard({ detail, index, updateDetail, removeDetail }: { detail: ProductDetail; index: number; updateDetail: (id: string, field: keyof ProductDetail, value: string) => void; removeDetail: (id: string) => void }) {
+function DetailCard({
+  detail,
+  index,
+  total,
+  updateDetail,
+  removeDetail,
+  moveDetail,
+}: {
+  detail: ProductDetail;
+  index: number;
+  total: number;
+  updateDetail: (id: string, field: keyof ProductDetail, value: string) => void;
+  removeDetail: (id: string) => void;
+  moveDetail: (index: number, direction: -1 | 1) => void;
+}) {
   return (
     <div className="relative rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
-      <button type="button" onClick={() => removeDetail(detail.id)} className="absolute right-3 top-3 rounded-full border border-red-200 bg-red-50 p-2 text-red-600 transition-colors hover:bg-red-100"><FaTrash className="h-4 w-4" /></button>
-      <p className="mb-3 text-xs font-medium text-[#5A5E55]">Detail {index + 1}</p>
+      <div className="absolute right-3 top-3 flex gap-1">
+        <button type="button" onClick={() => moveDetail(index, -1)} disabled={index === 0} className="rounded-full border border-[#d8a928]/20 bg-[#fcf5e8] p-2 text-[#5A5E55] transition-colors hover:text-[#0a0a0a] disabled:cursor-not-allowed disabled:opacity-40"><FaArrowUp className="h-3 w-3" /></button>
+        <button type="button" onClick={() => moveDetail(index, 1)} disabled={index === total - 1} className="rounded-full border border-[#d8a928]/20 bg-[#fcf5e8] p-2 text-[#5A5E55] transition-colors hover:text-[#0a0a0a] disabled:cursor-not-allowed disabled:opacity-40"><FaArrowDown className="h-3 w-3" /></button>
+        <button type="button" onClick={() => removeDetail(detail.id)} className="rounded-full border border-red-200 bg-red-50 p-2 text-red-600 transition-colors hover:bg-red-100"><FaTrash className="h-3 w-3" /></button>
+      </div>
+      <p className="mb-3 pr-28 text-xs font-medium text-[#5A5E55]">Detail {index + 1}</p>
       <div className="space-y-3">
-        <Input label="Title" value={detail.title} onChange={(value) => updateDetail(detail.id, "title", value)} placeholder="e.g., Natural Ingredients" />
-        <label className="block text-xs text-[#5A5E55]">Description<textarea value={detail.description} onChange={(e) => updateDetail(detail.id, "description", e.target.value)} className="mt-1.5 w-full resize-none rounded-lg border border-gray-300 px-4 py-2.5 text-sm transition-all focus:border-[#f6a45d] focus:outline-none focus:ring-2 focus:ring-[#f6a45d]/50" rows={2} placeholder="Describe this detail..." /></label>
+        <Input label="Title" value={detail.title} onChange={(value) => updateDetail(detail.id, "title", value)} placeholder="e.g., Performance tuned for creators" />
+        <label className="block text-xs text-[#5A5E55]">Rich Text Description<textarea value={detail.description} onChange={(e) => updateDetail(detail.id, "description", e.target.value)} className="mt-1.5 w-full resize-y rounded-lg border border-gray-300 px-4 py-2.5 text-sm leading-6 transition-all focus:border-[#f6a45d] focus:outline-none focus:ring-2 focus:ring-[#f6a45d]/50" rows={5} placeholder="Add product story, bullet-style lines, warranty notes, specs, or usage details..." /></label>
         <label className="block text-xs text-[#5A5E55]">Image (optional)<AdminImageUpload label="Detail image" folder="mmlaptop/products/details" usedIn="product_detail" value={detail.image} onChange={(url) => updateDetail(detail.id, "image", url)} /></label>
       </div>
     </div>

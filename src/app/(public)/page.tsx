@@ -32,6 +32,12 @@ const jsonLd = {
   ]
 };
 
+function parseStringArray(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
+}
+
 export const metadata: Metadata = {
   title: "MM Laptop Center – Premium Laptops & Tech",
   description:
@@ -69,7 +75,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-   const [categories, allProducts, featuredCollections, featuredBlogs, essenceSection] = await Promise.all([
+   const [categories, featuredCollections, featuredBlogs, essenceSection] = await Promise.all([
      safeHomeQuery(
        "categories",
        () => prisma.category.findMany({
@@ -79,23 +85,21 @@ export default async function Page() {
        }),
        [],
      ),
-safeHomeQuery(
-       "all products",
-       () => prisma.product.findMany({
-         where: { status: "ACTIVE" },
-         orderBy: { updatedAt: "desc" },
-         take: 40,
-         select: { id: true, handle: true, title: true, price: true, compareAtPrice: true, featuredImage: true, images: true, tags: true, categoryId: true, subcategoryId: true, isFeatured: true, createdAt: true, updatedAt: true },
-       }),
-       [],
-     ),
     safeHomeQuery(
       "featured collections",
       () => prisma.collection.findMany({
-        where: { isFeatured: true },
-        orderBy: { updatedAt: "desc" },
+        where: {
+          OR: [
+            { isFeatured: true },
+            { handle: { in: ["new-arrivals", "best-sellers"] } },
+          ],
+        },
+        orderBy: [
+          { isFeatured: "desc" },
+          { updatedAt: "desc" },
+        ],
         take: 20,
-        select: { id: true, handle: true, title: true, image: true },
+        select: { id: true, handle: true, title: true, image: true, isFeatured: true, productHandles: true },
       }),
       [],
     ),
@@ -119,6 +123,45 @@ safeHomeQuery(
 
   ]);
 
+const homeCollections = featuredCollections.map((collection) => ({
+  ...collection,
+  productHandles: parseStringArray(collection.productHandles),
+}));
+
+const collectionProductHandles = homeCollections
+  .filter((collection) => ["new-arrivals", "best-sellers"].includes(collection.handle))
+  .flatMap((collection) => collection.productHandles);
+
+const [recentProducts, collectionProducts] = await Promise.all([
+  safeHomeQuery(
+    "all products",
+    () => prisma.product.findMany({
+      where: { status: "ACTIVE" },
+      orderBy: { updatedAt: "desc" },
+      take: 40,
+      select: { id: true, handle: true, title: true, price: true, compareAtPrice: true, featuredImage: true, images: true, tags: true, categoryId: true, subcategoryId: true, isFeatured: true, createdAt: true, updatedAt: true },
+    }),
+    [],
+  ),
+  collectionProductHandles.length
+    ? safeHomeQuery(
+        "home collection products",
+        () => prisma.product.findMany({
+          where: {
+            status: "ACTIVE",
+            handle: { in: collectionProductHandles },
+          },
+          select: { id: true, handle: true, title: true, price: true, compareAtPrice: true, featuredImage: true, images: true, tags: true, categoryId: true, subcategoryId: true, isFeatured: true, createdAt: true, updatedAt: true },
+        }),
+        [],
+      )
+    : Promise.resolve([]),
+]);
+
+const allProducts = Array.from(
+  new Map([...collectionProducts, ...recentProducts].map((product) => [product.handle, product])).values(),
+);
+
 return (
        <>
           <script
@@ -132,7 +175,7 @@ return (
           <HomeContentSections
             categories={categories}
             products={allProducts}
-            collections={featuredCollections}
+            collections={homeCollections}
             featuredBlogs={featuredBlogs}
           />
       </div>

@@ -2,6 +2,18 @@ import { getAllProducts, searchProducts as searchProductsInDb } from "@/lib/stor
 import { invariant } from "@esmate/utils";
 import { prisma } from "@/lib/prisma";
 
+function getProductImage(product: { featuredImage: string | null; images: unknown }) {
+  if (product.featuredImage) {
+    return product.featuredImage;
+  }
+
+  if (Array.isArray(product.images)) {
+    return product.images.find((image): image is string => typeof image === "string") || null;
+  }
+
+  return null;
+}
+
 export async function getProductList(cursor?: string) {
   const products = await getAllProducts(cursor, 100);
   invariant(products, "products are not available");
@@ -89,12 +101,7 @@ export async function getProductsByCategorySlug(slug: string) {
     tags: Array.isArray(p.tags) ? (p.tags as unknown[]).filter((x): x is string => typeof x === "string") : [],
     featuredImage: {
       id: `${p.id}-featured`,
-      url:
-        p.featuredImage ??
-        (Array.isArray(p.images)
-          ? ((p.images as unknown[]).find((x): x is string => typeof x === "string") ?? null)
-          : null) ??
-        "https://placehold.co/400x300?text=Laptop",
+      url: getProductImage(p) ?? "https://placehold.co/400x300?text=Laptop",
       altText: null,
       width: 1200,
       height: 1200,
@@ -168,12 +175,7 @@ export async function getProductsAdvanced(params: {
         : [],
       featuredImage: {
         id: `${p.id}-featured`,
-        url:
-          p.featuredImage ??
-          (Array.isArray(p.images)
-            ? ((p.images as unknown[]).find((x): x is string => typeof x === "string") ?? null)
-            : null) ??
-          "https://placehold.co/400x300?text=Laptop",
+        url: getProductImage(p) ?? "https://placehold.co/400x300?text=Laptop",
         altText: null,
         width: 1200,
         height: 1200,

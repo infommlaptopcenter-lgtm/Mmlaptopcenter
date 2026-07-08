@@ -35,6 +35,8 @@ interface Collection {
   handle: string;
   title: string;
   image: string | null;
+  isFeatured?: boolean;
+  productHandles?: string[];
 }
 
 function ProductGrid({ products, title, bgColor = "white" }: { products: Product[]; title: string; bgColor?: string }) {
@@ -180,16 +182,20 @@ export function ProductsSection({ categories, products, collections }: { categor
   const [selectedCategory, setSelectedCategory] = useState<string>("");
 
   const featuredProducts = products.filter(p => p.isFeatured);
-  const newArrivals = [...products].sort((a, b) => {
-    const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-    const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-    return dateB - dateA;
-  }).slice(0, 8);
-  const bestSellers = [...products].sort((a, b) => {
-    const priceA = a.price ?? 0;
-    const priceB = b.price ?? 0;
-    return priceB - priceA;
-  }).slice(0, 8);
+  const productsByHandle = new Map(products.map((product) => [product.handle, product]));
+
+  const getCollectionProducts = (handle: string) => {
+    const collection = collections.find((item) => item.handle === handle);
+    const productHandles = collection?.productHandles || [];
+
+    return productHandles
+      .map((productHandle) => productsByHandle.get(productHandle))
+      .filter((product): product is Product => Boolean(product))
+      .slice(0, 8);
+  };
+
+  const newArrivals = getCollectionProducts("new-arrivals");
+  const bestSellers = getCollectionProducts("best-sellers");
 
   const filteredProducts = selectedCategory
     ? products.filter(p => {
@@ -275,7 +281,7 @@ export function ProductsSection({ categories, products, collections }: { categor
             Curated Collections
           </h2>
         </div>
-        <CollectionSlider collections={collections} />
+        <CollectionSlider collections={collections.filter((collection) => collection.isFeatured !== false)} />
       </section>
     </>
   );

@@ -318,15 +318,15 @@ export function StoreProductCard({
             />
           </div>
         )}
-        <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-white via-white/95 to-white/0 px-4 pb-3 pt-12">
-          <h3 className="text-sm font-bold leading-tight text-[#0a0a0a] drop-shadow-sm sm:text-base">
+        <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-white/75 via-white/35 to-transparent px-4 pb-2.5 pt-6 transition-all duration-300 group-hover:from-white/90 group-hover:via-white/60 group-hover:pt-10">
+          <h3 className="line-clamp-2 text-sm font-bold leading-tight text-[#0a0a0a] drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)] transition-all duration-300 group-hover:line-clamp-none sm:text-base">
             {title}
           </h3>
         </div>
       </Link>
 
       {/* ── Card body ─────────────────────────────────────── */}
-      <div className="flex flex-col gap-1.5 px-4 pb-4 pt-3">
+      <div className="flex flex-col gap-1.5 px-4 pb-4 pt-2">
         {/* Rating row */}
         <div className="flex items-center justify-between">
           <ProductRating

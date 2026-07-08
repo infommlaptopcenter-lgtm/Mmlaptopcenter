@@ -4,31 +4,14 @@ export async function loadProductExtras(
   productId: string,
   setValues: React.Dispatch<React.SetStateAction<ProductFormValues>>,
 ) {
-  await Promise.all([
-    loadExtra(productId, "variations", (data) => {
-      if (data.variations) {
-        setValues((v) => ({
-          ...v,
-          variations: data.variations.map((variation: any) => ({
-            name: variation.name,
-            value: variation.value,
-            price: variation.price,
-          })),
-        }));
-      }
-    }),
-    loadExtra(productId, "details", (data) => {
-      if (data.details) setValues((v) => ({ ...v, details: data.details }));
-    }),
-    loadExtra(productId, "certificates", (data) => {
-      if (data.certificates) setValues((v) => ({ ...v, certificates: data.certificates }));
-    }),
-  ]);
+  await loadExtra(productId, "details", (data) => {
+    if (data.details) setValues((v) => ({ ...v, details: data.details }));
+  });
 }
 
 export async function saveProductExtra(
   productId: string | undefined,
-  name: "variations" | "details" | "certificates",
+  name: "details",
   value: unknown,
   setSaving: (saving: boolean) => void,
   setError: (error: string | null) => void,

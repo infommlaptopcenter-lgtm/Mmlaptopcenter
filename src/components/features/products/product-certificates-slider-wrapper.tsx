@@ -1,1 +1,0 @@
-export { ProductCertificatesSlider } from "./product-certificates-slider";

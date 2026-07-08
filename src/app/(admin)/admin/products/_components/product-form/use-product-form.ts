@@ -19,9 +19,7 @@ export function useProductForm({ mode, productId, initialValues }: {
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [collections, setCollections] = useState<CollectionItem[]>([]);
   const [collectionSearch, setCollectionSearch] = useState("");
-  const [savingVariations, setSavingVariations] = useState(false);
   const [savingDetails, setSavingDetails] = useState(false);
-  const [savingCertificates, setSavingCertificates] = useState(false);
 
   const canAutoHandle = useMemo(() => values.handle.trim().length === 0, [values.handle]);
   const parentCategories = useMemo(() => categories.filter((c) => !c.parentId), [categories]);
@@ -52,16 +50,8 @@ export function useProductForm({ mode, productId, initialValues }: {
     }
   }, [mode, productId]);
 
-  async function saveVariations() {
-    await saveProductExtra(productId, "variations", values.variations, setSavingVariations, setError);
-  }
-
   async function saveDetails() {
     await saveProductExtra(productId, "details", values.details, setSavingDetails, setError);
-  }
-
-  async function saveCertificates() {
-    await saveProductExtra(productId, "certificates", values.certificates, setSavingCertificates, setError);
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -96,7 +86,6 @@ export function useProductForm({ mode, productId, initialValues }: {
 
   return {
     values, setValues, saving, error, onSubmit, categories, parentCategories, subcategories,
-    collectionSearch, setCollectionSearch, visibleCollections, savingVariations,
-    savingDetails, savingCertificates, saveVariations, saveDetails, saveCertificates,
+    collectionSearch, setCollectionSearch, visibleCollections, savingDetails, saveDetails,
   };
 }

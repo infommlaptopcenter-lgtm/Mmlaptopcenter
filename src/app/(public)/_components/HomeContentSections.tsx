@@ -6,7 +6,7 @@ import { CustomerVoicesSection } from "@/components/features/home/customer-voice
 type HomeContentSectionsProps = {
   categories: Array<{ id: string; name: string; slug: string; image: string | null }>;
   products: Array<any>;
-  collections: Array<{ id: string; handle: string; title: string; image: string | null }>;
+  collections: Array<{ id: string; handle: string; title: string; image: string | null; isFeatured?: boolean; productHandles?: string[] }>;
   featuredBlogs: Array<{
     id: string;
     title: string;

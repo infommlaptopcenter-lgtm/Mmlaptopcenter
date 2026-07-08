@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Badge } from "@esmate/shadcn/components/ui/badge";
 import { Button } from "@esmate/shadcn/components/ui/button";
 import { Skeleton } from "@esmate/shadcn/components/ui/skeleton";
-import { Heart, Package, RefreshCw, Shield, Truck } from "@esmate/shadcn/pkgs/lucide-react";
+import { Heart } from "@esmate/shadcn/pkgs/lucide-react";
 
 type GalleryImage = {
   id: string;
@@ -33,8 +33,8 @@ export function ProductGallerySection({
 }: ProductGallerySectionProps) {
   return (
     <div className="space-y-4">
-      <div className="relative mx-auto aspect-square w-full max-w-lg overflow-hidden rounded-2xl border border-[#d8a928]/20 bg-white shadow-md lg:max-w-full">
-        <div className="absolute inset-0 bg-[#fcf5e8]" />
+      <div className="relative mx-auto aspect-square w-full max-w-md overflow-hidden rounded-xl border border-[#d8a928]/20 bg-white shadow-md">
+        <div className="absolute inset-0 bg-[#f4f1e8]" />
         {currentImage ? (
           <>
             <Image
@@ -42,10 +42,10 @@ export function ProductGallerySection({
               alt={currentImage.altText || title}
               fill
               priority
-              className="object-cover transition-transform duration-300 hover:scale-105"
+              className="object-contain p-5 transition-transform duration-300 hover:scale-[1.03]"
               sizes="(max-width: 768px) 100vw, 50vw"
             />
-            <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-black/5 via-transparent to-transparent" />
+            <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-white/10 via-transparent to-black/5" />
           </>
         ) : (
           <Skeleton className="h-full w-full" />
@@ -70,7 +70,7 @@ export function ProductGallerySection({
       </div>
 
       <div className="w-full overflow-x-auto">
-        <div className="mx-auto flex justify-center gap-2 pb-2">
+        <div className="mx-auto flex max-w-md justify-start gap-2 pb-2">
           {images.map((img) => (
             <button
               key={img.id}
@@ -85,21 +85,6 @@ export function ProductGallerySection({
             </button>
           ))}
         </div>
-      </div>
-
-      <div className="grid grid-cols-4 gap-2">
-        {[
-          { icon: Truck, label: "Fast Delivery", desc: "Nationwide" },
-          { icon: Shield, label: "Secure", desc: "Safe checkout" },
-          { icon: RefreshCw, label: "Easy Returns", desc: "30 days" },
-          { icon: Package, label: "Gift Ready", desc: "Free wrap" },
-        ].map((item, idx) => (
-          <div key={idx} className="rounded-xl border border-[#d8a928]/20 bg-white p-2 text-center">
-            <item.icon className="mx-auto mb-1 h-4 w-4 text-[#f6a45d]" />
-            <div className="text-xs font-semibold text-[#0a0a0a]">{item.label}</div>
-            <div className="text-[10px] text-[#5A5E55]">{item.desc}</div>
-          </div>
-        ))}
       </div>
     </div>
   );

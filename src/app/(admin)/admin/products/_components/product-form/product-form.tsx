@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { ProductFormValues } from "./types";
-import { BasicInfoSection, CertificatesSection, DetailsSection, VariationsSection } from "./sections";
+import { BasicInfoSection, DetailsSection } from "./sections";
 import { FormFooter } from "./form-footer";
 import { useProductForm } from "./use-product-form";
 
@@ -45,29 +45,12 @@ export function ProductForm({
           categories={form.categories}
         />
 
-        <VariationsSection
-          values={form.values}
-          setValues={form.setValues}
-          mode={mode}
-          savingVariations={form.savingVariations}
-          saveVariations={form.saveVariations}
-          price={form.values.price}
-        />
-
         <DetailsSection
           values={form.values}
           setValues={form.setValues}
           mode={mode}
           savingDetails={form.savingDetails}
           saveDetails={form.saveDetails}
-        />
-
-        <CertificatesSection
-          values={form.values}
-          setValues={form.setValues}
-          mode={mode}
-          savingCertificates={form.savingCertificates}
-          saveCertificates={form.saveCertificates}
         />
 
         <FormFooter mode={mode} saving={form.saving} />

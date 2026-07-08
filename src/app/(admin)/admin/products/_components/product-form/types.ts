@@ -10,13 +10,6 @@ export type ProductDetail = {
   image?: string;
 };
 
-export type ProductCertificate = {
-  id: string;
-  title: string;
-  description: string;
-  image?: string;
-};
-
 export type ProductFormValues = {
   title: string;
   handle: string;
@@ -39,7 +32,5 @@ export type ProductFormValues = {
   tags: string[];
   collectionIds: string[];
   isFeatured: boolean;
-  variations: Array<{ name: string; value: string; price: number }>;
   details: ProductDetail[];
-  certificates: ProductCertificate[];
 };

@@ -31,6 +31,7 @@ type ProductCardNode = {
   priceRange: {
     minVariantPrice: MoneyV2;
   };
+  compareAtPrice?: MoneyV2 | null;
 };
 
 type ProductNode = {
@@ -71,15 +72,10 @@ type ProductNode = {
       sku?: string | null;
     }[];
   };
-  variations: {
-    id: string;
-    name: string;
-    value: string;
-    price: MoneyV2;
-  }[];
   vendor: string;
   productType: string | null;
   tags: string[];
+  categoryId: string | null;
   metafields: Array<{ key: string; value: string }>;
   recommendations: ProductCardNode[];
 };
@@ -108,11 +104,20 @@ type Connection<T> = {
 };
 
 function parseStringArray(value: Prisma.JsonValue | null | undefined): string[] {
-  if (!Array.isArray(value)) {
-    return [];
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return parseStringArray(parsed as Prisma.JsonValue);
+    } catch {
+      return value.trim() ? [value] : [];
+    }
   }
 
-  return value.filter((item): item is string => typeof item === "string");
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === "string");
+  }
+
+  return [];
 }
 
 function uniqueStrings(values: Array<string | null | undefined>): string[] {
@@ -147,6 +152,7 @@ function buildProductCardNode(product: {
   handle: string;
   title: string;
   price: number;
+  compareAtPrice?: number | null;
   featuredImage: string | null;
   images: Prisma.JsonValue;
   tags: Prisma.JsonValue;
@@ -172,21 +178,26 @@ function buildProductCardNode(product: {
     priceRange: {
       minVariantPrice: toMoney(product.price),
     },
+    compareAtPrice: product.compareAtPrice ? toMoney(product.compareAtPrice) : null,
   };
 }
 
 async function buildRecommendations(
   product: {
     handle: string;
-    collectionIds: Prisma.JsonValue;
+    categoryId: string | null;
   },
   limit = 4,
 ) {
-  const collectionIds = parseStringArray(product.collectionIds);
+  if (!product.categoryId) {
+    return [];
+  }
+
   const recommended = await prisma.product.findMany({
     where: {
       status: "ACTIVE",
       availableForSale: true,
+      categoryId: product.categoryId,
       handle: {
         not: product.handle,
       },
@@ -200,23 +211,16 @@ async function buildRecommendations(
       handle: true,
       title: true,
       price: true,
+      compareAtPrice: true,
       featuredImage: true,
       images: true,
       tags: true,
-      collectionIds: true,
     },
   });
 
   return recommended
-    .map((item) => ({
-      item,
-      score: parseStringArray(item.collectionIds).some((id) => collectionIds.includes(id))
-        ? 1
-        : 0,
-    }))
-    .sort((left, right) => right.score - left.score)
     .slice(0, limit)
-    .map(({ item }) => buildProductCardNode(item));
+    .map((item) => buildProductCardNode(item));
 }
 
 async function buildProductNode(product: {
@@ -238,12 +242,7 @@ async function buildProductNode(product: {
   vendor: string;
   tags: Prisma.JsonValue;
   collectionIds: Prisma.JsonValue;
-  variations: Array<{
-    id: string;
-    name: string;
-    value: string;
-    price: number;
-  }>;
+  categoryId: string | null;
 }) {
   const imageUrls = uniqueStrings([product.featuredImage, ...parseStringArray(product.images)]);
   const images = imageUrls
@@ -293,12 +292,7 @@ async function buildProductNode(product: {
     vendor: product.vendor,
     productType: product.productType,
     tags: parseStringArray(product.tags),
-    variations: product.variations.map((v) => ({
-      id: v.id,
-      name: v.name,
-      value: v.value,
-      price: toMoney(v.price),
-    })),
+    categoryId: product.categoryId,
     metafields: [
       { key: "vendor", value: product.vendor },
       { key: "sku", value: product.sku ?? "N/A" },
@@ -373,15 +367,8 @@ export async function getProduct(handle: string) {
       vendor: true,
       tags: true,
       collectionIds: true,
+      categoryId: true,
       status: true,
-      variations: {
-        select: {
-          id: true,
-          name: true,
-          value: true,
-          price: true,
-        },
-      },
     },
   });
 
@@ -512,6 +499,7 @@ export async function getCollectionProducts(
       title: true,
       description: true,
       price: true,
+      compareAtPrice: true,
       featuredImage: true,
       images: true,
       tags: true,
