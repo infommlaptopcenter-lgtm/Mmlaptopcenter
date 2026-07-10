@@ -23,7 +23,7 @@ const values = [
     icon: Award,
     title: "20-Year Legacy",
     description:
-      "Since 2006, Mudasser Meer has built a reputation based on transparency. We don't just sell tech; we guide you to the perfect machine.",
+      "Since 2006, Mudassir Meer has built a reputation based on transparency. We don't just sell tech; we guide you to the perfect machine.",
   },
   {
     icon: ShieldCheck,
@@ -61,7 +61,7 @@ export function AboutPageContent() {
 
               <h1 className="font-serif text-4xl font-extrabold leading-[1.1] tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
                 Authentic Laptops & Accessories.
-                <span className="mt-2 block text-[#ea580c]">Founded by Mudasser Meer.</span>
+                <span className="mt-2 block text-[#ea580c]">Founded by Mudassir Meer.</span>
               </h1>
 
               <p className="max-w-2xl text-base leading-relaxed text-gray-700 sm:text-lg">
@@ -116,10 +116,10 @@ export function AboutPageContent() {
 
               <div className="space-y-6 text-base leading-relaxed text-gray-600 sm:text-lg">
                 <p>
-                  Back in the early 2000s, our founder, <strong className="font-semibold text-gray-900">Mudasser Meer</strong>, noticed a persistent problem in Pakistan's tech market: a lack of trust. Customers wanting high-end laptops or Apple MacBooks were often met with faked specifications, swapped batteries, and non-existent warranty support.
+                  Back in the early 2000s, our founder, <strong className="font-semibold text-gray-900">Mudassir Meer</strong>, noticed a persistent problem in Pakistan's tech market: a lack of trust. Customers wanting high-end laptops or Apple MacBooks were often met with faked specifications, swapped batteries, and non-existent warranty support.
                 </p>
                 <p>
-                  Determined to create a change, Mudasser set up a single repair and testing table with one core philosophy: <strong className="font-semibold text-gray-900">absolute authenticity</strong>. He believed that if you treat customers with honesty, explain spec sheets clearly, and supply only tested, genuine products, people would notice.
+                  Determined to create a change, Mudassir set up a single repair and testing table with one core philosophy: <strong className="font-semibold text-gray-900">absolute authenticity</strong>. He believed that if you treat customers with honesty, explain spec sheets clearly, and supply only tested, genuine products, people would notice.
                 </p>
                 <p>
                   They did. Today, MM Laptop Center has grown into one of the most trusted tech hubs in the country. We specialize in curate-select new and pre-owned Apple MacBooks, elite business ultrabooks, powerful gaming setups, and genuine matching accessories.
@@ -148,7 +148,7 @@ export function AboutPageContent() {
                     <Users className="h-6 w-6" />
                   </div>
                   <div>
-                    <p className="text-base font-bold text-gray-950">Mudasser Meer</p>
+                    <p className="text-base font-bold text-gray-950">Mudassir Meer</p>
                     <p className="text-xs font-semibold uppercase tracking-wider text-[#b57910]">Founder & CEO</p>
                   </div>
                 </div>
@@ -232,7 +232,7 @@ export function AboutPageContent() {
                 Four pillars of our business success
               </h2>
               <p className="mt-6 text-base leading-relaxed text-gray-600 sm:text-lg">
-                We believe in building relationships that go beyond a simple transaction. Mudasser Meer's original goal of establishing trust is visible in the way we handle testing, packaging, and warranty claims.
+                We believe in building relationships that go beyond a simple transaction. Mudassir Meer's original goal of establishing trust is visible in the way we handle testing, packaging, and warranty claims.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Button asChild className="rounded-full border border-[#d8a928]/45 bg-black px-7 py-6 text-[#f6a45d] hover:bg-gray-900">

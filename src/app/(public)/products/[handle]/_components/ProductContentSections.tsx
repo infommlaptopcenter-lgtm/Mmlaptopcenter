@@ -16,47 +16,32 @@ type RelatedProduct = {
 export function ProductDescriptionSection({
   description,
   descriptionHtml,
-  metafields,
 }: {
   description?: string | null;
   descriptionHtml?: string | null;
-  metafields: Array<{ key: string; value: string }>;
 }) {
   const hasDescriptionHtml = Boolean(descriptionHtml?.trim());
   const hasDescription = Boolean(description?.trim());
 
   return (
-    <section className="grid gap-4 lg:grid-cols-[1.5fr_0.8fr]">
-      <div className="rounded-xl border border-[#d8a928]/20 bg-white p-5 shadow-sm sm:p-6">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#8b1a1a]">Overview</p>
-        <h2 className="mt-2 text-2xl font-bold text-[#0a0a0a]">Product Description</h2>
+    <section className="rounded-2xl border border-orange-200/80 bg-white p-5 shadow-sm sm:p-6">
+      <div className="max-w-4xl">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-700">Overview</p>
+        <h2 className="mt-2 font-serif text-2xl font-extrabold text-gray-950 sm:text-3xl">Product Description</h2>
         <div className="mt-4">
           {hasDescriptionHtml ? (
             <div
-              className="prose prose-sm max-w-none text-[#5A5E55]"
+              className="prose prose-sm max-w-none text-gray-700"
               dangerouslySetInnerHTML={{ __html: descriptionHtml || "" }}
             />
           ) : hasDescription ? (
-            <p className="whitespace-pre-line text-sm leading-7 text-[#5A5E55]">{description}</p>
+            <p className="whitespace-pre-line text-sm leading-7 text-gray-700">{description}</p>
           ) : (
-            <p className="text-sm text-[#5A5E55]">
+            <p className="text-sm text-gray-700">
               This product is ready for consultation. Contact MM Laptop Center for detailed specifications.
             </p>
           )}
         </div>
-      </div>
-
-      <div className="rounded-xl border border-[#d8a928]/20 bg-white p-5 shadow-sm sm:p-6">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#8b1a1a]">Technical</p>
-        <h2 className="mt-2 text-xl font-bold text-[#0a0a0a]">Key Specs</h2>
-        <dl className="mt-4 space-y-3">
-          {metafields.map((field) => (
-            <div key={field.key} className="flex items-start justify-between gap-3 border-b border-[#d8a928]/10 pb-3 text-sm">
-              <dt className="font-semibold capitalize text-[#0a0a0a]">{field.key}</dt>
-              <dd className="text-right text-[#5A5E55]">{field.value}</dd>
-            </div>
-          ))}
-        </dl>
       </div>
     </section>
   );

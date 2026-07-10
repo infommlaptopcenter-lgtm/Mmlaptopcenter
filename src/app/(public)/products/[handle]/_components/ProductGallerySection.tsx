@@ -33,7 +33,7 @@ export function ProductGallerySection({
 }: ProductGallerySectionProps) {
   return (
     <div className="space-y-4">
-      <div className="relative mx-auto aspect-square w-full max-w-md overflow-hidden rounded-xl border border-[#d8a928]/20 bg-white shadow-md">
+      <div className="relative mx-auto aspect-square w-full max-w-md overflow-hidden rounded-xl border border-[#d8a928]/20 bg-[#f4f1e8] shadow-md">
         <div className="absolute inset-0 bg-[#f4f1e8]" />
         {currentImage ? (
           <>
@@ -42,7 +42,7 @@ export function ProductGallerySection({
               alt={currentImage.altText || title}
               fill
               priority
-              className="object-contain p-5 transition-transform duration-300 hover:scale-[1.03]"
+              className="object-contain p-4 transition-transform duration-300 hover:scale-[1.03]"
               sizes="(max-width: 768px) 100vw, 50vw"
             />
             <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-white/10 via-transparent to-black/5" />
@@ -75,7 +75,7 @@ export function ProductGallerySection({
             <button
               key={img.id}
               onClick={() => onSelectImage(img)}
-              className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border-2 bg-white sm:h-16 sm:w-16 ${
+              className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border-2 bg-[#f4f1e8] sm:h-16 sm:w-16 ${
                 img.id === currentImage?.id
                   ? "border-[#f6a45d] ring-2 ring-[#f6a45d] ring-offset-1"
                   : "border-transparent hover:border-[#f6a45d]/40"
