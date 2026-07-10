@@ -209,7 +209,7 @@ export function ProductSingle({ data }: Props) {
             <span className="max-w-[16rem] truncate font-medium text-[#0a0a0a]">{data.title}</span>
           </nav>
 
-          <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-stretch">
+          <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
             <ProductGallerySection
               title={data.title}
               images={data.images.nodes}
