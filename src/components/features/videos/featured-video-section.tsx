@@ -38,7 +38,11 @@ export function FeaturedVideoSection({
             </a>
           </div>
         </div>
-        <VideoCard video={video} variant={video.platform === "TIKTOK" || video.platform === "INSTAGRAM" ? "vertical" : "landscape"} />
+        <VideoCard
+          video={video}
+          variant={video.platform === "TIKTOK" || video.platform === "INSTAGRAM" ? "vertical" : "landscape"}
+          autoPlay
+        />
       </div>
     </section>
   );
