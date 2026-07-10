@@ -7,6 +7,7 @@ import Image from "next/image";
 import { AdminImageUpload } from "@/components/admin/image-upload";
 import {
   buildVideoEmbedUrl,
+  detectVideoPlatform,
   VIDEO_PLACEMENT_LABELS,
   VIDEO_PLACEMENTS,
   VIDEO_PLATFORM_LABELS,
@@ -33,6 +34,11 @@ export function VideoForm({ mode, videoId, initialValues }: VideoFormProps) {
 
   function update<K extends keyof VideoFormValues>(key: K, value: VideoFormValues[K]) {
     setValues((current) => ({ ...current, [key]: value }));
+  }
+
+  function updateVideoUrl(videoUrl: string) {
+    const platform = detectVideoPlatform(videoUrl);
+    setValues((current) => ({ ...current, videoUrl, ...(platform ? { platform } : {}) }));
   }
 
   async function onSubmit(event: React.FormEvent) {
@@ -98,8 +104,13 @@ export function VideoForm({ mode, videoId, initialValues }: VideoFormProps) {
           </label>
 
           <label className="space-y-1.5 md:col-span-2">
-            <span className="text-sm font-semibold text-gray-800">Video URL / Embed URL</span>
-            <input className={inputClass} value={values.videoUrl} onChange={(e) => update("videoUrl", e.target.value)} required />
+            <span className="text-sm font-semibold text-gray-800">Video URL</span>
+            <input className={inputClass} value={values.videoUrl} onChange={(e) => updateVideoUrl(e.target.value)} required />
+            <div className="text-xs leading-5 text-gray-500">
+              <p className="font-semibold text-gray-700">Supported URLs</p>
+              <p>YouTube: Share URL · TikTok: Share URL</p>
+              <p>Facebook: Video/Post URL · Instagram: Reel/Post URL</p>
+            </div>
           </label>
 
           <label className="space-y-1.5">

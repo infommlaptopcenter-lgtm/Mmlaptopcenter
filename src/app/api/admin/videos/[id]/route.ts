@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin-auth";
 import { deleteImage } from "@/lib/cloudinary";
-import { prepareVideoData } from "@/lib/video-utils";
+import { prepareVideoData, VideoUrlError } from "@/lib/video-utils";
 import { z } from "zod";
 
 async function deleteThumbnailAsset(url: string | null) {
@@ -32,12 +32,15 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     await requireAdmin();
     const { id } = await params;
     const body = await request.json();
-    const data = prepareVideoData(body);
+    const data = await prepareVideoData(body);
     const video = await prisma.video.update({ where: { id }, data });
     return NextResponse.json(video);
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: "Validation failed", details: error.issues }, { status: 400 });
+    }
+    if (error instanceof VideoUrlError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }

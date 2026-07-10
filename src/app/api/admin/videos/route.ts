@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin-auth";
-import { prepareVideoData, VIDEO_PLACEMENTS, VIDEO_PLATFORMS } from "@/lib/video-utils";
+import { prepareVideoData, VIDEO_PLACEMENTS, VIDEO_PLATFORMS, VideoUrlError } from "@/lib/video-utils";
 import { z } from "zod";
 
 function optionalEnum<T extends readonly string[]>(value: string | null, allowed: T): T[number] | undefined {
@@ -50,12 +50,15 @@ export async function POST(request: Request) {
   try {
     await requireAdmin();
     const body = await request.json();
-    const data = prepareVideoData(body);
+    const data = await prepareVideoData(body);
     const video = await prisma.video.create({ data });
     return NextResponse.json({ video }, { status: 201 });
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: "Validation failed", details: error.issues }, { status: 400 });
+    }
+    if (error instanceof VideoUrlError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }

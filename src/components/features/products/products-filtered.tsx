@@ -5,7 +5,6 @@ import { Filter, X } from "@esmate/shadcn/pkgs/lucide-react";
 import { StoreProductCard } from "@/components/features/products/store-product-card-wrapper";
 
 const FALLBACK_IMAGE = "/logo/mmlaptop.png";
-const PRODUCTS_PER_CATEGORY_PAGE = 4;
 
 interface Subcategory {
   id: string;
@@ -115,7 +114,6 @@ export function ProductsFiltered({
   const categoryNodes = useMemo(() => buildCategoryNodes(categories), [categories]);
   const initialCategory = categoryNodes.find((category) => category.slug === initialCategorySlug);
   const [selectedCategoryId, setSelectedCategoryId] = useState(initialCategory?.id || "");
-  const [page, setPage] = useState(0);
   const [filtersOpen, setFiltersOpen] = useState(true);
 
   const categoryById = useMemo(
@@ -202,39 +200,9 @@ export function ProductsFiltered({
   const otherRows = useMemo(() => buildRows(otherProducts), [categoryById, categoryNodes, otherProducts]);
   const visibleRows = selectedCategoryId ? selectedRows : selectedRows;
 
-  const totalPages = Math.max(
-    1,
-    ...visibleRows.map((row) =>
-      Math.ceil(row.products.length / PRODUCTS_PER_CATEGORY_PAGE),
-    ),
-  );
+  const pagedRows = visibleRows.filter((row) => row.products.length > 0);
 
-  const pagedRows = visibleRows
-    .map((row) => ({
-      categoryId: row.categoryId,
-      products: row.products.slice(
-        page * PRODUCTS_PER_CATEGORY_PAGE,
-        (page + 1) * PRODUCTS_PER_CATEGORY_PAGE,
-      ),
-    }))
-    .filter((row) => row.products.length > 0);
-
-  const pagedOtherRows = otherRows
-    .map((row) => ({
-      categoryId: row.categoryId,
-      products: row.products.slice(0, PRODUCTS_PER_CATEGORY_PAGE),
-    }))
-    .filter((row) => row.products.length > 0);
-
-  useEffect(() => {
-    setPage(0);
-  }, [selectedCategoryId]);
-
-  useEffect(() => {
-    if (page > totalPages - 1) {
-      setPage(Math.max(0, totalPages - 1));
-    }
-  }, [page, totalPages]);
+  const pagedOtherRows = otherRows.filter((row) => row.products.length > 0);
 
   const selectCategory = (categoryId: string) => {
     setSelectedCategoryId((current) => (current === categoryId ? "" : categoryId));
@@ -351,11 +319,6 @@ export function ProductsFiltered({
                 {row.products.map((product) => (
                   <ProductCard key={product.handle} product={product} />
                 ))}
-                {Array.from({
-                  length: PRODUCTS_PER_CATEGORY_PAGE - row.products.length,
-                }).map((_, index) => (
-                  <div key={`empty-${row.categoryId}-${index}`} className="hidden xl:block" />
-                ))}
               </div>
             ))
           ) : (
@@ -363,41 +326,6 @@ export function ProductsFiltered({
               <p className="text-lg text-[#5A5E55]">No products found.</p>
             </div>
           )}
-
-          {totalPages > 1 ? (
-            <div className="flex flex-wrap items-center justify-center gap-2 pt-4">
-              <button
-                type="button"
-                onClick={() => setPage((current) => Math.max(0, current - 1))}
-                disabled={page === 0}
-                className="rounded-lg border border-[#d8a928]/30 bg-white px-4 py-2 text-sm font-semibold text-[#0a0a0a] disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Previous
-              </button>
-              {Array.from({ length: totalPages }).map((_, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => setPage(index)}
-                  className={`h-10 min-w-10 rounded-lg px-3 text-sm font-semibold ${
-                    page === index
-                      ? "bg-[#f6a45d] text-white"
-                      : "border border-[#d8a928]/30 bg-white text-[#0a0a0a]"
-                  }`}
-                >
-                  {index + 1}
-                </button>
-              ))}
-              <button
-                type="button"
-                onClick={() => setPage((current) => Math.min(totalPages - 1, current + 1))}
-                disabled={page >= totalPages - 1}
-                className="rounded-lg border border-[#d8a928]/30 bg-white px-4 py-2 text-sm font-semibold text-[#0a0a0a] disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Next
-              </button>
-            </div>
-          ) : null}
 
           {selectedCategoryId && pagedOtherRows.length > 0 ? (
             <div className="space-y-6 border-t border-[#d8a928]/20 pt-8">
@@ -409,11 +337,6 @@ export function ProductsFiltered({
                 >
                   {row.products.map((product) => (
                     <ProductCard key={product.handle} product={product} />
-                  ))}
-                  {Array.from({
-                    length: PRODUCTS_PER_CATEGORY_PAGE - row.products.length,
-                  }).map((_, index) => (
-                    <div key={`empty-other-${row.categoryId}-${index}`} className="hidden xl:block" />
                   ))}
                 </div>
               ))}

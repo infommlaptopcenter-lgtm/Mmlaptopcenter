@@ -1,4 +1,4 @@
-import { CategoriesSection, ProductsSection } from "@/components/features/home/products-section";
+import { CategoriesSection, CollectionsSection, ProductsSection } from "@/components/features/home/products-section";
 import { WhyChooseUsSection } from "@/components/features/home/why-choose-us";
 import { FeaturedBlogSection } from "@/components/features/home/featured-blog-section";
 import { CustomerVoicesSection } from "@/components/features/home/customer-voices-section";
@@ -37,6 +37,7 @@ export function HomeContentSections({
         heading="See the latest from MM Laptop Center"
         description="Watch featured laptop showcases, buying advice, and shop updates selected by the admin team."
       />
+      <CollectionsSection collections={collections} />
       <WhyChooseUsSection />
       <FeaturedBlogSection articles={featuredBlogs} />
       <CustomerVoicesSection />

@@ -316,17 +316,22 @@ export function ProductsSection({ categories, products, collections }: { categor
 
       <ProductGrid products={bestSellers} title="Best Sellers" bgColor="gray-50" />
 
-      <section className="mx-auto w-full max-w-7xl px-6 lg:px-8 py-16 bg-gray-50">
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <span className="inline-flex rounded-full bg-[#ffedd5] px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#ea580c]">
-            Collections
-          </span>
-          <h2 className="font-serif text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
-            Curated Collections
-          </h2>
-        </div>
-        <CollectionSlider collections={collections.filter((collection) => collection.isFeatured !== false)} />
-      </section>
     </>
+  );
+}
+
+export function CollectionsSection({ collections }: { collections: Collection[] }) {
+  return (
+    <section className="mx-auto w-full max-w-7xl bg-gray-50 px-6 py-16 lg:px-8">
+      <div className="mx-auto mb-16 max-w-3xl space-y-4 text-center">
+        <span className="inline-flex rounded-full bg-[#ffedd5] px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#ea580c]">
+          Collections
+        </span>
+        <h2 className="font-serif text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
+          Curated Collections
+        </h2>
+      </div>
+      <CollectionSlider collections={collections.filter((collection) => collection.isFeatured !== false)} />
+    </section>
   );
 }
