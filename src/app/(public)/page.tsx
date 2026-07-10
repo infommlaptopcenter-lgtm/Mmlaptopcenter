@@ -79,9 +79,8 @@ export default async function Page() {
      safeHomeQuery(
        "categories",
        () => prisma.category.findMany({
-         where: { parentId: null },
-         orderBy: { order: "asc" },
-         select: { id: true, name: true, slug: true, image: true },
+         orderBy: [{ order: "asc" }, { name: "asc" }],
+         select: { id: true, name: true, slug: true, image: true, parentId: true, order: true },
        }),
        [],
      ),

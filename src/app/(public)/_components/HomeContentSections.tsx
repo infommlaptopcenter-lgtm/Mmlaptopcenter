@@ -4,7 +4,7 @@ import { FeaturedBlogSection } from "@/components/features/home/featured-blog-se
 import { CustomerVoicesSection } from "@/components/features/home/customer-voices-section";
 
 type HomeContentSectionsProps = {
-  categories: Array<{ id: string; name: string; slug: string; image: string | null }>;
+  categories: Array<{ id: string; name: string; slug: string; image: string | null; parentId?: string | null; order?: number }>;
   products: Array<any>;
   collections: Array<{ id: string; handle: string; title: string; image: string | null; isFeatured?: boolean; productHandles?: string[] }>;
   featuredBlogs: Array<{

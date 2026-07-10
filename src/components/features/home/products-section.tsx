@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { StoreProductCard } from "@/components/features/products/store-product-card-wrapper";
@@ -12,6 +12,8 @@ interface Category {
   name: string;
   slug: string;
   image: string | null;
+  parentId?: string | null;
+  order?: number;
 }
 
 interface Product {
@@ -80,12 +82,14 @@ function ProductGrid({ products, title, bgColor = "white" }: { products: Product
 }
 
 export function CategoriesSection({ categories }: { categories: Category[] }) {
+  const mainCategories = categories.filter((category) => !category.parentId);
+
   return (
     <section className="lg:mx-auto lg:w-full lg:max-w-7xl lg:px-8 bg-white mt-6 relative z-20">
          
       <div className="flex gap-6 overflow-hidden relative">
         <div className="flex gap-6 animate-scroll scrollbar-hide px-6 lg:px-8">
-           {[...categories, ...categories].map((category, idx) => (
+           {[...mainCategories, ...mainCategories].map((category, idx) => (
              <Link
                key={`${category.id}-${idx}`}
                href="/products"
@@ -105,6 +109,55 @@ export function CategoriesSection({ categories }: { categories: Category[] }) {
           </div>
         </div>
     </section>
+  );
+}
+
+function FeaturedProductRow({ title, products, productCard }: { title: string; products: Product[]; productCard: (product: Product) => React.ReactNode }) {
+  const rowRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (products.length <= 1) return;
+
+    const interval = window.setInterval(() => {
+      const row = rowRef.current;
+      if (!row) return;
+
+      const firstCard = row.querySelector<HTMLElement>("[data-product-card]");
+      const cardWidth = firstCard?.offsetWidth || 280;
+      const gap = 24;
+      const nextLeft = row.scrollLeft + cardWidth + gap;
+      const atEnd = nextLeft >= row.scrollWidth - row.clientWidth - 4;
+
+      row.scrollTo({
+        left: atEnd ? 0 : nextLeft,
+        behavior: "smooth",
+      });
+    }, 5000);
+
+    return () => window.clearInterval(interval);
+  }, [products.length]);
+
+  if (!products.length) return null;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-4">
+        <h3 className="font-serif text-xl font-bold text-gray-900 sm:text-2xl">{title}</h3>
+        <Link href="/products" className="shrink-0 text-sm font-semibold text-[#f6a45d] hover:underline">
+          Shop Now
+        </Link>
+      </div>
+      <div
+        ref={rowRef}
+        className="flex snap-x gap-6 overflow-x-auto scroll-smooth pb-3 [scrollbar-width:thin]"
+      >
+        {products.map((product) => (
+          <div key={product.handle} data-product-card className="w-[17.5rem] shrink-0 snap-start sm:w-[18.5rem] lg:w-[19rem]">
+            {productCard(product)}
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -179,10 +232,32 @@ function CollectionSlider({ collections }: { collections: Collection[] }) {
 }
 
 export function ProductsSection({ categories, products, collections }: { categories: Category[]; products: Product[]; collections: Collection[] }) {
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-
   const featuredProducts = products.filter(p => p.isFeatured);
   const productsByHandle = new Map(products.map((product) => [product.handle, product]));
+  const mainCategories = categories
+    .filter((category) => !category.parentId)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0) || a.name.localeCompare(b.name));
+
+  const subcategoryIdsByParentId = categories.reduce((map, category) => {
+    if (!category.parentId) return map;
+    const ids = map.get(category.parentId) || [];
+    ids.push(category.id);
+    map.set(category.parentId, ids);
+    return map;
+  }, new Map<string, string[]>());
+
+  const featuredRows = mainCategories
+    .map((category) => {
+      const categoryIds = new Set([category.id, ...(subcategoryIdsByParentId.get(category.id) || [])]);
+      const rowProducts = featuredProducts.filter(
+        (product) =>
+          (product.categoryId && categoryIds.has(product.categoryId)) ||
+          (product.subcategoryId && categoryIds.has(product.subcategoryId)),
+      );
+
+      return { category, products: rowProducts };
+    })
+    .filter((row) => row.products.length > 0);
 
   const getCollectionProducts = (handle: string) => {
     const collection = collections.find((item) => item.handle === handle);
@@ -196,22 +271,6 @@ export function ProductsSection({ categories, products, collections }: { categor
 
   const newArrivals = getCollectionProducts("new-arrivals");
   const bestSellers = getCollectionProducts("best-sellers");
-
-  const filteredProducts = selectedCategory
-    ? products.filter(p => {
-        const cat = categories.find(c => c.slug === selectedCategory);
-        return cat && (p.categoryId === cat.id || p.subcategoryId === cat.id);
-      })
-    : featuredProducts;
-
-  const otherProducts = selectedCategory
-    ? products.filter(p => {
-        const cat = categories.find(c => c.slug === selectedCategory);
-        return cat && p.categoryId !== cat.id && p.subcategoryId !== cat.id;
-      })
-    : [];
-
-  const selectedCat = categories.find(c => c.slug === selectedCategory);
 
   const productCard = (product: Product) => {
     const productImageUrls = Array.isArray(product.images)
@@ -238,32 +297,20 @@ export function ProductsSection({ categories, products, collections }: { categor
 
   return (
     <>
-      {selectedCategory && filteredProducts.length > 0 && (
-        <section className="mx-auto w-full max-w-7xl px-6 lg:px-8 bg-white py-16">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="font-serif text-2xl font-bold text-gray-900">{selectedCat?.name} Products</h2>
-            <button onClick={() => setSelectedCategory("")} className="text-sm font-semibold text-[#f6a45d] hover:underline">
-              Clear Filter
-            </button>
-          </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {filteredProducts.map(productCard)}
-          </div>
-        </section>
-      )}
-
-      {(!selectedCategory || otherProducts.length > 0) && (
+      {featuredRows.length > 0 && (
         <section className="bg-white mx-auto w-full max-w-7xl px-6 lg:px-8 py-16">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="font-serif text-2xl font-bold text-gray-900">
-              {selectedCategory ? "Other Products" : "Featured Products"}
-            </h2>
-            <Link href="/products" className="text-sm font-semibold text-[#f6a45d] hover:underline">
-              Shop Now
-            </Link>
+          <div className="mb-8">
+            <h2 className="font-serif text-3xl font-extrabold text-gray-900 sm:text-4xl">Featured Products</h2>
           </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {(selectedCategory ? otherProducts : products).map(productCard)}
+          <div className="space-y-10">
+            {featuredRows.map((row) => (
+              <FeaturedProductRow
+                key={row.category.id}
+                title={row.category.name}
+                products={row.products}
+                productCard={productCard}
+              />
+            ))}
           </div>
         </section>
       )}

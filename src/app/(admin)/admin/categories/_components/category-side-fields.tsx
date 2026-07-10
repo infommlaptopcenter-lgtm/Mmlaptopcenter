@@ -14,7 +14,7 @@ export function CategorySideFields({ values, setValues, parentOptions, saving }:
       <AdminImageUpload label="Category Image" folder="mmlaptop/categories" usedIn="category" value={values.image} onChange={(url) => setValues((v) => ({ ...v, image: url }))} />
       <label className="block text-sm font-medium text-[#0a0a0a]">Parent Category (optional)<select value={values.parentId ?? ""} onChange={(e) => setValues((v) => ({ ...v, parentId: e.target.value }))} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2"><option value="">None (Main category)</option>{parentOptions.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
       <div className="grid gap-4 md:grid-cols-2">
-        <label className="block text-sm font-medium text-[#0a0a0a]">Order<input type="number" value={values.order} onChange={(e) => setValues((v) => ({ ...v, order: Number(e.target.value) }))} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-[#d8a928]" /></label>
+        <label className="block text-sm font-medium text-[#0a0a0a]">Order Number<input type="number" value={values.order} onChange={(e) => setValues((v) => ({ ...v, order: Number(e.target.value) }))} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-[#d8a928]" /></label>
         <label className="flex items-center gap-2 pt-6 text-sm text-[#0a0a0a]"><input type="checkbox" checked={values.featured} onChange={(e) => setValues((v) => ({ ...v, featured: e.target.checked }))} />Featured</label>
       </div>
       <SeoFields values={values} setValues={setValues} />
