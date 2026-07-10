@@ -5,11 +5,13 @@ type CategoryFilter = {
   id: string;
   name: string;
   slug: string;
+  order: number;
   subcategories: Array<{
     id: string;
     name: string;
     slug: string;
     parentId: string | null;
+    order: number;
   }>;
 };
 
@@ -22,6 +24,10 @@ type ProductListItem = {
   featuredImage: string | null;
   images: JsonValue | null;
   tags: JsonValue | null;
+  description: string | null;
+  sku: string | null;
+  productType: string | null;
+  vendor: string;
   categoryId: string | null;
   subcategoryId: string | null;
   isFeatured: boolean;
@@ -68,7 +74,7 @@ export function ProductsPageContent({
     <main className="bg-background min-h-screen">
       <div className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
         <ProductsFiltered
-          categories={categories.map((category) => ({ ...category, image: null }))}
+          categories={categories}
           initialProducts={initialProducts}
           initialCategorySlug={initialCategorySlug}
         />

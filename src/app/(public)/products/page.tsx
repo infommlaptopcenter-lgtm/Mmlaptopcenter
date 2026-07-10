@@ -61,8 +61,8 @@ export default async function Page({
 }) {
   const initialCategorySlug = (searchParams?.category ?? "").trim();
 
-  let categories: Array<{ id: string; name: string; slug: string; subcategories: Array<{ id: string; name: string; slug: string; parentId: string | null }> }> = [];
-  let allProducts: Array<{ id: string; handle: string; title: string; price: number; compareAtPrice: number | null; featuredImage: string | null; images: JsonValue | null; tags: JsonValue | null; categoryId: string | null; subcategoryId: string | null; isFeatured: boolean }> = [];
+  let categories: Array<{ id: string; name: string; slug: string; order: number; subcategories: Array<{ id: string; name: string; slug: string; parentId: string | null; order: number }> }> = [];
+  let allProducts: Array<{ id: string; handle: string; title: string; price: number; compareAtPrice: number | null; featuredImage: string | null; images: JsonValue | null; tags: JsonValue | null; description: string | null; sku: string | null; productType: string | null; vendor: string; categoryId: string | null; subcategoryId: string | null; isFeatured: boolean }> = [];
 
   try {
     [categories, allProducts] = await Promise.all([

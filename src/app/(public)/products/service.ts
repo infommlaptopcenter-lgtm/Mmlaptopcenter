@@ -34,6 +34,10 @@ export async function getAllProductsForFilter() {
       featuredImage: true,
       images: true,
       tags: true,
+      description: true,
+      sku: true,
+      productType: true,
+      vendor: true,
       categoryId: true,
       subcategoryId: true,
       isFeatured: true,
@@ -49,13 +53,13 @@ export async function getCategoriesForFilters() {
   const categories = await prisma.category.findMany({
     where: { parentId: null },
     orderBy: { order: "asc" },
-    select: { id: true, name: true, slug: true },
+    select: { id: true, name: true, slug: true, order: true },
   });
 
   const subcategories = await prisma.category.findMany({
     where: { parentId: { not: null } },
     orderBy: { order: "asc" },
-    select: { id: true, name: true, slug: true, parentId: true },
+    select: { id: true, name: true, slug: true, parentId: true, order: true },
   });
 
   return categories.map(cat => ({

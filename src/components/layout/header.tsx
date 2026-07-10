@@ -27,6 +27,7 @@ import { searchProducts } from "@/components/search/actions";
 
 const mainMenuItems = [
   { text: "Home", href: "/" },
+  { text: "All Products", href: "/products" },
   { text: "Laptops", href: "/products" },
   { text: "Accessories", href: "/category/accessories" },
   { text: "Deals", href: "/collections/hot-deals" },
@@ -381,6 +382,17 @@ export function Header() {
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className="relative">
+            <Link
+              href="/products"
+              className={`text-sm font-semibold transition-colors hover:text-[#b57910] ${
+                isActive("/products") ? "text-[#8a5b00]" : "text-[#1a1308]"
+              }`}
+            >
+              All Products
+            </Link>
           </div>
 
           <div className="relative">
