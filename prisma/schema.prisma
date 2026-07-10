@@ -223,6 +223,45 @@ model HomepageSection {
   updatedAt       DateTime    @updatedAt
 }
 
+enum VideoPlatform {
+  YOUTUBE
+  TIKTOK
+  FACEBOOK
+  INSTAGRAM
+}
+
+enum VideoPlacement {
+  HOMEPAGE
+  ABOUT
+  VIDEOS_PAGE
+}
+
+model Video {
+  id              String         @id @default(cuid())
+  title           String
+  description     String?
+  thumbnail       String?
+  videoUrl        String
+  embedUrl        String?
+  platform        VideoPlatform
+  placement       VideoPlacement @default(VIDEOS_PAGE)
+  buttonText      String?
+  buttonUrl       String?
+  featured        Boolean        @default(false)
+  active          Boolean        @default(true)
+  displayOrder    Int            @default(0)
+  seoTitle        String?
+  seoDescription  String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([platform])
+  @@index([placement])
+  @@index([featured])
+  @@index([active])
+  @@index([displayOrder])
+}
+
 model NavigationMenu {
   id              String      @id @default(cuid())
   location        String      @unique

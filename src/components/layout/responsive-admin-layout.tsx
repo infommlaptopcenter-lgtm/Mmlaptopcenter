@@ -20,6 +20,7 @@ import {
   FiCheckCircle,
   FiList,
   FiHome,
+  FiVideo,
 } from "react-icons/fi";
 
 interface AdminNavContextType {
@@ -56,6 +57,7 @@ const navItems = [
   { href: "/admin/orders", icon: FiShoppingBag, label: "Orders" },
   { href: "/admin/inquiries", icon: FiMessageSquare, label: "Inquiries" },
   { href: "/admin/blog", icon: FiFileText, label: "Blog" },
+  { href: "/admin/videos", icon: FiVideo, label: "Videos" },
   { href: "/admin/homepage/section-management", icon: FiHome, label: "Homepage Sections" },
   { href: "/admin/media", icon: FiImage, label: "Media" },
   { href: "/admin/settings", icon: FiSettings, label: "Settings" },

@@ -299,9 +299,6 @@ export function ProductsSection({ categories, products, collections }: { categor
     <>
       {featuredRows.length > 0 && (
         <section className="bg-white mx-auto w-full max-w-7xl px-6 lg:px-8 py-16">
-          <div className="mb-8">
-            <h2 className="font-serif text-3xl font-extrabold text-gray-900 sm:text-4xl">Featured Products</h2>
-          </div>
           <div className="space-y-10">
             {featuredRows.map((row) => (
               <FeaturedProductRow

@@ -2,6 +2,8 @@ import { CategoriesSection, ProductsSection } from "@/components/features/home/p
 import { WhyChooseUsSection } from "@/components/features/home/why-choose-us";
 import { FeaturedBlogSection } from "@/components/features/home/featured-blog-section";
 import { CustomerVoicesSection } from "@/components/features/home/customer-voices-section";
+import { FeaturedVideoSection } from "@/components/features/videos/featured-video-section";
+import type { PublicVideo } from "@/lib/video-utils";
 
 type HomeContentSectionsProps = {
   categories: Array<{ id: string; name: string; slug: string; image: string | null; parentId?: string | null; order?: number }>;
@@ -16,6 +18,7 @@ type HomeContentSectionsProps = {
     publishedAt?: Date | string | null;
     content?: string | null;
   }>;
+  homeVideo: PublicVideo | null;
 };
 
 export function HomeContentSections({
@@ -23,11 +26,17 @@ export function HomeContentSections({
   products,
   collections,
   featuredBlogs,
+  homeVideo,
 }: HomeContentSectionsProps) {
   return (
     <>
       <CategoriesSection categories={categories} />
       <ProductsSection categories={categories} products={products} collections={collections} />
+      <FeaturedVideoSection
+        video={homeVideo}
+        heading="See the latest from MM Laptop Center"
+        description="Watch featured laptop showcases, buying advice, and shop updates selected by the admin team."
+      />
       <WhyChooseUsSection />
       <FeaturedBlogSection articles={featuredBlogs} />
       <CustomerVoicesSection />

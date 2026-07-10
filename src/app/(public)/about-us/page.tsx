@@ -1,4 +1,7 @@
 import { Metadata } from "next"
+import { prisma } from "@/lib/prisma"
+import { serializeVideo } from "@/lib/video-utils"
+import { FeaturedVideoSection } from "@/components/features/videos/featured-video-section"
 import { AboutPageContent } from "./_components/about-page-content"
 
 export const metadata: Metadata = {
@@ -24,8 +27,24 @@ export const metadata: Metadata = {
   },
 }
 
-export default function AboutPage() {
-  return <AboutPageContent />;
+export const dynamic = "force-dynamic";
+
+export default async function AboutPage() {
+  const aboutVideo = await prisma.video.findFirst({
+    where: { active: true, featured: true, placement: "ABOUT" },
+    orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
+  });
+
+  return (
+    <>
+      <AboutPageContent />
+      <FeaturedVideoSection
+        video={aboutVideo ? serializeVideo(aboutVideo) : null}
+        heading="Meet our work through video"
+        description="A separate featured story for the about page, managed from the admin video module."
+      />
+    </>
+  );
 }
 
 

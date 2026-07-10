@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
+import { serializeVideo } from "@/lib/video-utils";
 import { HomeHeroSection } from "./_components/HomeHeroSection";
 import { HomeContentSections } from "./_components/HomeContentSections";
 
@@ -75,7 +76,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-   const [categories, featuredCollections, featuredBlogs, essenceSection] = await Promise.all([
+   const [categories, featuredCollections, featuredBlogs, essenceSection, homeVideo] = await Promise.all([
      safeHomeQuery(
        "categories",
        () => prisma.category.findMany({
@@ -116,6 +117,14 @@ export default async function Page() {
       "essence section",
       () => prisma.homepageSection.findUnique({
         where: { sectionKey: "essence" },
+      }),
+      null,
+    ),
+    safeHomeQuery(
+      "featured home video",
+      () => prisma.video.findFirst({
+        where: { active: true, featured: true, placement: "HOMEPAGE" },
+        orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
       }),
       null,
     ),
@@ -176,6 +185,7 @@ return (
             products={allProducts}
             collections={homeCollections}
             featuredBlogs={featuredBlogs}
+            homeVideo={homeVideo ? serializeVideo(homeVideo) : null}
           />
       </div>
     </>
