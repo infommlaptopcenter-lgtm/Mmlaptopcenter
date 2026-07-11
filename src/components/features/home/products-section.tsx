@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { ArrowUpRight } from "@esmate/shadcn/pkgs/lucide-react";
 import { StoreProductCard } from "@/components/features/products/store-product-card-wrapper";
 
 const FALLBACK_IMAGE = "/logo/mmlaptop.png";
@@ -112,7 +113,7 @@ export function CategoriesSection({ categories }: { categories: Category[] }) {
   );
 }
 
-function FeaturedProductRow({ title, products, productCard }: { title: string; products: Product[]; productCard: (product: Product) => React.ReactNode }) {
+function FeaturedProductRow({ title, categorySlug, products, productCard }: { title: string; categorySlug: string; products: Product[]; productCard: (product: Product) => React.ReactNode }) {
   const rowRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -141,10 +142,14 @@ function FeaturedProductRow({ title, products, productCard }: { title: string; p
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-start gap-3 sm:gap-4">
         <h3 className="font-serif text-xl font-bold text-gray-900 sm:text-2xl">{title}</h3>
-        <Link href="/products" className="shrink-0 text-sm font-semibold text-[#f6a45d] hover:underline">
+        <Link
+          href={`/category/${encodeURIComponent(categorySlug)}`}
+          className="group inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#d8a928]/50 bg-[#fcf5e8] px-4 py-2 text-xs font-bold uppercase tracking-wide text-[#8a5b00] shadow-sm transition hover:-translate-y-0.5 hover:border-[#f6a45d] hover:bg-[#f6a45d] hover:text-white hover:shadow-md sm:text-sm"
+        >
           Shop Now
+          <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </Link>
       </div>
       <div
@@ -304,6 +309,7 @@ export function ProductsSection({ categories, products, collections }: { categor
               <FeaturedProductRow
                 key={row.category.id}
                 title={row.category.name}
+                categorySlug={row.category.slug}
                 products={row.products}
                 productCard={productCard}
               />
