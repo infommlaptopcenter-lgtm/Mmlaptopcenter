@@ -31,6 +31,15 @@ const productSchema = z.object({
     description: z.string().optional(),
     image: z.string().optional(),
   })).default([]),
+  color: z.string().optional(), size: z.string().optional(), storage: z.string().optional(), ram: z.string().optional(),
+  processor: z.string().optional(), condition: z.string().optional(),
+  specifications: z.record(z.string(), z.string()).default({}), customAttributes: z.record(z.string(), z.string()).default({}),
+  variants: z.array(z.object({
+    id: z.string(), name: z.string().min(1), description: z.string().optional(), price: z.number().min(0), compareAtPrice: z.number().nullable().optional(),
+    sku: z.string().optional(), stock: z.number().int().min(0), images: z.array(z.string()).default([]), color: z.string().optional(), size: z.string().optional(),
+    storage: z.string().optional(), ram: z.string().optional(), processor: z.string().optional(), condition: z.string().optional(),
+    specifications: z.record(z.string(), z.string()).default({}), customAttributes: z.record(z.string(), z.string()).default({}), active: z.boolean(), isDefault: z.boolean(),
+  })).default([]),
 });
 
 export async function GET(
@@ -43,13 +52,15 @@ export async function GET(
     
     const product = await prisma.product.findUnique({
       where: { id },
+      include: { variations: { orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }] } },
     });
 
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    return NextResponse.json(product);
+    const { variations, ...productData } = product;
+    return NextResponse.json({ ...productData, variants: variations });
   } catch (error: any) {
     console.error("Error fetching product:", error);
     return NextResponse.json(
@@ -69,7 +80,7 @@ export async function PUT(
     
     const body = await request.json();
     const validated = productSchema.parse(body);
-    const { details, ...productData } = validated;
+    const { details, variants, ...productData } = validated;
 
     if (!productData.categoryId) delete (productData as any).categoryId;
     if (!productData.subcategoryId) delete (productData as any).subcategoryId;
@@ -87,6 +98,14 @@ export async function PUT(
       data: {
         ...productData,
         details: details,
+        variations: {
+          deleteMany: { id: { notIn: variants.map((variant) => variant.id) } },
+          upsert: variants.map(({ id, ...variant }) => ({
+            where: { id },
+            create: { id, ...variant, value: variant.name },
+            update: { ...variant, value: variant.name },
+          })),
+        },
       },
     });
 

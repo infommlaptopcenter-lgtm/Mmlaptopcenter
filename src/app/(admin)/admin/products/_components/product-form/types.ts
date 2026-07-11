@@ -10,7 +10,31 @@ export type ProductDetail = {
   image?: string;
 };
 
-export type ProductFormValues = {
+export type ProductAttributes = {
+  color?: string;
+  size?: string;
+  storage?: string;
+  ram?: string;
+  processor?: string;
+  condition?: string;
+  specifications: Record<string, string>;
+  customAttributes: Record<string, string>;
+};
+
+export type ProductVariantFormValue = ProductAttributes & {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  compareAtPrice?: number | null;
+  sku?: string;
+  stock: number;
+  images: string[];
+  active: boolean;
+  isDefault: boolean;
+};
+
+export type ProductFormValues = ProductAttributes & {
   title: string;
   handle: string;
   description?: string;
@@ -33,4 +57,5 @@ export type ProductFormValues = {
   collectionIds: string[];
   isFeatured: boolean;
   details: ProductDetail[];
+  variants: ProductVariantFormValue[];
 };

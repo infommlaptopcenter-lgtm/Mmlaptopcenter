@@ -13,6 +13,7 @@ import { useVariantSelector } from "@/hooks/use-variant-selector";
 import { getProductSingle } from "./service";
 import { ProductGallerySection } from "./_components/ProductGallerySection";
 import { ProductInfoPanel } from "./_components/ProductInfoPanel";
+import { ProductVariantsSection } from "./_components/ProductVariantsSection";
 import { ExtraProductDetails } from "./_components/ExtraProductDetails";
 import {
   ProductDescriptionSection,
@@ -45,11 +46,14 @@ export function ProductSingle({ data }: Props) {
     return data.variants?.nodes.find((variant) => variant.availableForSale)?.id || data.variants?.nodes[0]?.id;
   }, [data.variants?.nodes]);
 
-  const { variantId, options, selectOption } = useVariantSelector(data, defaultVariantId);
+  const { variantId, options, selectOption, selectVariant } = useVariantSelector(data, defaultVariantId);
 
   const selectedVariant = useMemo(() => {
     return data.variants?.nodes.find((variant) => variant.id === variantId) || data.variants?.nodes[0] || null;
   }, [data.variants?.nodes, variantId]);
+  const selectedImages = selectedVariant?.images?.length ? selectedVariant.images : data.images.nodes;
+  const selectedTitle = selectedVariant?.name || data.title;
+  const selectedDescription = selectedVariant?.description || data.description;
 
   const productHandle = data.handle;
   const fallbackReviewStats = useMemo(() => getFallbackReviewStats(data.id || data.handle || data.title), [
@@ -61,14 +65,15 @@ export function ProductSingle({ data }: Props) {
     reviewStats && reviewStats.totalReviews > 0 ? reviewStats : fallbackReviewStats;
 
   const inventory = useMemo(() => {
+    if (typeof selectedVariant?.stock === "number") return selectedVariant.stock;
     const value = data.metafields?.find((field) => field.key === "inventory")?.value;
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : null;
-  }, [data.metafields]);
+  }, [data.metafields, selectedVariant?.stock]);
 
   useEffect(() => {
-    setCurrentImage(data.images.nodes[0] || null);
-  }, [data.images.nodes]);
+    setCurrentImage(selectedImages[0] || null);
+  }, [selectedImages]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -137,7 +142,7 @@ export function ProductSingle({ data }: Props) {
   const whatsAppNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "";
   const whatsAppHref = `https://wa.me/${whatsAppNumber}?text=${encodeURIComponent(
     buildWhatsAppOrderMessage({
-      title: data.title,
+      title: selectedTitle,
       price: selectedPriceLabel,
       quantity,
       selectedOptions: selectedLabel,
@@ -160,10 +165,10 @@ export function ProductSingle({ data }: Props) {
     try {
       await linesAdd([{ merchandiseId, quantity }]);
       toast.success("Added to cart", {
-        description: `${quantity} x ${data.title}${selectedLabel ? ` (${selectedLabel})` : ""}`,
+        description: `${quantity} x ${selectedTitle}${selectedLabel ? ` (${selectedLabel})` : ""}`,
         icon: <ShoppingCart className="h-4 w-4" />,
       });
-      trackAddToCart(data.title, merchandiseId, getSelectedPrice());
+      trackAddToCart(selectedTitle, merchandiseId, getSelectedPrice());
     } catch {
       toast.error("Failed to add to cart");
     }
@@ -209,10 +214,10 @@ export function ProductSingle({ data }: Props) {
             <span className="max-w-[16rem] truncate font-medium text-[#0a0a0a]">{data.title}</span>
           </nav>
 
-          <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+          <div className="grid items-stretch gap-6 lg:grid-cols-[0.9fr_1.1fr]">
             <ProductGallerySection
-              title={data.title}
-              images={data.images.nodes}
+              title={selectedTitle}
+              images={selectedImages}
               currentImage={currentImage}
               onSelectImage={setCurrentImage}
               onToggleWishlist={toggleWishlist}
@@ -221,10 +226,14 @@ export function ProductSingle({ data }: Props) {
             />
 
             <ProductInfoPanel
-              title={data.title}
+              title={selectedTitle}
+              description={selectedDescription}
               priceBlock={priceBlock}
               reviewStats={visibleReviewStats}
               inventory={inventory}
+              sku={selectedVariant?.sku}
+              specifications={selectedVariant?.specifications}
+              availableForSale={Boolean(selectedVariant?.availableForSale)}
               options={options}
               selectOption={selectOption}
               quantity={quantity}
@@ -236,6 +245,13 @@ export function ProductSingle({ data }: Props) {
               whatsAppHref={whatsAppHref}
             />
           </div>
+
+          <ProductVariantsSection
+            variants={data.variants.nodes}
+            selectedId={selectedVariant?.id}
+            fallbackImage={data.featuredImage?.url || undefined}
+            onSelect={selectVariant}
+          />
 
           <ProductDescriptionSection
             description={data.description}

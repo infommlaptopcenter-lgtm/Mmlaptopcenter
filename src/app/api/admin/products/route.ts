@@ -31,6 +31,15 @@ const productSchema = z.object({
     description: z.string().optional(),
     image: z.string().optional(),
   })).default([]),
+  color: z.string().optional(), size: z.string().optional(), storage: z.string().optional(), ram: z.string().optional(),
+  processor: z.string().optional(), condition: z.string().optional(),
+  specifications: z.record(z.string(), z.string()).default({}), customAttributes: z.record(z.string(), z.string()).default({}),
+  variants: z.array(z.object({
+    id: z.string(), name: z.string().min(1), description: z.string().optional(), price: z.number().min(0), compareAtPrice: z.number().nullable().optional(),
+    sku: z.string().optional(), stock: z.number().int().min(0), images: z.array(z.string()).default([]), color: z.string().optional(), size: z.string().optional(),
+    storage: z.string().optional(), ram: z.string().optional(), processor: z.string().optional(), condition: z.string().optional(),
+    specifications: z.record(z.string(), z.string()).default({}), customAttributes: z.record(z.string(), z.string()).default({}), active: z.boolean(), isDefault: z.boolean(),
+  })).default([]),
 });
 
 export async function GET(request: Request) {
@@ -91,7 +100,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const validated = productSchema.parse(body);
 
-    const { details, ...productData } = validated;
+    const { details, variants, ...productData } = validated;
 
     if (!productData.categoryId) delete (productData as any).categoryId;
     if (!productData.subcategoryId) delete (productData as any).subcategoryId;
@@ -100,6 +109,7 @@ export async function POST(request: Request) {
       data: {
         ...productData,
         details: details,
+        variations: { create: variants.map(({ id, ...variant }) => ({ id, ...variant, value: variant.name })) },
       },
     });
 

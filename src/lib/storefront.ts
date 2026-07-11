@@ -52,7 +52,7 @@ type ProductNode = {
     nodes: StorefrontImage[];
   };
   options: {
-    id: string;
+    id?: string;
     name: string;
     values: string[];
   }[];
@@ -70,6 +70,11 @@ type ProductNode = {
         id: string;
       } | null;
       sku?: string | null;
+      name?: string;
+      description?: string | null;
+      stock?: number;
+      images?: StorefrontImage[];
+      specifications?: Record<string, string>;
     }[];
   };
   vendor: string;
@@ -243,6 +248,7 @@ async function buildProductNode(product: {
   tags: Prisma.JsonValue;
   collectionIds: Prisma.JsonValue;
   categoryId: string | null;
+  variations: Array<{ id: string; name: string; description: string | null; price: number; compareAtPrice: number | null; sku: string | null; stock: number; images: Prisma.JsonValue; color: string | null; size: string | null; storage: string | null; ram: string | null; processor: string | null; condition: string | null; specifications: Prisma.JsonValue; active: boolean; isDefault: boolean }>;
 }) {
   const imageUrls = uniqueStrings([product.featuredImage, ...parseStringArray(product.images)]);
   const images = imageUrls
@@ -253,6 +259,17 @@ async function buildProductNode(product: {
   if (fallbackImage && !images.length) {
     images.push(fallbackImage);
   }
+  const activeVariations = product.variations.filter((variant) => variant.active);
+  const variationSpecifications = new Map(activeVariations.map((variant) => [variant.id, variant.specifications && typeof variant.specifications === "object" && !Array.isArray(variant.specifications) ? variant.specifications as Record<string, string> : {}]));
+  const variantOptions = [
+    { name: "Color", values: activeVariations.map((variant) => variant.color) },
+    { name: "Size", values: activeVariations.map((variant) => variant.size) },
+    { name: "Storage", values: activeVariations.map((variant) => variant.storage) },
+    { name: "RAM", values: activeVariations.map((variant) => variant.ram) },
+    { name: "Processor", values: activeVariations.map((variant) => variant.processor) },
+    { name: "Condition", values: activeVariations.map((variant) => variant.condition) },
+  ].map((option) => ({ ...option, values: [...new Set(option.values.filter((value): value is string => Boolean(value)))] })).filter((option) => option.values.length);
+  const specificationOptions = [...new Set([...variationSpecifications.values()].flatMap((specifications) => Object.keys(specifications)))].map((name) => ({ name, values: [...new Set(activeVariations.map((variant) => variationSpecifications.get(variant.id)?.[name]).filter((value): value is string => Boolean(value)))] }));
 
   return {
     id: product.id,
@@ -275,9 +292,29 @@ async function buildProductNode(product: {
     images: {
       nodes: images,
     },
-    options: [],
+    options: [...variantOptions, ...specificationOptions],
     variants: {
-      nodes: [
+      nodes: activeVariations.length ? activeVariations.map((variant) => {
+        const variantImages = parseStringArray(variant.images).map((url, index) => toImage(url, `${variant.id}-image-${index}`)).filter((image): image is StorefrontImage => Boolean(image));
+        const variantImage = variantImages[0];
+        return {
+          id: variant.id,
+          availableForSale: variant.active && variant.stock > 0,
+          price: toMoney(variant.price),
+          compareAtPrice: variant.compareAtPrice ? toMoney(variant.compareAtPrice) : null,
+          selectedOptions: [
+            ["Color", variant.color], ["Size", variant.size], ["Storage", variant.storage], ["RAM", variant.ram], ["Processor", variant.processor], ["Condition", variant.condition],
+            ...Object.entries(variationSpecifications.get(variant.id) || {}),
+          ].filter((item): item is [string, string] => Boolean(item[1])).map(([name, value]) => ({ name, value })),
+          image: variantImage ? { id: variantImage.id } : images[0] ? { id: images[0].id } : null,
+          sku: variant.sku,
+          name: variant.name,
+          description: variant.description,
+          stock: variant.stock,
+          images: variantImages,
+          specifications: variant.specifications && typeof variant.specifications === "object" && !Array.isArray(variant.specifications) ? variant.specifications as Record<string, string> : {},
+        };
+      }) : [
         {
           id: product.id,
           availableForSale: product.availableForSale && product.inventory > 0,
@@ -369,6 +406,7 @@ export async function getProduct(handle: string) {
       collectionIds: true,
       categoryId: true,
       status: true,
+      variations: { orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }] },
     },
   });
 

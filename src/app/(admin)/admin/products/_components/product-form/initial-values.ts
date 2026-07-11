@@ -23,4 +23,13 @@ export const defaultProductValues: ProductFormValues = {
   collectionIds: [],
   isFeatured: false,
   details: [],
+  color: "",
+  size: "",
+  storage: "",
+  ram: "",
+  processor: "",
+  condition: "",
+  specifications: {},
+  customAttributes: {},
+  variants: [],
 };

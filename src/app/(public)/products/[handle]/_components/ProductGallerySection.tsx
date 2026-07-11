@@ -32,7 +32,7 @@ export function ProductGallerySection({
   discountBadge,
 }: ProductGallerySectionProps) {
   return (
-    <div className="space-y-4">
+    <div className="h-full space-y-4 rounded-2xl border border-orange-100/80 bg-white/45 p-3 sm:p-4">
       <div className="relative mx-auto aspect-square w-full max-w-md overflow-hidden rounded-xl border border-[#d8a928]/20 bg-[#f4f1e8] shadow-md">
         <div className="absolute inset-0 bg-[#f4f1e8]" />
         {currentImage ? (

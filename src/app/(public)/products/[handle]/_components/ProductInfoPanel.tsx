@@ -27,6 +27,10 @@ type ProductInfoPanelProps = {
   priceBlock: PriceBlock | null;
   reviewStats: ReviewStats;
   inventory: number | null;
+  description?: string | null;
+  sku?: string | null;
+  specifications?: Record<string, string>;
+  availableForSale: boolean;
   options: VariantOption[];
   selectOption: (name: string, value: string) => void;
   quantity: number;
@@ -43,6 +47,10 @@ export function ProductInfoPanel({
   priceBlock,
   reviewStats,
   inventory,
+  description,
+  sku,
+  specifications = {},
+  availableForSale,
   options,
   selectOption,
   quantity,
@@ -65,7 +73,7 @@ export function ProductInfoPanel({
           : "text-2xl sm:text-3xl lg:text-[2.2rem]";
 
   return (
-    <aside className="h-fit overflow-hidden rounded-2xl border border-orange-200/80 bg-[linear-gradient(135deg,rgba(255,247,237,0.96),rgba(255,255,255,0.92))] px-3.5 pb-4 pt-3.5 shadow-[0_18px_45px_rgba(26,19,8,0.08)] sm:px-4 sm:pb-5 sm:pt-4 lg:h-[28rem]">
+    <aside className="h-full min-h-[32rem] overflow-hidden rounded-2xl border border-orange-200/80 bg-[linear-gradient(135deg,rgba(255,247,237,0.96),rgba(255,255,255,0.92))] px-3.5 pb-4 pt-3.5 shadow-[0_18px_45px_rgba(26,19,8,0.08)] sm:px-4 sm:pb-5 sm:pt-4 lg:min-h-[36rem]">
       <div className="flex h-full flex-col gap-2.5 overflow-y-auto pr-1">
         <div className="flex flex-wrap items-center gap-1.5">
           <Badge className="rounded-full bg-[#12372a] px-2.5 py-0.5 text-[11px] text-white hover:bg-[#12372a]">
@@ -84,6 +92,7 @@ export function ProductInfoPanel({
           <h1 className={`break-words font-serif font-extrabold leading-tight tracking-normal text-gray-950 ${titleSizeClass}`}>
             {title}
           </h1>
+          {description ? <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-gray-600">{description}</p> : null}
         </div>
 
         <div className="space-y-2.5">
@@ -161,8 +170,9 @@ export function ProductInfoPanel({
             </div>
           )}
 
-          {options.length > 0 ? (
-            <div className="space-y-2.5">
+          {options.length > 0 || sku ? (
+            <div className="space-y-2.5 rounded-xl bg-white/65 p-2.5 shadow-sm ring-1 ring-orange-100/80">
+            <div className="flex items-center justify-between"><h2 className="text-sm font-extrabold text-gray-950">Variants</h2>{sku ? <span className="text-[11px] font-semibold text-gray-500">SKU: {sku}</span> : null}</div>
             {options.map((option) => (
               <div key={option.name} className="space-y-1.5">
                 <div className="flex items-center justify-between gap-3">
@@ -190,15 +200,16 @@ export function ProductInfoPanel({
             ))}
             </div>
           ) : null}
+          {Object.keys(specifications).length ? <div className="flex flex-wrap gap-1.5">{Object.entries(specifications).map(([name, value]) => <span key={name} className="rounded-full bg-orange-50 px-2 py-1 text-[11px] font-semibold text-orange-800">{name}: {value}</span>)}</div> : null}
         </div>
 
         <div className="space-y-2.5 pt-1">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <Button onClick={onAddToCart} className="h-10 rounded-md bg-orange-500 text-xs font-bold text-white shadow-[0_14px_30px_rgba(249,115,22,0.24)] hover:bg-orange-600 sm:text-sm">
+            <Button onClick={onAddToCart} disabled={!availableForSale} className="h-10 rounded-md bg-orange-500 text-xs font-bold text-white shadow-[0_14px_30px_rgba(249,115,22,0.24)] hover:bg-orange-600 sm:text-sm">
               <ShoppingCart className="mr-2 h-4 w-4" />
               Add Cart
             </Button>
-            <Button onClick={onBuyNow} disabled={buyLoading} className="h-10 rounded-md bg-[#1a1308] text-xs font-bold text-white hover:bg-[#2a2118] sm:text-sm">
+            <Button onClick={onBuyNow} disabled={buyLoading || !availableForSale} className="h-10 rounded-md bg-[#1a1308] text-xs font-bold text-white hover:bg-[#2a2118] sm:text-sm">
               <Zap className="mr-2 h-4 w-4" />
               {buyLoading ? "Processing" : "Buy Now"}
             </Button>

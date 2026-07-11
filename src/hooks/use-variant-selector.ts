@@ -104,5 +104,11 @@ export function useVariantSelector(product: Product, defaultVariantId: string) {
     setSelectedValues(newSelections);
   };
 
-  return { variantId, options, selectOption };
+  const selectVariant = (id: string) => {
+    const variant = product.variants.nodes.find((item) => item.id === id && item.availableForSale);
+    if (!variant) return;
+    setSelectedValues(Object.fromEntries(variant.selectedOptions.map((option) => [option.name, option.value])));
+  };
+
+  return { variantId: variantId || defaultVariantId, options, selectOption, selectVariant };
 }
