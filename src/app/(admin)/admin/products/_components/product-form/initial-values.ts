@@ -22,6 +22,7 @@ export const defaultProductValues: ProductFormValues = {
   tags: [],
   collectionIds: [],
   isFeatured: false,
+  displayOrder: 1,
   details: [],
   color: "",
   size: "",

@@ -30,6 +30,7 @@ model Product {
   tags             Json     @default("[]")
   collectionIds    Json     @default("[]")
   isFeatured       Boolean  @default(false)
+  displayOrder     Int      @default(9999)
   details          Json     @default("[]")
   certificates     Json     @default("[]")
   color            String?
@@ -43,6 +44,8 @@ model Product {
   variations       ProductVariation[]
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+
+  @@index([displayOrder])
 }
 
 model ProductVariation {

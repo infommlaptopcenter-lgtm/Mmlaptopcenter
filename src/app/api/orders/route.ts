@@ -23,7 +23,12 @@ const orderCreateSchema = z.object({
     )
     .min(1),
   notes: z.string().optional(),
+  paymentMethod: z.enum(["cod", "manual_transfer"]).default("cod"),
+  paymentProofUrl: z.string().url().optional(),
+  transactionReference: z.string().max(120).optional(),
 });
+
+const COD_LIMIT = 100_000;
 
 function generateOrderNumber() {
   const ts = new Date()
@@ -56,16 +61,27 @@ export async function POST(request: Request) {
     });
 
     const productById = new Map(products.map((p) => [p.id, p]));
+    const variations = await prisma.productVariation.findMany({
+      where: { id: { in: ids }, active: true, product: { status: "ACTIVE", availableForSale: true } },
+      include: { product: { select: { title: true, featuredImage: true } } },
+    });
+    const variationById = new Map(variations.map((variation) => [variation.id, variation]));
 
     // Validate items against DB snapshot
     const enrichedItems = input.items.map((item) => {
       const product = productById.get(item.productId);
-      if (!product) {
+      const variation = variationById.get(item.productId);
+      if (!product && !variation) {
         throw new Error("One or more products are not available. Please check if all products are active.");
       }
-      if (!product.availableForSale) {
+      if (product && !product.availableForSale) {
         throw new Error(`Product not available for sale: ${product.title}`);
       }
+      if (variation) {
+        const images = Array.isArray(variation.images) ? (variation.images as unknown[]).filter((image): image is string => typeof image === "string") : [];
+        return { productId: variation.id, title: `${variation.product.title} - ${variation.name}`, price: variation.price, quantity: item.quantity, image: images[0] ?? variation.product.featuredImage ?? null, variationId: variation.id };
+      }
+      if (!product) throw new Error("Product is not available.");
       // if (product.inventory < item.quantity) {
       //   throw new Error(`Insufficient inventory for ${product.title}. Available: ${product.inventory}`);
       // }
@@ -88,15 +104,16 @@ export async function POST(request: Request) {
     const discount = 0;
     const total = subtotal + shippingCost + tax - discount;
 
+    if (input.paymentMethod === "cod" && total > COD_LIMIT) throw new Error(`Cash on delivery is only available for orders up to Rs. ${COD_LIMIT.toLocaleString()}.`);
+    if (input.paymentMethod === "manual_transfer" && (!input.paymentProofUrl || !input.transactionReference)) throw new Error("Transaction reference and payment screenshot are required for manual payment.");
+
     const orderNumber = generateOrderNumber();
 
     const order = await prisma.$transaction(async (tx) => {
       // Best-effort inventory decrement: do not block order confirmation on stock gaps.
       for (const item of enrichedItems) {
-        await tx.product.updateMany({
-          where: { id: item.productId, inventory: { gte: item.quantity } },
-          data: { inventory: { decrement: item.quantity } },
-        });
+        if ("variationId" in item) await tx.productVariation.updateMany({ where: { id: item.variationId, stock: { gte: item.quantity } }, data: { stock: { decrement: item.quantity } } });
+        else await tx.product.updateMany({ where: { id: item.productId, inventory: { gte: item.quantity } }, data: { inventory: { decrement: item.quantity } } });
       }
 
       return tx.order.create({
@@ -112,10 +129,10 @@ export async function POST(request: Request) {
           tax,
           total,
           discount,
-          paymentMethod: "cod",
+          paymentMethod: input.paymentMethod,
           paymentStatus: "pending",
           orderStatus: "pending",
-          notes: input.notes,
+          notes: [input.notes, input.paymentMethod === "manual_transfer" ? `PAYMENT REFERENCE: ${input.transactionReference}\nPAYMENT PROOF: ${input.paymentProofUrl}` : ""].filter(Boolean).join("\n\n") || undefined,
         },
       });
     });

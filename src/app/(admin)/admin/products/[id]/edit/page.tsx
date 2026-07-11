@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { ProductForm, type ProductFormValues } from "../../_components/product-form";
+import { ProductForm, type ProductFormValues, type ProductVariantFormValue } from "../../_components/product-form";
 
 export default function EditProductPage() {
   const params = useParams<{ id: string }>();
@@ -47,9 +47,33 @@ export default function EditProductPage() {
           tags: Array.isArray(data.tags) ? data.tags : [],
           collectionIds: Array.isArray(data.collectionIds) ? data.collectionIds : [],
           isFeatured: data.isFeatured ?? false,
+          displayOrder: data.displayOrder && data.displayOrder > 0 ? data.displayOrder : 9999,
+          details: Array.isArray(data.details) ? data.details : [],
+          color: data.color ?? "",
+          size: data.size ?? "",
+          storage: data.storage ?? "",
+          ram: data.ram ?? "",
+          processor: data.processor ?? "",
+          condition: data.condition ?? "",
+          specifications: data.specifications && typeof data.specifications === "object" ? data.specifications : {},
+          customAttributes: data.customAttributes && typeof data.customAttributes === "object" ? data.customAttributes : {},
+          variants: Array.isArray(data.variants) ? data.variants.map((variant: ProductVariantFormValue) => ({
+            ...variant,
+            description: variant.description ?? "",
+            sku: variant.sku ?? "",
+            images: Array.isArray(variant.images) ? variant.images : [],
+            color: variant.color ?? "",
+            size: variant.size ?? "",
+            storage: variant.storage ?? "",
+            ram: variant.ram ?? "",
+            processor: variant.processor ?? "",
+            condition: variant.condition ?? "",
+            specifications: variant.specifications && typeof variant.specifications === "object" ? variant.specifications : {},
+            customAttributes: variant.customAttributes && typeof variant.customAttributes === "object" ? variant.customAttributes : {},
+          })) : [],
         });
-      } catch (e: any) {
-        if (!cancelled) setError(e?.message || "Failed to load product");
+      } catch (e: unknown) {
+        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load product");
       } finally {
         if (!cancelled) setLoading(false);
       }

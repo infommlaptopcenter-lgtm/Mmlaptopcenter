@@ -25,6 +25,7 @@ const productSchema = z.object({
   tags: z.array(z.string()).default([]),
   collectionIds: z.array(z.string()).default([]),
   isFeatured: z.boolean().default(false),
+  displayOrder: z.number().int().min(1).default(9999),
   details: z.array(z.object({
     id: z.string(),
     title: z.string().min(1, "Detail title is required"),
@@ -51,8 +52,8 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get("limit") || "20");
     const search = searchParams.get("search") || "";
     const status = searchParams.get("status") || "";
-    const sort = searchParams.get("sort") || "createdAt";
-    const order = searchParams.get("order") || "desc";
+    const sort = searchParams.get("sort") || "displayOrder";
+    const order = searchParams.get("order") || "asc";
 
     const where: any = {};
     if (search) {

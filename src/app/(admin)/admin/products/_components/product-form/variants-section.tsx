@@ -27,9 +27,9 @@ export function VariantsSection({ values, setValues }: { values: ProductFormValu
   return (
     <section className="space-y-4 rounded-xl border border-[#d8a928]/25 bg-[#fcf5e8]/40 p-4 lg:col-span-2">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="font-bold text-gray-950">Product Variations</h2><p className="text-xs text-gray-500">Add variations here before Additional Details. Each new variation starts with the main product values.</p></div><button type="button" onClick={() => setValues((current) => ({ ...current, variants: [...current.variants, inheritedVariant(current)] }))} className="rounded-lg bg-[#1a1308] px-4 py-2 text-sm font-bold text-white">Add Variation</button></div>
-      {values.variants.length === 0 ? <div className="rounded-xl border border-dashed border-[#d8a928]/40 bg-white p-5 text-center text-sm text-gray-500">No variations added. The main product will be used as-is.</div> : null}
+      {values.variants.length === 0 ? <div className="rounded-xl border border-dashed border-[#d8a928]/40 bg-white p-5 text-center text-sm text-gray-500">No variations added. The main product will be used as-is.</div> : <p className="text-xs font-semibold text-gray-600">{values.variants.length} saved variation{values.variants.length === 1 ? "" : "s"} shown below.</p>}
       {values.variants.map((variant, index) => (
-        <details key={variant.id} open={index === values.variants.length - 1} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+        <details key={variant.id} open className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
           <summary className="cursor-pointer font-bold text-gray-900">{variant.name || `Variation ${index + 1}`} {variant.isDefault ? <span className="ml-2 text-xs text-orange-600">Default</span> : null}</summary>
           <div className="mt-4 space-y-4">
             <div><h3 className="text-sm font-bold text-gray-900">Basic Information</h3><p className="text-xs text-gray-500">Use the same product information flow for this variation.</p></div>

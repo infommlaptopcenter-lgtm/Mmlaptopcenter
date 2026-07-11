@@ -25,6 +25,7 @@ const productSchema = z.object({
   tags: z.array(z.string()).default([]),
   collectionIds: z.array(z.string()).default([]),
   isFeatured: z.boolean().default(false),
+  displayOrder: z.number().int().min(1).default(9999),
   details: z.array(z.object({
     id: z.string(),
     title: z.string().min(1, "Detail title is required"),

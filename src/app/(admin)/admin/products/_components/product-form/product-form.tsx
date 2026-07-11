@@ -49,7 +49,7 @@ export function ProductForm({
 
         <section className="space-y-4 rounded-xl border border-[#d8a928]/25 p-4 lg:col-span-2">
           <div><h2 className="font-bold text-gray-950">Product Attributes</h2><p className="text-xs text-gray-500">Saved on the main product even when it has no variants.</p></div>
-          <AttributesFields value={form.values} onChange={(patch) => form.setValues((current) => ({ ...current, ...patch }))} />
+          <AttributesFields value={form.values} showExtended={false} onChange={(patch) => form.setValues((current) => ({ ...current, ...patch }))} />
         </section>
 
         <VariantsSection values={form.values} setValues={form.setValues} />

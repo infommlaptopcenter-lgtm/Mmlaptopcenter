@@ -56,6 +56,7 @@ export type ProductFormValues = ProductAttributes & {
   tags: string[];
   collectionIds: string[];
   isFeatured: boolean;
+  displayOrder: number;
   details: ProductDetail[];
   variants: ProductVariantFormValue[];
 };

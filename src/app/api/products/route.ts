@@ -21,7 +21,7 @@ export async function GET(request: Request) {
           : {}),
         ...(categoryId ? { OR: [{ categoryId }, { subcategoryId: categoryId }] } : {}),
       },
-      orderBy: { updatedAt: "desc" },
+      orderBy: [{ displayOrder: "asc" }, { updatedAt: "desc" }],
       take: 50,
       select: {
         id: true,

@@ -431,9 +431,7 @@ export async function getAllProducts(cursor?: string, take = DEFAULT_PAGE_SIZE) 
       where,
       skip,
       take,
-      orderBy: {
-        updatedAt: "desc",
-      },
+      orderBy: [{ displayOrder: "asc" }, { updatedAt: "desc" }],
       select: {
         id: true,
         handle: true,
