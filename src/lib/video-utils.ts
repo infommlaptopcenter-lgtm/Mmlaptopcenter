@@ -103,7 +103,17 @@ function tiktokEmbed(url: URL) {
 
 function facebookEmbed(url: URL) {
   if (!(url.hostname === "fb.watch" || isHost(url, "facebook.com"))) return null;
-  const isVideoPath = url.hostname === "fb.watch" || /\/(watch|videos|reel|posts|permalink|share\/v)(\/|$)/.test(url.pathname) || url.searchParams.has("v");
+  // Facebook's Copy link action now commonly returns /share/r/... and
+  // /share/v/... URLs. Older videos can also use watch.php or story.php.
+  // The Facebook player resolves those public share URLs itself, so avoid
+  // rejecting valid links just because their path is not a canonical
+  // /videos/... permalink.
+  const isVideoPath =
+    url.hostname === "fb.watch" ||
+    /\/(watch(?:\.php)?|videos|reels?|posts|permalink|share\/(?:r|v|reel|video))(\/|$)/i.test(url.pathname) ||
+    /\/(?:story|video)\.php$/i.test(url.pathname) ||
+    url.searchParams.has("v") ||
+    url.searchParams.has("story_fbid");
   if (!isVideoPath) return null;
   return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url.toString())}&show_text=false&width=734`;
 }
