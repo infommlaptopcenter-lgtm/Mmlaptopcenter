@@ -11,7 +11,7 @@ export type VariantCardItem = {
 };
 
 export function ProductVariantsSection({ variants, selectedId, fallbackImage, onSelect }: { variants: VariantCardItem[]; selectedId?: string | null; fallbackImage?: string; onSelect: (id: string) => void }) {
-  if (variants.length <= 1) return null;
+  if (!variants.length) return null;
   return (
     <section className="space-y-5">
       <div><span className="text-xs font-bold uppercase tracking-wider text-orange-600">Available configurations</span><h2 className="font-serif text-2xl font-extrabold text-gray-950 sm:text-3xl">Product Variants</h2></div>

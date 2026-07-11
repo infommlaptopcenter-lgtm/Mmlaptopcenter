@@ -170,31 +170,18 @@ export function ProductInfoPanel({
           {options.length > 0 || sku ? (
             <div className="space-y-2.5 rounded-xl bg-white/65 p-2.5 shadow-sm ring-1 ring-orange-100/80">
             <div className="flex items-center justify-between"><h2 className="text-sm font-extrabold text-gray-950">Variants</h2>{sku ? <span className="text-[11px] font-semibold text-gray-500">SKU: {sku}</span> : null}</div>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-5">
             {options.map((option) => (
               <div key={option.name} className="space-y-1.5">
-                <div className="flex items-center justify-between gap-3">
-                  <Label className="text-xs font-bold uppercase tracking-wide text-gray-700">{option.name}</Label>
-                  {selectedLabel ? <span className="truncate text-xs font-semibold text-gray-600">{selectedLabel}</span> : null}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {option.values.map((value) => (
-                    <button
-                      key={value.value}
-                      type="button"
-                      disabled={value.disabled}
-                      onClick={() => selectOption(option.name, value.value)}
-                      className={`rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition sm:text-sm ${
-                        value.selected
-                          ? "border-orange-500 bg-orange-500 text-white shadow-sm"
-                          : "border-orange-200 bg-white/80 text-gray-950 hover:border-orange-400"
-                      } ${value.disabled ? "cursor-not-allowed opacity-40" : ""}`}
-                    >
-                      {value.value}
-                    </button>
-                  ))}
-                </div>
+                <Label className="text-[10px] font-bold uppercase tracking-wide text-gray-600">{option.name}</Label>
+                <select value={option.values.find((value) => value.selected)?.value || ""} onChange={(event) => selectOption(option.name, event.target.value)} className="h-9 w-full rounded-lg border border-orange-200 bg-white px-2 text-xs font-semibold text-gray-950 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200">
+                  <option value="">Any</option>
+                  {option.values.map((value) => <option key={value.value} value={value.value} disabled={value.disabled}>{option.name === "Price" ? formatMoney(value.value, priceBlock?.displayPrice.currencyCode || "PKR") : value.value}</option>)}
+                </select>
               </div>
             ))}
+            </div>
+            {selectedLabel ? <p className="truncate text-[11px] font-semibold text-gray-500">Selected: {selectedLabel}</p> : <p className="text-[11px] font-semibold text-gray-500">Main product selected. Choose a filter only if you want a variant.</p>}
             </div>
           ) : null}
           {Object.keys(specifications).length ? <div className="flex flex-wrap gap-1.5">{Object.entries(specifications).map(([name, value]) => <span key={name} className="rounded-full bg-orange-50 px-2 py-1 text-[11px] font-semibold text-orange-800">{name}: {value}</span>)}</div> : null}

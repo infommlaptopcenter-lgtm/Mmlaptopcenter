@@ -22,27 +22,17 @@ type Option = {
   values: OptionValue[];
 };
 
-function getInitialSelections(product: Product): Record<string, string> {
+function getInitialSelections(product: Product, defaultVariantId: string): Record<string, string> {
   const initial: Record<string, string> = {};
-  
-  for (const option of product.options) {
-    const firstAvailableVariant = product.variants.nodes.find((v) => v.availableForSale);
-    if (firstAvailableVariant) {
-      const selectedOption = firstAvailableVariant.selectedOptions.find((so) => so.name === option.name);
-      if (selectedOption) {
-        initial[option.name] = selectedOption.value;
-      }
-    }
-    if (!initial[option.name] && option.values.length > 0) {
-      initial[option.name] = option.values[0];
-    }
+  const defaultVariant = product.variants.nodes.find((variant) => variant.id === defaultVariantId);
+  for (const option of defaultVariant?.selectedOptions || []) {
+    initial[option.name] = option.value;
   }
-  
   return initial;
 }
 
 export function useVariantSelector(product: Product, defaultVariantId: string) {
-  const initialSelections = useMemo(() => getInitialSelections(product), [product]);
+  const initialSelections = useMemo(() => getInitialSelections(product, defaultVariantId), [defaultVariantId, product]);
   const [selectedValues, setSelectedValues] = useState<Record<string, string>>(initialSelections);
 
   useEffect(() => {
@@ -84,22 +74,21 @@ export function useVariantSelector(product: Product, defaultVariantId: string) {
   }, [selectedValues, product]);
 
   const variantId = useMemo(() => {
-    const allSelected = product.options.every((opt) => selectedValues[opt.name]);
-    if (!allSelected) return null;
+    const chosenOptions = Object.entries(selectedValues);
+    if (!chosenOptions.length) return defaultVariantId;
 
     const variant = product.variants.nodes.find(
-      (v) => v.availableForSale && v.selectedOptions.every((so) => selectedValues[so.name] === so.value),
+      (v) => v.availableForSale && v.selectedOptions.length > 0 && chosenOptions.every(([name, value]) => v.selectedOptions.some((option) => option.name === name && option.value === value)),
     );
-    return variant?.id || null;
-  }, [selectedValues, product]);
+    return variant?.id || defaultVariantId;
+  }, [defaultVariantId, selectedValues, product]);
 
   const selectOption = (name: string, value: string) => {
     const optionIndex = product.options.findIndex((opt) => opt.name === name);
     const newSelections = { ...selectedValues, [name]: value };
+    if (!value) delete newSelections[name];
     
-    product.options.slice(optionIndex + 1).forEach((opt) => {
-      delete newSelections[opt.name];
-    });
+    product.options.slice(optionIndex + 1).forEach((opt) => delete newSelections[opt.name]);
 
     setSelectedValues(newSelections);
   };

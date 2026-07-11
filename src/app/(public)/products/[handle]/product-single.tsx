@@ -245,7 +245,7 @@ export function ProductSingle({ data }: Props) {
           </div>
 
           <ProductVariantsSection
-            variants={data.variants.nodes}
+            variants={data.variants.nodes.filter((variant) => variant.id !== data.id)}
             selectedId={selectedVariant?.id}
             fallbackImage={data.featuredImage?.url || undefined}
             onSelect={selectVariant}
