@@ -266,6 +266,13 @@ export function StoreProductCard({
         )}
       </div>
 
+      <div className="absolute left-1/2 top-3 z-20 -translate-x-1/2 rounded-full bg-white/95 px-2.5 py-2 shadow-lg backdrop-blur">
+        <ProductRating
+          rating={visibleReviewStats.averageRating}
+          totalReviews={visibleReviewStats.totalReviews}
+        />
+      </div>
+
       {/* ── Product image ──────────────────────────────────── */}
       <Link
         href={`/products/${handle}`}
@@ -318,22 +325,15 @@ export function StoreProductCard({
             />
           </div>
         )}
-        <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-white/75 via-white/35 to-transparent px-4 pb-2.5 pt-6 transition-all duration-300 group-hover:from-white/90 group-hover:via-white/60 group-hover:pt-10">
-          <h3 className="line-clamp-2 text-sm font-bold leading-tight text-[#0a0a0a] drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)] transition-all duration-300 group-hover:line-clamp-none sm:text-base">
-            {title}
-          </h3>
-        </div>
       </Link>
 
       {/* ── Card body ─────────────────────────────────────── */}
       <div className="flex flex-col gap-1.5 px-4 pb-4 pt-2">
-        {/* Rating row */}
-        <div className="flex items-center justify-between">
-          <ProductRating
-            rating={visibleReviewStats.averageRating}
-            totalReviews={visibleReviewStats.totalReviews}
-          />
-        </div>
+        <Link href={`/products/${handle}`} className="group/title block min-h-10">
+          <h3 className="line-clamp-2 text-sm font-bold leading-tight text-[#0a0a0a] transition-colors group-hover/title:text-[#8b1a1a] sm:text-base">
+            {title}
+          </h3>
+        </Link>
 
         {/* Prices + Buy Now button */}
         <div className="mt-2 grid grid-cols-2 gap-2">
