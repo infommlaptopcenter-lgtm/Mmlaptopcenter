@@ -318,11 +318,6 @@ export function StoreProductCard({
             />
           </div>
         )}
-        {tag ? (
-          <span className="absolute bottom-3 left-3 z-20 rounded-full border border-orange-300/80 bg-white/90 px-3 py-1.5 text-[11px] font-bold uppercase tracking-normal text-orange-700 shadow-sm backdrop-blur-sm">
-            {tag}
-          </span>
-        ) : null}
       </Link>
 
       {/* ── Card body ─────────────────────────────────────── */}
