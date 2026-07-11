@@ -2,15 +2,29 @@
 
 import { useMemo, useState } from "react";
 import { VIDEO_PLATFORM_LABELS, VIDEO_PLATFORMS, type PublicVideo, type VideoPlatformValue } from "@/lib/video-utils";
-import { VideoCard } from "./video-card";
 import { SharedVideoPlayer } from "./shared-video-player";
 
 const PAGE_SIZE = 8;
 
-function variantFor(platform: VideoPlatformValue) {
-  if (platform === "TIKTOK" || platform === "INSTAGRAM") return "vertical" as const;
-  if (platform === "FACEBOOK") return "facebook" as const;
-  return "landscape" as const;
+const PLATFORM_STYLES: Record<VideoPlatformValue, { section: string; badge: string; title: string }> = {
+  YOUTUBE: { section: "border-red-200 bg-gradient-to-br from-white to-red-50", badge: "bg-red-600 text-white", title: "text-red-700" },
+  TIKTOK: { section: "border-gray-800 bg-gradient-to-br from-black via-gray-950 to-cyan-950", badge: "bg-white text-black shadow-[3px_3px_0_#25f4ee,-3px_-3px_0_#fe2c55]", title: "text-white" },
+  FACEBOOK: { section: "border-blue-200 bg-gradient-to-br from-white to-blue-50", badge: "bg-blue-600 text-white", title: "text-blue-700" },
+  INSTAGRAM: { section: "border-fuchsia-200 bg-gradient-to-br from-orange-50 via-white to-fuchsia-50", badge: "bg-gradient-to-r from-orange-500 via-pink-500 to-fuchsia-600 text-white", title: "text-fuchsia-700" },
+};
+
+function PlatformVideoSection({ platform, videos }: { platform: VideoPlatformValue; videos: PublicVideo[] }) {
+  if (!videos.length) return null;
+  const styles = PLATFORM_STYLES[platform];
+  return (
+    <section className={`min-w-0 overflow-hidden rounded-3xl border p-4 shadow-sm sm:p-6 ${styles.section}`}>
+      <div className="mb-5 flex flex-wrap items-center gap-3">
+        <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-wider ${styles.badge}`}>{VIDEO_PLATFORM_LABELS[platform]}</span>
+        <h2 className={`font-serif text-2xl font-bold ${styles.title}`}>{VIDEO_PLATFORM_LABELS[platform]} Videos</h2>
+      </div>
+      <SharedVideoPlayer videos={videos} theme={platform} />
+    </section>
+  );
 }
 
 export function VideosPageClient({ videos }: { videos: PublicVideo[] }) {
@@ -74,36 +88,19 @@ export function VideosPageClient({ videos }: { videos: PublicVideo[] }) {
           {featuredVideos.length ? (
             <section className="space-y-4">
               <h2 className="font-serif text-2xl font-bold text-gray-950">Featured Videos</h2>
-              <SharedVideoPlayer videos={featuredVideos} />
+              <SharedVideoPlayer videos={featuredVideos} theme={platform === "ALL" ? "DEFAULT" : platform} />
             </section>
           ) : null}
 
           {platform === "ALL" ? (
             <div className="space-y-10">
               {VIDEO_PLATFORMS.map((item) => {
-                const platformVideos = visibleVideos.filter((video) => video.platform === item);
-                if (!platformVideos.length) return null;
-                return (
-                  <section key={item} className="space-y-4">
-                    <h2 className="font-serif text-2xl font-bold text-gray-950">{VIDEO_PLATFORM_LABELS[item]}</h2>
-                    <div className={`grid gap-5 ${item === "TIKTOK" || item === "INSTAGRAM" ? "sm:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-2 xl:grid-cols-3"}`}>
-                      {platformVideos.map((video) => (
-                        <VideoCard key={video.id} video={video} variant={variantFor(video.platform)} />
-                      ))}
-                    </div>
-                  </section>
-                );
+                const platformVideos = videos.filter((video) => video.platform === item).slice(0, visible);
+                return <PlatformVideoSection key={item} platform={item} videos={platformVideos} />;
               })}
             </div>
           ) : (
-            <section className="space-y-4">
-              <h2 className="font-serif text-2xl font-bold text-gray-950">{VIDEO_PLATFORM_LABELS[platform]}</h2>
-              <div className={`grid gap-5 ${platform === "TIKTOK" || platform === "INSTAGRAM" ? "sm:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-2 xl:grid-cols-3"}`}>
-                {visibleVideos.map((video) => (
-                  <VideoCard key={video.id} video={video} variant={variantFor(video.platform)} />
-                ))}
-              </div>
-            </section>
+            <PlatformVideoSection platform={platform} videos={visibleVideos} />
           )}
 
           {!filtered.length ? (
