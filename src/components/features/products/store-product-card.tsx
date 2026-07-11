@@ -248,7 +248,7 @@ export function StoreProductCard({
       {/* ── Tag badge ─────────────────────────────────────── */}
       {/* ── WhatsApp floating button ───────────────────────── */}
       {discount !== null && (
-        <span className="absolute right-3 top-3 z-20 rounded-full bg-[#8b1a1a] px-3 py-1.5 text-xs font-extrabold uppercase tracking-wide text-white shadow-lg">
+        <span className="absolute right-3 top-3 z-20 rounded-full border border-orange-400 bg-orange-500 px-3 py-1.5 text-xs font-extrabold uppercase tracking-wide text-white shadow-lg">
           {discount}% OFF
         </span>
       )}
@@ -264,13 +264,6 @@ export function StoreProductCard({
             </span>
           </div>
         )}
-      </div>
-
-      <div className="absolute left-1/2 top-3 z-20 -translate-x-1/2 rounded-full bg-white/95 px-2.5 py-2 shadow-lg backdrop-blur">
-        <ProductRating
-          rating={visibleReviewStats.averageRating}
-          totalReviews={visibleReviewStats.totalReviews}
-        />
       </div>
 
       {/* ── Product image ──────────────────────────────────── */}
@@ -325,12 +318,24 @@ export function StoreProductCard({
             />
           </div>
         )}
+        {tag ? (
+          <span className="absolute bottom-3 left-3 z-20 rounded-full border border-orange-300/80 bg-white/90 px-3 py-1.5 text-[11px] font-bold uppercase tracking-normal text-orange-700 shadow-sm backdrop-blur-sm">
+            {tag}
+          </span>
+        ) : null}
       </Link>
 
       {/* ── Card body ─────────────────────────────────────── */}
       <div className="flex flex-col gap-1.5 px-4 pb-4 pt-2">
+        <div className="flex items-center justify-between">
+          <ProductRating
+            rating={visibleReviewStats.averageRating}
+            totalReviews={visibleReviewStats.totalReviews}
+          />
+        </div>
+
         <Link href={`/products/${handle}`} className="group/title block min-h-10">
-          <h3 className="line-clamp-2 text-sm font-bold leading-tight text-[#0a0a0a] transition-colors group-hover/title:text-[#8b1a1a] sm:text-base">
+          <h3 className="line-clamp-2 font-serif text-base font-extrabold leading-tight tracking-normal text-gray-950 transition-colors group-hover/title:text-orange-600 sm:text-lg">
             {title}
           </h3>
         </Link>
@@ -343,14 +348,14 @@ export function StoreProductCard({
             <button
               onClick={handleAddToCart}
               disabled={loading}
-              className="rounded-full bg-[#8b1a1a] px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-[#a52020] active:scale-95 disabled:opacity-60 whitespace-nowrap"
+              className="whitespace-nowrap rounded-md bg-orange-500 px-4 py-2 text-sm font-bold text-white shadow-[0_10px_22px_rgba(249,115,22,0.24)] transition-all hover:-translate-y-0.5 hover:bg-orange-600 active:scale-95 disabled:opacity-60"
             >
               {loading ? "Adding…" : "Buy Now"}
             </button>
           ) : (
             <Link
               href={`/products/${handle}`}
-              className="rounded-full bg-[#8b1a1a] px-4 py-2 text-center text-sm font-bold text-white transition-colors hover:bg-[#a52020] active:scale-95 whitespace-nowrap"
+              className="whitespace-nowrap rounded-md bg-orange-500 px-4 py-2 text-center text-sm font-bold text-white shadow-[0_10px_22px_rgba(249,115,22,0.24)] transition-all hover:-translate-y-0.5 hover:bg-orange-600 active:scale-95"
             >
               Buy Now
             </Link>
@@ -359,7 +364,7 @@ export function StoreProductCard({
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#25d366] px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-[#1fb855] active:scale-95 whitespace-nowrap"
+            className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md bg-green-800 px-4 py-2 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-green-900 active:scale-95"
             aria-label={`Order ${title} on WhatsApp`}
           >
             <FaWhatsapp className="h-4 w-4" />
