@@ -343,14 +343,14 @@ export function StoreProductCard({
             <button
               onClick={handleAddToCart}
               disabled={loading}
-              className="whitespace-nowrap rounded-md border border-orange-300 bg-orange-100 px-4 py-2 text-sm font-bold text-orange-800 shadow-sm transition-all hover:-translate-y-0.5 hover:border-orange-400 hover:bg-orange-200 active:scale-95 disabled:opacity-60"
+              className="whitespace-nowrap rounded-md bg-orange-400 px-4 py-2 text-sm font-bold text-white shadow-[0_8px_18px_rgba(251,146,60,0.18)] transition-all hover:-translate-y-0.5 hover:bg-orange-500 active:scale-95 disabled:opacity-60"
             >
               {loading ? "Adding…" : "Buy Now"}
             </button>
           ) : (
             <Link
               href={`/products/${handle}`}
-              className="whitespace-nowrap rounded-md border border-orange-300 bg-orange-100 px-4 py-2 text-center text-sm font-bold text-orange-800 shadow-sm transition-all hover:-translate-y-0.5 hover:border-orange-400 hover:bg-orange-200 active:scale-95"
+              className="whitespace-nowrap rounded-md bg-orange-400 px-4 py-2 text-center text-sm font-bold text-white shadow-[0_8px_18px_rgba(251,146,60,0.18)] transition-all hover:-translate-y-0.5 hover:bg-orange-500 active:scale-95"
             >
               Buy Now
             </Link>
@@ -359,7 +359,7 @@ export function StoreProductCard({
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-green-300 bg-green-100 px-4 py-2 text-sm font-bold text-green-800 shadow-sm transition-all hover:-translate-y-0.5 hover:border-green-400 hover:bg-green-200 active:scale-95"
+            className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md bg-green-700 px-4 py-2 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-green-800 active:scale-95"
             aria-label={`Order ${title} on WhatsApp`}
           >
             <FaWhatsapp className="h-4 w-4" />
