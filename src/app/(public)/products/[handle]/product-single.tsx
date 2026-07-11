@@ -173,6 +173,27 @@ export function ProductSingle({ data }: Props) {
     }
   };
 
+  const addVariantCardToCart = async (variant: (typeof data.variants.nodes)[number]) => {
+    try {
+      await linesAdd([{ merchandiseId: variant.id, quantity: 1 }]);
+      toast.success("Added to cart", { description: variant.name || data.title, icon: <ShoppingCart className="h-4 w-4" /> });
+      trackAddToCart(variant.name || data.title, variant.id, parseFloat(variant.price.amount));
+    } catch {
+      toast.error("Failed to add to cart");
+    }
+  };
+
+  const getVariantWhatsAppHref = (variant: (typeof data.variants.nodes)[number]) => {
+    const optionsLabel = variant.selectedOptions.map((option) => `${option.name}: ${option.value}`).join(", ");
+    return `https://wa.me/${whatsAppNumber}?text=${encodeURIComponent(buildWhatsAppOrderMessage({
+      title: variant.name || data.title,
+      price: formatMoney(variant.price.amount, variant.price.currencyCode),
+      quantity: 1,
+      selectedOptions: optionsLabel,
+      url,
+    }))}`;
+  };
+
   const buyNow = async () => {
     const merchandiseId = variantId || selectedVariant?.id || defaultVariantId;
 
@@ -249,6 +270,8 @@ export function ProductSingle({ data }: Props) {
             selectedId={selectedVariant?.id}
             fallbackImage={data.featuredImage?.url || undefined}
             onSelect={selectVariant}
+            onAddToCart={addVariantCardToCart}
+            getWhatsAppHref={getVariantWhatsAppHref}
           />
 
           <ProductDescriptionSection
