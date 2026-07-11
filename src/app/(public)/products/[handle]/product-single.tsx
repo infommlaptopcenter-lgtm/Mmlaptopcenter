@@ -13,7 +13,7 @@ import { useVariantSelector } from "@/hooks/use-variant-selector";
 import { getProductSingle } from "./service";
 import { ProductGallerySection } from "./_components/ProductGallerySection";
 import { ProductInfoPanel } from "./_components/ProductInfoPanel";
-import { ProductVariantsSection } from "./_components/ProductVariantsSection";
+import { ProductVariantsSection, type VariantCardItem } from "./_components/ProductVariantsSection";
 import { ExtraProductDetails } from "./_components/ExtraProductDetails";
 import {
   ProductDescriptionSection,
@@ -173,7 +173,7 @@ export function ProductSingle({ data }: Props) {
     }
   };
 
-  const addVariantCardToCart = async (variant: (typeof data.variants.nodes)[number]) => {
+  const addVariantCardToCart = async (variant: VariantCardItem) => {
     try {
       await linesAdd([{ merchandiseId: variant.id, quantity: 1 }]);
       toast.success("Added to cart", { description: variant.name || data.title, icon: <ShoppingCart className="h-4 w-4" /> });
@@ -183,7 +183,7 @@ export function ProductSingle({ data }: Props) {
     }
   };
 
-  const getVariantWhatsAppHref = (variant: (typeof data.variants.nodes)[number]) => {
+  const getVariantWhatsAppHref = (variant: VariantCardItem) => {
     const optionsLabel = variant.selectedOptions.map((option) => `${option.name}: ${option.value}`).join(", ");
     return `https://wa.me/${whatsAppNumber}?text=${encodeURIComponent(buildWhatsAppOrderMessage({
       title: variant.name || data.title,
