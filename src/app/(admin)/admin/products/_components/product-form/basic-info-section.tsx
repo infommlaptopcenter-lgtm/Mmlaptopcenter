@@ -2,6 +2,7 @@
 
 import { AdminImageUpload } from "@/components/admin/image-upload";
 import type { ProductSectionProps } from "./section-types";
+import type { ProductFormValues } from "./types";
 
 export function BasicInfoSection({
   values, setValues, parentCategories, subcategories, collectionSearch,
@@ -38,6 +39,17 @@ export function BasicInfoSection({
           </select>
         </div>
         <textarea value={values.description ?? ""} onChange={(e) => setValues((v) => ({ ...v, description: e.target.value }))} rows={4} className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-sm transition-all focus:border-[#f6a45d] focus:outline-none focus:ring-2 focus:ring-[#f6a45d]/50" placeholder="Product Description" />
+        <textarea value={values.descriptionHtml ?? ""} onChange={(e) => setValues((v) => ({ ...v, descriptionHtml: e.target.value }))} rows={4} className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 font-mono text-sm transition-all focus:border-[#f6a45d] focus:outline-none focus:ring-2 focus:ring-[#f6a45d]/50" placeholder="HTML Description (optional)" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <input value={values.productType ?? ""} onChange={(e) => setValues((v) => ({ ...v, productType: e.target.value }))} className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm transition-all focus:border-[#f6a45d] focus:outline-none focus:ring-2 focus:ring-[#f6a45d]/50" placeholder="Product Type" />
+          <input value={values.vendor ?? ""} onChange={(e) => setValues((v) => ({ ...v, vendor: e.target.value }))} className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm transition-all focus:border-[#f6a45d] focus:outline-none focus:ring-2 focus:ring-[#f6a45d]/50" placeholder="Vendor" />
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <select value={values.status} onChange={(e) => setValues((v) => ({ ...v, status: e.target.value as ProductFormValues["status"] }))} className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm transition-all focus:border-[#f6a45d] focus:outline-none focus:ring-2 focus:ring-[#f6a45d]/50">
+            <option value="ACTIVE">Active</option><option value="DRAFT">Draft</option><option value="ARCHIVED">Archived</option>
+          </select>
+          <label className="flex items-center gap-3 rounded-lg border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-800"><input type="checkbox" checked={values.availableForSale} onChange={(e) => setValues((v) => ({ ...v, availableForSale: e.target.checked }))} /> Available for sale</label>
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -56,6 +68,8 @@ export function BasicInfoSection({
           </div>
         </div>
         <input value={values.tags.join(", ")} onChange={(e) => setValues((v) => ({ ...v, tags: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) }))} className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm transition-all focus:border-[#f6a45d] focus:outline-none focus:ring-2 focus:ring-[#f6a45d]/50" placeholder="Tags (comma-separated)" />
+        <input value={values.seoTitle ?? ""} onChange={(e) => setValues((v) => ({ ...v, seoTitle: e.target.value }))} className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm transition-all focus:border-[#f6a45d] focus:outline-none focus:ring-2 focus:ring-[#f6a45d]/50" placeholder="SEO Title" />
+        <textarea value={values.seoDescription ?? ""} onChange={(e) => setValues((v) => ({ ...v, seoDescription: e.target.value }))} rows={3} className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-sm transition-all focus:border-[#f6a45d] focus:outline-none focus:ring-2 focus:ring-[#f6a45d]/50" placeholder="SEO Description" />
         <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-[#d8a928]/20 bg-[#fcf5e8]/60 p-4 transition-colors hover:bg-[#fcf5e8]">
           <input type="checkbox" checked={values.isFeatured} onChange={(e) => setValues((v) => ({ ...v, isFeatured: e.target.checked }))} className="h-5 w-5 rounded border-gray-300 text-[#f6a45d] focus:ring-[#f6a45d]" />
           <div><p className="text-sm font-medium text-[#0a0a0a]">Mark as Featured Product</p><p className="text-xs text-[#5A5E55]">Featured products appear on the homepage</p></div>
