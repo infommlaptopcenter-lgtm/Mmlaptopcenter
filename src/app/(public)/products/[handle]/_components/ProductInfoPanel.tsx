@@ -27,7 +27,6 @@ type ProductInfoPanelProps = {
   priceBlock: PriceBlock | null;
   reviewStats: ReviewStats;
   inventory: number | null;
-  description?: string | null;
   sku?: string | null;
   specifications?: Record<string, string>;
   availableForSale: boolean;
@@ -47,7 +46,6 @@ export function ProductInfoPanel({
   priceBlock,
   reviewStats,
   inventory,
-  description,
   sku,
   specifications = {},
   availableForSale,
@@ -92,7 +90,6 @@ export function ProductInfoPanel({
           <h1 className={`break-words font-serif font-extrabold leading-tight tracking-normal text-gray-950 ${titleSizeClass}`}>
             {title}
           </h1>
-          {description ? <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-gray-600">{description}</p> : null}
         </div>
 
         <div className="space-y-2.5">

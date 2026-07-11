@@ -53,7 +53,6 @@ export function ProductSingle({ data }: Props) {
   }, [data.variants?.nodes, variantId]);
   const selectedImages = selectedVariant?.images?.length ? selectedVariant.images : data.images.nodes;
   const selectedTitle = selectedVariant?.name || data.title;
-  const selectedDescription = selectedVariant?.description || data.description;
 
   const productHandle = data.handle;
   const fallbackReviewStats = useMemo(() => getFallbackReviewStats(data.id || data.handle || data.title), [
@@ -227,7 +226,6 @@ export function ProductSingle({ data }: Props) {
 
             <ProductInfoPanel
               title={selectedTitle}
-              description={selectedDescription}
               priceBlock={priceBlock}
               reviewStats={visibleReviewStats}
               inventory={inventory}
