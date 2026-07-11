@@ -18,6 +18,7 @@ export default async function EditVideoPage({ params }: { params: Promise<{ id: 
     videoUrl: video.videoUrl,
     platform: video.platform,
     placement: video.placement,
+    format: video.format,
     buttonText: video.buttonText || "",
     buttonUrl: video.buttonUrl || "",
     featured: video.featured,

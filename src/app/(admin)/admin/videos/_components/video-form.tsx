@@ -10,6 +10,8 @@ import {
   detectVideoPlatform,
   VIDEO_PLACEMENT_LABELS,
   VIDEO_PLACEMENTS,
+  VIDEO_FORMAT_LABELS,
+  VIDEO_FORMATS,
   VIDEO_PLATFORM_LABELS,
   VIDEO_PLATFORMS,
 } from "@/lib/video-utils";
@@ -104,6 +106,15 @@ export function VideoForm({ mode, videoId, initialValues }: VideoFormProps) {
           </label>
 
           <label className="space-y-1.5 md:col-span-2">
+            <span className="text-sm font-semibold text-gray-800">Video Format</span>
+            <select className={inputClass} value={values.format} onChange={(e) => update("format", e.target.value as VideoFormValues["format"])}>
+              {VIDEO_FORMATS.map((format) => (
+                <option key={format} value={format}>{VIDEO_FORMAT_LABELS[format]}</option>
+              ))}
+            </select>
+          </label>
+
+          <label className="space-y-1.5 md:col-span-2">
             <span className="text-sm font-semibold text-gray-800">Video URL</span>
             <input className={inputClass} value={values.videoUrl} onChange={(e) => updateVideoUrl(e.target.value)} required />
             <div className="text-xs leading-5 text-gray-500">
@@ -189,7 +200,7 @@ export function VideoForm({ mode, videoId, initialValues }: VideoFormProps) {
             </span>
           </div>
           {embedUrl ? (
-            <div className="aspect-video overflow-hidden rounded-xl bg-black">
+            <div className={`overflow-hidden rounded-xl bg-black ${values.format === "VERTICAL" ? "mx-auto aspect-[9/16] max-h-[520px]" : "aspect-video"}`}>
               <iframe
                 src={embedUrl}
                 title={values.title || "Video preview"}

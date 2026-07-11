@@ -30,16 +30,17 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AboutPage() {
-  const aboutVideo = await prisma.video.findFirst({
-    where: { active: true, featured: true, placement: "ABOUT" },
-    orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
+  const aboutVideos = await prisma.video.findMany({
+    where: { active: true, placement: "ABOUT" },
+    orderBy: [{ featured: "desc" }, { displayOrder: "asc" }, { createdAt: "desc" }],
+    take: 8,
   });
 
   return (
     <>
       <AboutPageContent />
       <FeaturedVideoSection
-        video={aboutVideo ? serializeVideo(aboutVideo) : null}
+        videos={aboutVideos.map(serializeVideo)}
         heading="Meet our work through video"
         description="A separate featured story for the about page, managed from the admin video module."
       />

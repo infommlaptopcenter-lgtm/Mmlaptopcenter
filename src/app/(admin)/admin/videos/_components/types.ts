@@ -1,4 +1,4 @@
-import type { VideoPlatformValue, VideoPlacementValue } from "@/lib/video-utils";
+import type { VideoFormatValue, VideoPlatformValue, VideoPlacementValue } from "@/lib/video-utils";
 
 export type AdminVideo = {
   id: string;
@@ -9,6 +9,7 @@ export type AdminVideo = {
   embedUrl: string | null;
   platform: VideoPlatformValue;
   placement: VideoPlacementValue;
+  format: VideoFormatValue;
   buttonText: string | null;
   buttonUrl: string | null;
   featured: boolean;
@@ -27,6 +28,7 @@ export const emptyVideoFormValues: VideoFormValues = {
   videoUrl: "",
   platform: "YOUTUBE",
   placement: "VIDEOS_PAGE",
+  format: "LANDSCAPE",
   buttonText: "",
   buttonUrl: "",
   featured: false,

@@ -3,9 +3,11 @@ import type { Video } from "@prisma/client";
 
 export const VIDEO_PLATFORMS = ["YOUTUBE", "TIKTOK", "FACEBOOK", "INSTAGRAM"] as const;
 export const VIDEO_PLACEMENTS = ["HOMEPAGE", "ABOUT", "VIDEOS_PAGE"] as const;
+export const VIDEO_FORMATS = ["LANDSCAPE", "VERTICAL"] as const;
 
 export type VideoPlatformValue = (typeof VIDEO_PLATFORMS)[number];
 export type VideoPlacementValue = (typeof VIDEO_PLACEMENTS)[number];
+export type VideoFormatValue = (typeof VIDEO_FORMATS)[number];
 
 export class VideoUrlError extends Error {
   constructor(message: string) {
@@ -27,6 +29,11 @@ export const VIDEO_PLACEMENT_LABELS: Record<VideoPlacementValue, string> = {
   VIDEOS_PAGE: "Videos Page",
 };
 
+export const VIDEO_FORMAT_LABELS: Record<VideoFormatValue, string> = {
+  LANDSCAPE: "Landscape / Laptop Screen",
+  VERTICAL: "Vertical / Reel / Short",
+};
+
 export const videoSchema = z.object({
   title: z.string().trim().min(1, "Title is required"),
   description: z.string().trim().optional().nullable(),
@@ -35,6 +42,7 @@ export const videoSchema = z.object({
   // Kept in the payload for backwards compatibility. The URL is the source of truth.
   platform: z.enum(VIDEO_PLATFORMS).optional(),
   placement: z.enum(VIDEO_PLACEMENTS).default("VIDEOS_PAGE"),
+  format: z.enum(VIDEO_FORMATS).default("LANDSCAPE"),
   buttonText: z.string().trim().optional().nullable(),
   buttonUrl: z.string().trim().optional().nullable(),
   featured: z.boolean().default(false),
@@ -55,6 +63,7 @@ export type PublicVideo = {
   embedUrl: string | null;
   platform: VideoPlatformValue;
   placement: VideoPlacementValue;
+  format: VideoFormatValue;
   buttonText: string | null;
   buttonUrl: string | null;
   featured: boolean;
@@ -178,6 +187,7 @@ export function serializeVideo(video: Video): PublicVideo {
     embedUrl: buildVideoEmbedUrl(video.platform, video.videoUrl) ?? video.embedUrl,
     platform: video.platform,
     placement: video.placement,
+    format: video.format,
     buttonText: video.buttonText,
     buttonUrl: video.buttonUrl,
     featured: video.featured,

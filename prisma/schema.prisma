@@ -236,6 +236,11 @@ enum VideoPlacement {
   VIDEOS_PAGE
 }
 
+enum VideoFormat {
+  LANDSCAPE
+  VERTICAL
+}
+
 model Video {
   id              String         @id @default(cuid())
   title           String
@@ -245,6 +250,7 @@ model Video {
   embedUrl        String?
   platform        VideoPlatform
   placement       VideoPlacement @default(VIDEOS_PAGE)
+  format          VideoFormat    @default(LANDSCAPE)
   buttonText      String?
   buttonUrl       String?
   featured        Boolean        @default(false)

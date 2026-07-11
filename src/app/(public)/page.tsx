@@ -76,7 +76,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-   const [categories, featuredCollections, featuredBlogs, essenceSection, homeVideo] = await Promise.all([
+   const [categories, featuredCollections, featuredBlogs, essenceSection, homeVideos] = await Promise.all([
      safeHomeQuery(
        "categories",
        () => prisma.category.findMany({
@@ -121,12 +121,13 @@ export default async function Page() {
       null,
     ),
     safeHomeQuery(
-      "featured home video",
-      () => prisma.video.findFirst({
-        where: { active: true, featured: true, placement: "HOMEPAGE" },
-        orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
+      "home videos",
+      () => prisma.video.findMany({
+        where: { active: true, placement: "HOMEPAGE" },
+        orderBy: [{ featured: "desc" }, { displayOrder: "asc" }, { createdAt: "desc" }],
+        take: 8,
       }),
-      null,
+      [],
     ),
 
   ]);
@@ -185,7 +186,7 @@ return (
             products={allProducts}
             collections={homeCollections}
             featuredBlogs={featuredBlogs}
-            homeVideo={homeVideo ? serializeVideo(homeVideo) : null}
+            homeVideos={homeVideos.map(serializeVideo)}
           />
       </div>
     </>

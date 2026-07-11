@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { VIDEO_PLATFORM_LABELS, VIDEO_PLATFORMS, type PublicVideo, type VideoPlatformValue } from "@/lib/video-utils";
 import { VideoCard } from "./video-card";
+import { SharedVideoPlayer } from "./shared-video-player";
 
 const PAGE_SIZE = 8;
 
@@ -73,11 +74,7 @@ export function VideosPageClient({ videos }: { videos: PublicVideo[] }) {
           {featuredVideos.length ? (
             <section className="space-y-4">
               <h2 className="font-serif text-2xl font-bold text-gray-950">Featured Videos</h2>
-              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-                {featuredVideos.map((video) => (
-                  <VideoCard key={video.id} video={video} variant={variantFor(video.platform)} />
-                ))}
-              </div>
+              <SharedVideoPlayer videos={featuredVideos} />
             </section>
           ) : null}
 

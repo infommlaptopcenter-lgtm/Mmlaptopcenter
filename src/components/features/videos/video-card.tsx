@@ -22,13 +22,13 @@ function playerUrl(video: PublicVideo, autoPlay: boolean) {
   return url.toString();
 }
 
-export function VideoCard({ video, variant = "landscape", autoPlay = false }: VideoCardProps) {
-  const isVertical = variant === "vertical";
+export function VideoCard({ video, autoPlay = false }: VideoCardProps) {
+  const isVertical = video.format === "VERTICAL";
   const embedUrl = playerUrl(video, autoPlay);
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-[#d8a928]/20 bg-white shadow-sm transition hover:border-[#f6a45d] hover:shadow-lg">
-      <div className={`relative w-full overflow-hidden bg-black ${isVertical ? "aspect-[9/14]" : "aspect-video"}`}>
+      <div className={`relative w-full overflow-hidden bg-black ${isVertical ? "aspect-[9/16]" : "aspect-video"}`}>
         {embedUrl ? (
           <iframe
             src={embedUrl}

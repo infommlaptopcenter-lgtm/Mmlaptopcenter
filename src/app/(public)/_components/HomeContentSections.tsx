@@ -18,7 +18,7 @@ type HomeContentSectionsProps = {
     publishedAt?: Date | string | null;
     content?: string | null;
   }>;
-  homeVideo: PublicVideo | null;
+  homeVideos: PublicVideo[];
 };
 
 export function HomeContentSections({
@@ -26,14 +26,14 @@ export function HomeContentSections({
   products,
   collections,
   featuredBlogs,
-  homeVideo,
+  homeVideos,
 }: HomeContentSectionsProps) {
   return (
     <>
       <CategoriesSection categories={categories} />
       <ProductsSection categories={categories} products={products} collections={collections} />
       <FeaturedVideoSection
-        video={homeVideo}
+        videos={homeVideos}
         heading="See the latest from MM Laptop Center"
         description="Watch featured laptop showcases, buying advice, and shop updates selected by the admin team."
       />
