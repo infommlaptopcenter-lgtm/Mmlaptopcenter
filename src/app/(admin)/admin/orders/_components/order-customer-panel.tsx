@@ -13,7 +13,7 @@ export function OrderCustomerPanel({
   const address = order.customerAddress ?? {};
   const hasValidWhatsApp = order.customerPhone && isValidWhatsAppNumber(order.customerPhone);
   return (
-    <div className="rounded-xl border border-[#d8a928]/20 bg-white p-6">
+    <div className="rounded-xl border border-[#d8a928]/20 bg-white p-4 sm:p-5">
       <h2 className="text-sm font-semibold text-[#0a0a0a]">Customer</h2>
       <div className="mt-3 space-y-1 text-sm text-[#5A5E55]">
         <div className="font-medium text-[#0a0a0a]">{order.customerName}</div>
@@ -33,9 +33,9 @@ function PhoneLine({ phone, valid }: { phone: string; valid: boolean }) {
 
 function WhatsAppButtons({ sending, onChat, onConfirm }: { sending: boolean; onChat: () => void; onConfirm: () => void }) {
   return (
-    <div className="mt-4 space-y-2">
-      <button onClick={onChat} className="flex w-full items-center justify-center gap-2 rounded-lg border border-[#25D366] px-4 py-2 text-sm font-medium text-[#25D366] transition-colors hover:bg-[#25D366] hover:text-white"><FaWhatsapp className="h-4 w-4" />Chat on WhatsApp</button>
-      <button onClick={onConfirm} disabled={sending} className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#25D366] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#128C7E] disabled:opacity-50"><FaWhatsapp className="h-4 w-4" />{sending ? "Opening..." : "Send Confirmation"}</button>
+    <div className="mt-4 grid grid-cols-2 gap-2">
+      <button onClick={onChat} className="flex min-w-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-[#25D366] px-2 py-2 text-[11px] font-semibold text-[#25D366] transition-colors hover:bg-[#25D366] hover:text-white sm:px-3 sm:text-xs"><FaWhatsapp className="h-3.5 w-3.5 shrink-0" /><span>WhatsApp Chat</span></button>
+      <button onClick={onConfirm} disabled={sending} className="flex min-w-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md bg-[#25D366] px-2 py-2 text-[11px] font-semibold text-white transition-colors hover:bg-[#128C7E] disabled:opacity-50 sm:px-3 sm:text-xs"><FaWhatsapp className="h-3.5 w-3.5 shrink-0" /><span>{sending ? "Opening..." : "Send Confirmation"}</span></button>
     </div>
   );
 }

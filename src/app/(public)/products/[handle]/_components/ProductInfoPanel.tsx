@@ -188,22 +188,22 @@ export function ProductInfoPanel({
         </div>
 
         <div className="space-y-2.5 pt-1">
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <Button onClick={onAddToCart} disabled={!availableForSale} className="h-10 rounded-md bg-orange-500 text-xs font-bold text-white shadow-[0_14px_30px_rgba(249,115,22,0.24)] hover:bg-orange-600 sm:text-sm">
-              <ShoppingCart className="mr-2 h-4 w-4" />
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+            <Button onClick={onAddToCart} disabled={!availableForSale} className="h-9 min-w-0 rounded-md bg-orange-500 px-1 text-[10px] font-bold text-white shadow-[0_10px_22px_rgba(249,115,22,0.2)] hover:bg-orange-600 sm:h-10 sm:px-2 sm:text-xs">
+              <ShoppingCart className="mr-1 h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
               Add Cart
             </Button>
-            <Button onClick={onBuyNow} disabled={buyLoading || !availableForSale} className="h-10 rounded-md bg-[#1a1308] text-xs font-bold text-white hover:bg-[#2a2118] sm:text-sm">
-              <Zap className="mr-2 h-4 w-4" />
+            <Button onClick={onBuyNow} disabled={buyLoading || !availableForSale} className="h-9 min-w-0 rounded-md bg-[#1a1308] px-1 text-[10px] font-bold text-white hover:bg-[#2a2118] sm:h-10 sm:px-2 sm:text-xs">
+              <Zap className="mr-1 h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
               {buyLoading ? "Processing" : "Buy Now"}
             </Button>
             <a
               href={whatsAppHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-10 items-center justify-center rounded-md bg-[#25D366] px-4 text-xs font-bold text-white transition hover:bg-[#1fb855] sm:text-sm"
+              className="inline-flex h-9 min-w-0 items-center justify-center whitespace-nowrap rounded-md bg-[#25D366] px-1 text-[10px] font-bold text-white transition hover:bg-[#1fb855] sm:h-10 sm:px-2 sm:text-xs"
             >
-              <FaWhatsapp className="mr-2 h-4 w-4" />
+              <FaWhatsapp className="mr-1 h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
               WhatsApp
             </a>
           </div>
