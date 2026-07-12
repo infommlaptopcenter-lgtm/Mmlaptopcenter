@@ -18,7 +18,7 @@ function escapeHtml(value: string) {
 
 export async function sendOrderConfirmationEmail(order: EmailOrder) {
   const user = process.env.GMAIL_USER || process.env.ADMIN_EMAIL || process.env.ADMIN_USER;
-  const appPassword = process.env.GMAIL_APP_PASSWORD;
+  const appPassword = process.env.GMAIL_APP_PASSWORD || process.env.googleapppassword;
   if (!user || !user.includes("@") || !appPassword) {
     throw new Error("Gmail confirmation email is not configured. Add GMAIL_USER and GMAIL_APP_PASSWORD to .env, then restart the server.");
   }
