@@ -1,14 +1,12 @@
-import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function getAdminUser() {
-  const client = new PrismaClient();
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) return null;
-    return client.adminUser.findUnique({ where: { email: session.user.email } });
+    return prisma.adminUser.findUnique({ where: { email: session.user.email } });
   } catch {
     return null;
   }

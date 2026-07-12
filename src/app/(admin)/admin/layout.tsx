@@ -1,12 +1,8 @@
-import Link from "next/link";
-import { PrismaClient } from "@prisma/client";
-import { FiUser } from "react-icons/fi";
 import { getServerSession } from "next-auth";
 import AdminProviders from "@/components/admin/admin-providers";
 import { authOptions } from "@/lib/auth";
 import { ResponsiveAdminLayout } from "@/components/layout/responsive-admin-layout";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 async function getAdminUser() {
   try {

@@ -1,8 +1,6 @@
 import { getProduct } from "@/lib/storefront";
 import { invariant } from "@esmate/utils";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 export async function getProductSingle(handle: string) {
   const product = await getProduct(handle);
