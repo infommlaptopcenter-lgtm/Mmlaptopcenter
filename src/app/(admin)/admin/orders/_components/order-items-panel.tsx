@@ -1,4 +1,4 @@
-import type { OrderDetail } from "./types";
+import type { OrderDetail, OrderItem } from "./types";
 
 export function OrderItemsPanel({ order }: { order: OrderDetail }) {
   const items = Array.isArray(order.items) ? order.items : [];
@@ -8,7 +8,7 @@ export function OrderItemsPanel({ order }: { order: OrderDetail }) {
       <div className="mt-4 overflow-x-auto">
         <table className="w-full text-sm">
           <thead><tr className="border-b border-[#d8a928]/20 text-[#5A5E55]"><th className="py-2 text-left">Product</th><th className="py-2 text-right">Qty</th><th className="py-2 text-right">Price</th><th className="py-2 text-right">Line total</th></tr></thead>
-          <tbody>{items.map((it: any, idx: number) => <ItemRow key={idx} item={it} />)}</tbody>
+          <tbody>{items.map((item, index) => <ItemRow key={item.productId ?? index} item={item} />)}</tbody>
         </table>
       </div>
       <div className="mt-4 grid gap-2 text-sm">
@@ -22,7 +22,7 @@ export function OrderItemsPanel({ order }: { order: OrderDetail }) {
   );
 }
 
-function ItemRow({ item }: { item: any }) {
+function ItemRow({ item }: { item: OrderItem }) {
   return (
     <tr className="border-b border-[#d8a928]/10">
       <td className="py-3"><div className="font-medium text-[#0a0a0a]">{item.title ?? item.productTitle ?? "Item"}</div><div className="text-xs text-[#5A5E55]">{item.productId ?? ""}</div></td>

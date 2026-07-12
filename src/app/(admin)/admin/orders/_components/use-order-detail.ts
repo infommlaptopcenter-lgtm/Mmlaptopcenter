@@ -43,6 +43,7 @@ export function useOrderDetail(id?: string) {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Failed to update order");
       setOrder((o) => (o ? { ...o, ...data } : o));
+      if (data.emailWarning) setError(`Order updated, but ${data.emailWarning}`);
     } catch (e: any) {
       setError(e?.message || "Failed to update order");
     } finally {

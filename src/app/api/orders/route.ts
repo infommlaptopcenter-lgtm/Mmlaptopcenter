@@ -133,8 +133,10 @@ export async function POST(request: Request) {
           discount,
           paymentMethod: input.paymentMethod,
           paymentStatus: "pending",
+          paymentProofUrl: input.paymentProofUrl,
+          transactionReference: input.transactionReference,
           orderStatus: "pending",
-          notes: [input.notes, input.paymentMethod !== "cod" ? `PAYMENT REFERENCE: ${input.transactionReference}\nPAYMENT PROOF: ${input.paymentProofUrl}` : ""].filter(Boolean).join("\n\n") || undefined,
+          notes: input.notes,
         },
       });
     });

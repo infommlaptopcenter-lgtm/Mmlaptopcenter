@@ -24,7 +24,7 @@ export default function OrderDetailPage() {
         <div className="space-y-6 lg:col-span-2"><OrderItemsPanel order={state.order} /></div>
         <div className="space-y-6">
           <OrderCustomerPanel order={state.order} sendingWhatsApp={state.sendingWhatsApp} openCustomerWhatsApp={state.openCustomerWhatsApp} sendOrderConfirmation={state.sendOrderConfirmation} />
-          <OrderStatusPanel form={state.form} setForm={state.setForm} saving={state.saving} save={state.save} />
+          <OrderStatusPanel form={state.form} setForm={state.setForm} saving={state.saving} save={state.save} paymentMethod={state.order.paymentMethod} paymentProofUrl={state.order.paymentProofUrl} transactionReference={state.order.transactionReference} />
         </div>
       </div>
     </div>

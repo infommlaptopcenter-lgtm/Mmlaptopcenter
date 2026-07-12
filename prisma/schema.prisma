@@ -122,6 +122,9 @@ model Order {
   couponCode      String?
   paymentMethod   String      @default("pending")
   paymentStatus   String      @default("pending")
+  paymentProofUrl String?
+  transactionReference String?
+  confirmationEmailSentAt DateTime?
   orderStatus     String      @default("pending")
   notes           String?
   trackingNumber  String?

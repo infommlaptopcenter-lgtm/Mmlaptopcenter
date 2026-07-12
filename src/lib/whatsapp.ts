@@ -109,7 +109,8 @@ ${items}
 *Delivery Address:*
 ${addressStr}
 
-*Payment:* Cash on Delivery (COD)
+*Payment:* ${order.paymentMethod?.replaceAll("_", " ").toUpperCase() || "N/A"}
+*Order Status:* ${order.orderStatus || "confirmed"}
 
 We're preparing your order for dispatch. You'll receive tracking updates soon.
 

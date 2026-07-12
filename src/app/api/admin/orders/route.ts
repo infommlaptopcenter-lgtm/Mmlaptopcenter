@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-auth";
 
@@ -34,7 +35,7 @@ export async function GET(request: Request) {
     const paymentStatus = searchParams.get("paymentStatus") || "";
     const search = searchParams.get("search") || "";
 
-    const where: any = {};
+    const where: Prisma.OrderWhereInput = {};
     if (status) where.orderStatus = status;
     if (paymentStatus) where.paymentStatus = paymentStatus;
     if (search) {

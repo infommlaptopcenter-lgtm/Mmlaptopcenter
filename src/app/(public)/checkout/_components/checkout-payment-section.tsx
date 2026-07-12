@@ -17,10 +17,20 @@ type Props = {
 export function CheckoutPaymentSection({ subtotal, method, setMethod, proofUrl, setProofUrl, reference, setReference }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const codAvailable = subtotal <= COD_LIMIT;
   const jazzCashAvailable = subtotal <= JAZZCASH_LIMIT;
 
   async function uploadProof(file: File) {
+    setUploadError(null);
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setUploadError("Only JPG, PNG, or WebP screenshots are allowed.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError("Screenshot must be smaller than 5 MB.");
+      return;
+    }
     setUploading(true);
     try {
       const body = new FormData();
@@ -29,6 +39,8 @@ export function CheckoutPaymentSection({ subtotal, method, setMethod, proofUrl, 
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Upload failed");
       setProofUrl(data.url);
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : "Upload failed");
     } finally {
       setUploading(false);
     }
@@ -61,7 +73,7 @@ export function CheckoutPaymentSection({ subtotal, method, setMethod, proofUrl, 
         <p className="mt-3 text-xs text-[#5A5E55]">Send the full amount (maximum PKR {JAZZCASH_LIMIT.toLocaleString()}), then enter the transaction ID and upload the payment screenshot below.</p>
       </div>}
       <label className="block text-sm font-semibold text-[#1a1308]">Transaction ID / reference<input value={reference} onChange={(event) => setReference(event.target.value)} required className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-[#f6a45d] focus:outline-none focus:ring-2 focus:ring-[#f6a45d]/30" /></label>
-      <div><input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => { const file = event.target.files?.[0]; if (file) void uploadProof(file); }} /><button type="button" onClick={() => inputRef.current?.click()} disabled={uploading} className="inline-flex items-center gap-2 rounded-lg border border-[#d8a928]/30 bg-white px-4 py-2.5 text-sm font-bold text-[#1a1308] hover:bg-[#fcf5e8] disabled:opacity-60"><Upload className="h-4 w-4" />{uploading ? "Uploading..." : proofUrl ? "Replace payment screenshot" : "Upload payment screenshot"}</button>{proofUrl ? <p className="mt-2 text-xs font-semibold text-green-700">Screenshot uploaded successfully. Admin will verify it.</p> : null}</div>
+      <div><input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => { const file = event.target.files?.[0]; if (file) void uploadProof(file); event.target.value = ""; }} /><button type="button" onClick={() => inputRef.current?.click()} disabled={uploading} className="inline-flex items-center gap-2 rounded-lg border border-[#d8a928]/30 bg-white px-4 py-2.5 text-sm font-bold text-[#1a1308] hover:bg-[#fcf5e8] disabled:opacity-60"><Upload className="h-4 w-4" />{uploading ? "Uploading..." : proofUrl ? "Replace payment screenshot" : "Upload payment screenshot"}</button><p className="mt-2 text-xs text-[#5A5E55]">Required. JPG, PNG, or WebP; maximum 5 MB.</p>{uploadError ? <p className="mt-1 text-xs font-semibold text-red-700">{uploadError}</p> : null}{proofUrl ? <p className="mt-1 text-xs font-semibold text-green-700">Screenshot uploaded successfully. Admin will verify it.</p> : null}</div>
     </div> : null}
   </section>;
 }
