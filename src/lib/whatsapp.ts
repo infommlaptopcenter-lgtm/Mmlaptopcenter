@@ -26,7 +26,9 @@ export function isValidWhatsAppNumber(phone: string): boolean {
  * Removes +, spaces, dashes, and parentheses
  */
 export function formatPhoneForWhatsApp(phone: string): string {
-  return phone.replace(/[\s\-\(\)\+]/g, "");
+  const cleaned = phone.replace(/[\s\-\(\)\+]/g, "");
+  if (cleaned.startsWith("0")) return `92${cleaned.slice(1)}`;
+  return cleaned;
 }
 
 /**

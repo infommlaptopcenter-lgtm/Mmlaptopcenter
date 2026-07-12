@@ -17,13 +17,15 @@ export default function OrderDetailPage() {
   if (!state.order) return null;
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 xl:p-8">
       <OrderHeader order={state.order} />
       {state.whatsAppSuccess && <div className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">{state.whatsAppSuccess}</div>}
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2"><OrderItemsPanel order={state.order} /></div>
-        <div className="space-y-6">
+      <div className="grid items-start gap-6 xl:grid-cols-2">
+        <div className="min-w-0 space-y-6">
+          <OrderItemsPanel order={state.order} />
           <OrderCustomerPanel order={state.order} sendingWhatsApp={state.sendingWhatsApp} openCustomerWhatsApp={state.openCustomerWhatsApp} sendOrderConfirmation={state.sendOrderConfirmation} />
+        </div>
+        <div className="min-w-0 space-y-6">
           <OrderStatusPanel form={state.form} setForm={state.setForm} saving={state.saving} save={state.save} paymentMethod={state.order.paymentMethod} paymentProofUrl={state.order.paymentProofUrl} transactionReference={state.order.transactionReference} />
         </div>
       </div>
