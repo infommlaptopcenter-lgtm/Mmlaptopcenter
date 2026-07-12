@@ -10,7 +10,7 @@ import { ADMIN_WHATSAPP_NUMBER, isValidWhatsAppNumber } from "@/lib/whatsapp";
 import { CheckoutCustomerForm } from "./checkout-customer-form";
 import { CheckoutOrderSummary } from "./checkout-order-summary";
 import { CheckoutPaymentSection } from "./checkout-payment-section";
-import { COD_LIMIT, type CheckoutDetails, type PaymentMethod } from "./checkout-types";
+import { COD_LIMIT, JAZZCASH_LIMIT, type CheckoutDetails, type PaymentMethod } from "./checkout-types";
 
 const initialDetails: CheckoutDetails = { customerName: "", customerEmail: "", customerPhone: "", line1: "", line2: "", city: "", state: "", pincode: "", notes: "" };
 
@@ -26,7 +26,10 @@ export function CheckoutPageContent() {
   const [error, setError] = useState<string | null>(null);
   const isEmpty = (cart.totalQuantity ?? 0) === 0;
 
-  useEffect(() => { if (subtotal > COD_LIMIT) setPaymentMethod("manual_transfer"); }, [subtotal]);
+  useEffect(() => {
+    if (subtotal > COD_LIMIT && paymentMethod === "cod") setPaymentMethod("bank_transfer");
+    if (subtotal > JAZZCASH_LIMIT && paymentMethod === "jazzcash") setPaymentMethod("bank_transfer");
+  }, [subtotal, paymentMethod]);
 
   const whatsappMessage = encodeURIComponent(`Hi MM Laptop Center, I need help with my checkout. Total: Rs. ${subtotal.toLocaleString()}. Name: ${details.customerName || "Not entered"}. Phone: ${details.customerPhone || "Not entered"}.`);
 
@@ -35,7 +38,8 @@ export function CheckoutPageContent() {
     if (isEmpty) return;
     if (!isValidWhatsAppNumber(details.customerPhone)) return setError("Please enter a valid WhatsApp or phone number.");
     if (paymentMethod === "cod" && subtotal > COD_LIMIT) return setError(`Cash on delivery is only available up to Rs. ${COD_LIMIT.toLocaleString()}.`);
-    if (paymentMethod === "manual_transfer" && (!paymentProofUrl || !transactionReference.trim())) return setError("Please enter the transaction reference and upload its screenshot.");
+    if (paymentMethod === "jazzcash" && subtotal > JAZZCASH_LIMIT) return setError(`JazzCash is only available up to Rs. ${JAZZCASH_LIMIT.toLocaleString()}.`);
+    if (paymentMethod !== "cod" && (!paymentProofUrl || !transactionReference.trim())) return setError("Please enter the transaction reference and upload its screenshot.");
     setSubmitting(true); setError(null);
     try {
       addPaymentInfo();
@@ -64,7 +68,7 @@ export function CheckoutPageContent() {
           <button type="submit" disabled={submitting} className="rounded-xl bg-[#f6a45d] px-3 py-3 text-sm font-bold text-white shadow-sm hover:bg-[#d8861f] disabled:opacity-50">{submitting ? "Placing order..." : paymentMethod === "cod" ? "Place COD order" : "Submit payment"}</button>
           <a href={`https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${whatsappMessage}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 rounded-xl bg-green-700 px-3 py-3 text-sm font-bold text-white hover:bg-green-800"><FaWhatsapp className="h-5 w-5" /> WhatsApp help</a>
         </div>
-        <p className="text-center text-xs text-[#5A5E55]">Manual payments remain pending until an administrator verifies the transaction.</p>
+        <p className="text-center text-xs text-[#5A5E55]">Bank Transfer and JazzCash payments remain pending until an administrator verifies the transaction.</p>
       </div>
       <CheckoutOrderSummary cart={cart} subtotal={subtotal} />
     </form>

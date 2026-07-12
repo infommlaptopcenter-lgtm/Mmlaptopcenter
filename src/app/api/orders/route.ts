@@ -23,12 +23,13 @@ const orderCreateSchema = z.object({
     )
     .min(1),
   notes: z.string().optional(),
-  paymentMethod: z.enum(["cod", "manual_transfer"]).default("cod"),
+  paymentMethod: z.enum(["cod", "bank_transfer", "jazzcash"]).default("cod"),
   paymentProofUrl: z.string().url().optional(),
   transactionReference: z.string().max(120).optional(),
 });
 
-const COD_LIMIT = 100_000;
+const COD_LIMIT = 50_000;
+const JAZZCASH_LIMIT = 10_000;
 
 function generateOrderNumber() {
   const ts = new Date()
@@ -105,7 +106,8 @@ export async function POST(request: Request) {
     const total = subtotal + shippingCost + tax - discount;
 
     if (input.paymentMethod === "cod" && total > COD_LIMIT) throw new Error(`Cash on delivery is only available for orders up to Rs. ${COD_LIMIT.toLocaleString()}.`);
-    if (input.paymentMethod === "manual_transfer" && (!input.paymentProofUrl || !input.transactionReference)) throw new Error("Transaction reference and payment screenshot are required for manual payment.");
+    if (input.paymentMethod === "jazzcash" && total > JAZZCASH_LIMIT) throw new Error(`JazzCash is only available for orders up to Rs. ${JAZZCASH_LIMIT.toLocaleString()}. Please use bank transfer or bank cash deposit.`);
+    if (input.paymentMethod !== "cod" && (!input.paymentProofUrl || !input.transactionReference)) throw new Error("Transaction reference and payment screenshot are required for prepaid payment.");
 
     const orderNumber = generateOrderNumber();
 
@@ -132,7 +134,7 @@ export async function POST(request: Request) {
           paymentMethod: input.paymentMethod,
           paymentStatus: "pending",
           orderStatus: "pending",
-          notes: [input.notes, input.paymentMethod === "manual_transfer" ? `PAYMENT REFERENCE: ${input.transactionReference}\nPAYMENT PROOF: ${input.paymentProofUrl}` : ""].filter(Boolean).join("\n\n") || undefined,
+          notes: [input.notes, input.paymentMethod !== "cod" ? `PAYMENT REFERENCE: ${input.transactionReference}\nPAYMENT PROOF: ${input.paymentProofUrl}` : ""].filter(Boolean).join("\n\n") || undefined,
         },
       });
     });

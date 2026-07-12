@@ -1,4 +1,4 @@
-export type PaymentMethod = "cod" | "manual_transfer";
+export type PaymentMethod = "cod" | "bank_transfer" | "jazzcash";
 
 export type CheckoutDetails = {
   customerName: string;
@@ -12,9 +12,14 @@ export type CheckoutDetails = {
   notes: string;
 };
 
-export const COD_LIMIT = 100_000;
+export const COD_LIMIT = 50_000;
+export const JAZZCASH_LIMIT = 10_000;
 
-export const paymentAccounts = [
-  { name: "Easypaisa", title: process.env.NEXT_PUBLIC_EASYPAISA_TITLE || "MM Laptop Center", number: process.env.NEXT_PUBLIC_EASYPAISA_NUMBER || "Contact us for account number" },
-  { name: "Bank Transfer", title: process.env.NEXT_PUBLIC_BANK_ACCOUNT_TITLE || "MM Laptop Center", number: process.env.NEXT_PUBLIC_BANK_ACCOUNT_NUMBER || "Contact us for account details", detail: process.env.NEXT_PUBLIC_BANK_NAME || "Bank account" },
-];
+export const bankAccount = {
+  bank: "HBL",
+  title: "Mudassir Meer",
+  iban: "PK66HABB0005057900704603",
+  number: "05057900704603",
+};
+
+export const jazzCashAccount = { title: "Mudassir Meer", number: "03048928282" };
