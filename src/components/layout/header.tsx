@@ -100,7 +100,7 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b border-[#d8a928]/45 bg-[#f4f1e8] shadow-sm">
       {/* ───────── top announcement bar ───────── */}
       <div className="hidden bg-[#1a1308] text-white lg:block">
-        <div className="mx-auto flex h-10 max-w-7xl items-center justify-between px-8 text-xs">
+        <div className="flex h-10 w-full items-center justify-between px-4 text-xs sm:px-6">
           <div className="flex items-center gap-6">
             {topBarLeft.map((item) => (
               <span key={item.text} className="flex items-center gap-2 font-medium">
@@ -132,7 +132,7 @@ export function Header() {
       </div>
 
       {/* ───────── main nav ───────── */}
-      <nav className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 lg:h-20 lg:gap-6 lg:px-8">
+      <nav className="flex h-16 w-full items-center gap-4 px-3 sm:px-4 lg:h-20 lg:gap-6 lg:px-6">
         <div className="lg:hidden">
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
