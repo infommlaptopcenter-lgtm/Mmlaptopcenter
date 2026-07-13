@@ -71,8 +71,8 @@ export function ProductInfoPanel({
           : "text-2xl sm:text-3xl lg:text-[2.2rem]";
 
   return (
-    <aside className="h-full min-h-[32rem] overflow-hidden rounded-2xl border border-orange-200/80 bg-[linear-gradient(135deg,rgba(255,247,237,0.96),rgba(255,255,255,0.92))] px-3.5 pb-4 pt-3.5 shadow-[0_18px_45px_rgba(26,19,8,0.08)] sm:px-4 sm:pb-5 sm:pt-4 lg:min-h-[36rem]">
-      <div className="flex h-full flex-col gap-2.5 overflow-y-auto pr-1">
+    <aside className="h-full min-w-0 overflow-hidden rounded-2xl border border-orange-200/80 bg-[linear-gradient(135deg,rgba(255,247,237,0.96),rgba(255,255,255,0.92))] px-3 pb-4 pt-3.5 shadow-[0_18px_45px_rgba(26,19,8,0.08)] sm:min-h-[32rem] sm:px-4 sm:pb-5 sm:pt-4 lg:min-h-[36rem]">
+      <div className="flex h-full min-w-0 flex-col gap-2.5 sm:overflow-y-auto sm:pr-1">
         <div className="flex flex-wrap items-center gap-1.5">
           <Badge className="rounded-full bg-[#12372a] px-2.5 py-0.5 text-[11px] text-white hover:bg-[#12372a]">
             In Stock
@@ -188,12 +188,12 @@ export function ProductInfoPanel({
         </div>
 
         <div className="space-y-2.5 pt-1">
-          <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
-            <Button onClick={onAddToCart} disabled={!availableForSale} className="h-9 min-w-0 rounded-md bg-orange-500 px-1 text-[10px] font-bold text-white shadow-[0_10px_22px_rgba(249,115,22,0.2)] hover:bg-orange-600 sm:h-10 sm:px-2 sm:text-xs">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <Button onClick={onAddToCart} disabled={!availableForSale} className="h-11 min-w-0 rounded-md bg-orange-500 px-3 text-sm font-bold text-white shadow-[0_10px_22px_rgba(249,115,22,0.2)] hover:bg-orange-600 sm:h-10 sm:px-2 sm:text-xs">
               <ShoppingCart className="mr-1 h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
               Add Cart
             </Button>
-            <Button onClick={onBuyNow} disabled={buyLoading || !availableForSale} className="h-9 min-w-0 rounded-md bg-[#1a1308] px-1 text-[10px] font-bold text-white hover:bg-[#2a2118] sm:h-10 sm:px-2 sm:text-xs">
+            <Button onClick={onBuyNow} disabled={buyLoading || !availableForSale} className="h-11 min-w-0 rounded-md bg-[#1a1308] px-3 text-sm font-bold text-white hover:bg-[#2a2118] sm:h-10 sm:px-2 sm:text-xs">
               <Zap className="mr-1 h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
               {buyLoading ? "Processing" : "Buy Now"}
             </Button>
@@ -201,7 +201,7 @@ export function ProductInfoPanel({
               href={whatsAppHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-9 min-w-0 items-center justify-center whitespace-nowrap rounded-md bg-[#25D366] px-1 text-[10px] font-bold text-white transition hover:bg-[#1fb855] sm:h-10 sm:px-2 sm:text-xs"
+              className="inline-flex h-11 min-w-0 items-center justify-center whitespace-nowrap rounded-md bg-[#25D366] px-3 text-sm font-bold text-white transition hover:bg-[#1fb855] sm:h-10 sm:px-2 sm:text-xs"
             >
               <FaWhatsapp className="mr-1 h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
               WhatsApp

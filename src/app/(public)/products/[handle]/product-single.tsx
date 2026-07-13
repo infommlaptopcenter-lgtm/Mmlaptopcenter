@@ -225,7 +225,7 @@ export function ProductSingle({ data }: Props) {
   return (
     <ProductProvider data={data}>
       <section className="w-full overflow-x-hidden bg-[#fcf5e8]">
-        <div className="mx-auto max-w-7xl space-y-8 px-4 py-5 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-7xl space-y-8 px-3 py-5 sm:px-6 lg:px-8">
           <nav className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[#5A5E55]">
             <Link href="/" className="transition-colors hover:text-[#0a0a0a]">Home</Link>
             <ChevronRight className="h-3 w-3 shrink-0 opacity-60" />
@@ -234,7 +234,7 @@ export function ProductSingle({ data }: Props) {
             <span className="max-w-[16rem] truncate font-medium text-[#0a0a0a]">{data.title}</span>
           </nav>
 
-          <div className="grid items-stretch gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="grid w-full min-w-0 grid-cols-1 items-stretch gap-4 sm:gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
             <ProductGallerySection
               title={selectedTitle}
               images={selectedImages}

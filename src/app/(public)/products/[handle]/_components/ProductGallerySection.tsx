@@ -32,7 +32,7 @@ export function ProductGallerySection({
   discountBadge,
 }: ProductGallerySectionProps) {
   return (
-    <div className="h-full space-y-4 rounded-2xl border border-orange-100/80 bg-white/45 p-3 sm:p-4">
+    <div className="h-full min-w-0 space-y-4 rounded-2xl border border-orange-100/80 bg-white/45 p-2 sm:p-4">
       <div className="relative mx-auto aspect-square w-full max-w-md overflow-hidden rounded-xl border border-[#d8a928]/20 bg-[#f4f1e8] shadow-md">
         <div className="absolute inset-0 bg-[#f4f1e8]" />
         {currentImage ? (
@@ -42,7 +42,7 @@ export function ProductGallerySection({
               alt={currentImage.altText || title}
               fill
               priority
-              className="object-contain p-4 transition-transform duration-300 hover:scale-[1.03]"
+              className="object-contain p-2 transition-transform duration-300 hover:scale-[1.03] sm:p-4"
               sizes="(max-width: 768px) 100vw, 50vw"
             />
             <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-white/10 via-transparent to-black/5" />
@@ -69,8 +69,8 @@ export function ProductGallerySection({
         )}
       </div>
 
-      <div className="w-full overflow-x-auto">
-        <div className="mx-auto flex max-w-md justify-start gap-2 pb-2">
+      <div className="w-full overflow-x-auto px-0.5">
+        <div className="flex w-max min-w-full max-w-md justify-start gap-2 pb-2 sm:mx-auto">
           {images.map((img) => (
             <button
               key={img.id}
