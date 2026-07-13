@@ -86,10 +86,10 @@ export function CategoriesSection({ categories }: { categories: Category[] }) {
   const mainCategories = categories.filter((category) => !category.parentId);
 
   return (
-    <section className="lg:mx-auto lg:w-full lg:max-w-7xl lg:px-8 bg-white mt-6 relative z-20">
+    <section className="storefront-categories relative z-20 mt-6 bg-white lg:mx-auto lg:max-w-7xl">
          
       <div className="flex gap-6 overflow-hidden relative">
-        <div className="flex gap-6 animate-scroll scrollbar-hide px-6 lg:px-8">
+        <div className="animate-scroll scrollbar-hide flex gap-6 px-2 sm:px-3 lg:px-4">
            {[...mainCategories, ...mainCategories].map((category, idx) => (
              <Link
                key={`${category.id}-${idx}`}

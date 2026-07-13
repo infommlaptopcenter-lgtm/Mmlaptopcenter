@@ -41,6 +41,11 @@
 @media (min-width: 1280px) {
   .public-site .max-w-7xl {
     max-width: 96rem;
+    width: calc(100% - 2rem);
+  }
+
+  .public-site .storefront-categories {
+    width: calc(100% - 0.5rem);
   }
 }
 
