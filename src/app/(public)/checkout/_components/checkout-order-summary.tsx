@@ -3,10 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Minus, Plus, Trash2 } from "@esmate/shadcn/pkgs/lucide-react";
+import { calculateOrderPricing, COD_TAX_RATE } from "@/lib/order-pricing";
+import type { PaymentMethod } from "./checkout-types";
 
 type Cart = ReturnType<typeof import("@/lib/commerce").useCart>;
 
-export function CheckoutOrderSummary({ cart, subtotal }: { cart: Cart; subtotal: number }) {
+export function CheckoutOrderSummary({ cart, subtotal, paymentMethod }: { cart: Cart; subtotal: number; paymentMethod: PaymentMethod }) {
+  const pricing = calculateOrderPricing(subtotal, paymentMethod === "cod");
+
   return <aside className="h-fit rounded-2xl border border-[#d8a928]/25 bg-white p-5 shadow-sm lg:sticky lg:top-24">
     <h2 className="font-serif text-xl font-extrabold text-[#1a1308]">Your purchase</h2>
     <div className="mt-4 space-y-4">
@@ -30,8 +34,9 @@ export function CheckoutOrderSummary({ cart, subtotal }: { cart: Cart; subtotal:
     </div>
     <div className="mt-4 space-y-2 text-sm">
       <div className="flex justify-between text-[#5A5E55]"><span>Subtotal</span><span>Rs. {subtotal.toLocaleString()}</span></div>
-      <div className="flex justify-between text-[#5A5E55]"><span>Delivery</span><span className="font-semibold text-green-700">Free</span></div>
-      <div className="flex justify-between border-t border-[#d8a928]/20 pt-3 font-serif text-lg font-extrabold text-[#1a1308]"><span>Total</span><span className="text-[#c86f2d]">Rs. {subtotal.toLocaleString()}</span></div>
+      <div className="flex justify-between text-[#5A5E55]"><span>Delivery</span><span>Rs. {pricing.shippingCost.toLocaleString()}</span></div>
+      {paymentMethod === "cod" ? <div className="flex justify-between text-[#5A5E55]"><span>COD government tax ({COD_TAX_RATE * 100}%)</span><span>Rs. {pricing.tax.toLocaleString()}</span></div> : null}
+      <div className="flex justify-between border-t border-[#d8a928]/20 pt-3 font-serif text-lg font-extrabold text-[#1a1308]"><span>Total</span><span className="text-[#c86f2d]">Rs. {pricing.total.toLocaleString()}</span></div>
     </div>
   </aside>;
 }

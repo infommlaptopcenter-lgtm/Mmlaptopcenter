@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { calculateOrderPricing } from "@/lib/order-pricing";
 
 const orderCreateSchema = z.object({
   customerName: z.string().min(1),
@@ -100,10 +101,11 @@ export async function POST(request: Request) {
     });
 
     const subtotal = enrichedItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    const shippingCost = 0;
-    const tax = 0;
+    const pricing = calculateOrderPricing(subtotal, input.paymentMethod === "cod");
+    const shippingCost = pricing.shippingCost;
+    const tax = pricing.tax;
     const discount = 0;
-    const total = subtotal + shippingCost + tax - discount;
+    const total = pricing.total - discount;
 
     if (input.paymentMethod === "cod" && total > COD_LIMIT) throw new Error(`Cash on delivery is only available for orders up to Rs. ${COD_LIMIT.toLocaleString()}.`);
     if (input.paymentMethod === "jazzcash" && total > JAZZCASH_LIMIT) throw new Error(`JazzCash is only available for orders up to Rs. ${JAZZCASH_LIMIT.toLocaleString()}. Please use bank transfer or bank cash deposit.`);

@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Banknote, Building2, Smartphone, Upload } from "@esmate/shadcn/pkgs/lucide-react";
 import { bankAccount, COD_LIMIT, JAZZCASH_LIMIT, jazzCashAccount, type PaymentMethod } from "./checkout-types";
+import { calculateOrderPricing } from "@/lib/order-pricing";
 
 type Props = {
   subtotal: number;
@@ -18,8 +19,8 @@ export function CheckoutPaymentSection({ subtotal, method, setMethod, proofUrl, 
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const codAvailable = subtotal <= COD_LIMIT;
-  const jazzCashAvailable = subtotal <= JAZZCASH_LIMIT;
+  const codAvailable = calculateOrderPricing(subtotal, true).total <= COD_LIMIT;
+  const jazzCashAvailable = calculateOrderPricing(subtotal, false).total <= JAZZCASH_LIMIT;
 
   async function uploadProof(file: File) {
     setUploadError(null);
@@ -60,7 +61,7 @@ export function CheckoutPaymentSection({ subtotal, method, setMethod, proofUrl, 
     {subtotal > JAZZCASH_LIMIT ? <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800">Orders above PKR {JAZZCASH_LIMIT.toLocaleString()} must be paid by bank transfer or bank cash deposit.</p> : null}
     {!codAvailable ? <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800">Cash on Delivery is unavailable above PKR {COD_LIMIT.toLocaleString()}.</p> : null}
 
-    {method === "cod" ? <div className="mt-5 rounded-xl bg-[#fcf5e8] p-4 text-sm text-[#5A5E55]"><p className="font-bold text-[#1a1308]">Cash on Delivery instructions</p><p className="mt-1">Pay the courier in cash when your order arrives. Please keep the exact amount ready.</p></div> : null}
+    {method === "cod" ? <div className="mt-5 rounded-xl bg-[#fcf5e8] p-4 text-sm text-[#5A5E55]"><p className="font-bold text-[#1a1308]">Cash on Delivery instructions</p><p className="mt-1">Pay the courier in cash when your order arrives. A 4% government COD tax applies in addition to the PKR 400 delivery charge.</p></div> : null}
 
     {method !== "cod" ? <div className="mt-5 space-y-4 border-t border-[#d8a928]/15 pt-5">
       {method === "bank_transfer" ? <div className="rounded-xl bg-[#fcf5e8] p-4 text-sm">

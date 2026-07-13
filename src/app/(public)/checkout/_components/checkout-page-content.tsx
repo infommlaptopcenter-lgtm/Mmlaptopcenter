@@ -7,6 +7,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import { useCart } from "@/lib/commerce";
 import { addPaymentInfo, purchase } from "@/lib/pixel";
 import { ADMIN_WHATSAPP_NUMBER, isValidWhatsAppNumber } from "@/lib/whatsapp";
+import { calculateOrderPricing } from "@/lib/order-pricing";
 import { CheckoutCustomerForm } from "./checkout-customer-form";
 import { CheckoutOrderSummary } from "./checkout-order-summary";
 import { CheckoutPaymentSection } from "./checkout-payment-section";
@@ -25,20 +26,26 @@ export function CheckoutPageContent() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const isEmpty = (cart.totalQuantity ?? 0) === 0;
+  const pricing = useMemo(
+    () => calculateOrderPricing(subtotal, paymentMethod === "cod"),
+    [subtotal, paymentMethod],
+  );
+  const codTotal = useMemo(() => calculateOrderPricing(subtotal, true).total, [subtotal]);
+  const prepaidTotal = useMemo(() => calculateOrderPricing(subtotal, false).total, [subtotal]);
 
   useEffect(() => {
-    if (subtotal > COD_LIMIT && paymentMethod === "cod") setPaymentMethod("bank_transfer");
-    if (subtotal > JAZZCASH_LIMIT && paymentMethod === "jazzcash") setPaymentMethod("bank_transfer");
-  }, [subtotal, paymentMethod]);
+    if (codTotal > COD_LIMIT && paymentMethod === "cod") setPaymentMethod("bank_transfer");
+    if (prepaidTotal > JAZZCASH_LIMIT && paymentMethod === "jazzcash") setPaymentMethod("bank_transfer");
+  }, [codTotal, prepaidTotal, paymentMethod]);
 
-  const whatsappMessage = encodeURIComponent(`Hi MM Laptop Center, I need help with my checkout. Total: Rs. ${subtotal.toLocaleString()}. Name: ${details.customerName || "Not entered"}. Phone: ${details.customerPhone || "Not entered"}.`);
+  const whatsappMessage = encodeURIComponent(`Hi MM Laptop Center, I need help with my checkout. Total: Rs. ${pricing.total.toLocaleString()}. Name: ${details.customerName || "Not entered"}. Phone: ${details.customerPhone || "Not entered"}.`);
 
   async function placeOrder(event: React.FormEvent) {
     event.preventDefault();
     if (isEmpty) return;
     if (!isValidWhatsAppNumber(details.customerPhone)) return setError("Please enter a valid WhatsApp or phone number.");
-    if (paymentMethod === "cod" && subtotal > COD_LIMIT) return setError(`Cash on delivery is only available up to Rs. ${COD_LIMIT.toLocaleString()}.`);
-    if (paymentMethod === "jazzcash" && subtotal > JAZZCASH_LIMIT) return setError(`JazzCash is only available up to Rs. ${JAZZCASH_LIMIT.toLocaleString()}.`);
+    if (paymentMethod === "cod" && codTotal > COD_LIMIT) return setError(`Cash on delivery is only available up to Rs. ${COD_LIMIT.toLocaleString()}.`);
+    if (paymentMethod === "jazzcash" && prepaidTotal > JAZZCASH_LIMIT) return setError(`JazzCash is only available up to Rs. ${JAZZCASH_LIMIT.toLocaleString()}.`);
     if (paymentMethod !== "cod" && (!paymentProofUrl || !transactionReference.trim())) return setError("Please enter the transaction reference and upload its screenshot.");
     setSubmitting(true); setError(null);
     try {
@@ -51,7 +58,7 @@ export function CheckoutPageContent() {
       }) });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "Failed to place order");
-      purchase(data.order.orderNumber, subtotal); cart.clear(); router.push(`/checkout/success?orderNumber=${encodeURIComponent(data.order.orderNumber)}`);
+      purchase(data.order.orderNumber, data.order.total ?? pricing.total); cart.clear(); router.push(`/checkout/success?orderNumber=${encodeURIComponent(data.order.orderNumber)}`);
     } catch (caught) { setError(caught instanceof Error ? caught.message : "Failed to place order"); } finally { setSubmitting(false); }
   }
 
@@ -70,7 +77,7 @@ export function CheckoutPageContent() {
         </div>
         <p className="text-center text-xs text-[#5A5E55]">Bank Transfer and JazzCash payments remain pending until an administrator verifies the transaction.</p>
       </div>
-      <CheckoutOrderSummary cart={cart} subtotal={subtotal} />
+      <CheckoutOrderSummary cart={cart} subtotal={subtotal} paymentMethod={paymentMethod} />
     </form>
   </div></main>;
 }
