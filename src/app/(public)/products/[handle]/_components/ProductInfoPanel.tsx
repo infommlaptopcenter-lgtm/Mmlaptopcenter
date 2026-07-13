@@ -188,22 +188,22 @@ export function ProductInfoPanel({
         </div>
 
         <div className="space-y-2.5 pt-1">
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <Button onClick={onAddToCart} disabled={!availableForSale} className="h-11 min-w-0 rounded-md bg-orange-500 px-3 text-sm font-bold text-white shadow-[0_10px_22px_rgba(249,115,22,0.2)] hover:bg-orange-600 sm:h-10 sm:px-2 sm:text-xs">
-              <ShoppingCart className="mr-1 h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+            <Button onClick={onAddToCart} disabled={!availableForSale} className="h-10 min-w-0 rounded-md bg-orange-500 px-0.5 text-[9px] font-bold text-white shadow-[0_10px_22px_rgba(249,115,22,0.2)] hover:bg-orange-600 min-[360px]:px-1 min-[360px]:text-[10px] sm:px-2 sm:text-xs">
+              <ShoppingCart className="mr-0.5 h-3 w-3 shrink-0 min-[360px]:mr-1 min-[360px]:h-3.5 min-[360px]:w-3.5 sm:h-4 sm:w-4" />
               Add Cart
             </Button>
-            <Button onClick={onBuyNow} disabled={buyLoading || !availableForSale} className="h-11 min-w-0 rounded-md bg-[#1a1308] px-3 text-sm font-bold text-white hover:bg-[#2a2118] sm:h-10 sm:px-2 sm:text-xs">
-              <Zap className="mr-1 h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+            <Button onClick={onBuyNow} disabled={buyLoading || !availableForSale} className="h-10 min-w-0 rounded-md bg-[#1a1308] px-0.5 text-[9px] font-bold text-white hover:bg-[#2a2118] min-[360px]:px-1 min-[360px]:text-[10px] sm:px-2 sm:text-xs">
+              <Zap className="mr-0.5 h-3 w-3 shrink-0 min-[360px]:mr-1 min-[360px]:h-3.5 min-[360px]:w-3.5 sm:h-4 sm:w-4" />
               {buyLoading ? "Processing" : "Buy Now"}
             </Button>
             <a
               href={whatsAppHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-11 min-w-0 items-center justify-center whitespace-nowrap rounded-md bg-[#25D366] px-3 text-sm font-bold text-white transition hover:bg-[#1fb855] sm:h-10 sm:px-2 sm:text-xs"
+              className="inline-flex h-10 min-w-0 items-center justify-center whitespace-nowrap rounded-md bg-[#25D366] px-0.5 text-[9px] font-bold text-white transition hover:bg-[#1fb855] min-[360px]:px-1 min-[360px]:text-[10px] sm:px-2 sm:text-xs"
             >
-              <FaWhatsapp className="mr-1 h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+              <FaWhatsapp className="mr-0.5 h-3 w-3 shrink-0 min-[360px]:mr-1 min-[360px]:h-3.5 min-[360px]:w-3.5 sm:h-4 sm:w-4" />
               WhatsApp
             </a>
           </div>
