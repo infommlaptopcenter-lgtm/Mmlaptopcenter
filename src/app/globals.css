@@ -36,6 +36,14 @@
   --radius: 0.75rem;
 }
 
+/* Keep storefront content comfortably wide on desktop while preserving the
+   narrower reading widths used for text-heavy sections. */
+@media (min-width: 1280px) {
+  .public-site .max-w-7xl {
+    max-width: 96rem;
+  }
+}
+
 @keyframes marquee {
   0% {
     transform: translateX(0%);
