@@ -1,4 +1,4 @@
-export const DELIVERY_CHARGE = 400;
+export const DELIVERY_CHARGE = 0;
 export const COD_TAX_RATE = 0.04;
 
 export function calculateOrderPricing(subtotal: number, isCashOnDelivery: boolean) {

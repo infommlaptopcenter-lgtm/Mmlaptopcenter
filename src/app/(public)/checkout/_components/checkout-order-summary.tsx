@@ -34,7 +34,7 @@ export function CheckoutOrderSummary({ cart, subtotal, paymentMethod }: { cart: 
     </div>
     <div className="mt-4 space-y-2 text-sm">
       <div className="flex justify-between text-[#5A5E55]"><span>Subtotal</span><span>Rs. {subtotal.toLocaleString()}</span></div>
-      <div className="flex justify-between text-[#5A5E55]"><span>Delivery</span><span>Rs. {pricing.shippingCost.toLocaleString()}</span></div>
+      <div className="flex justify-between text-[#5A5E55]"><span>Delivery</span><span className="font-semibold text-green-700">Free</span></div>
       {paymentMethod === "cod" ? <div className="flex justify-between text-[#5A5E55]"><span>COD government tax ({COD_TAX_RATE * 100}%)</span><span>Rs. {pricing.tax.toLocaleString()}</span></div> : null}
       <div className="flex justify-between border-t border-[#d8a928]/20 pt-3 font-serif text-lg font-extrabold text-[#1a1308]"><span>Total</span><span className="text-[#c86f2d]">Rs. {pricing.total.toLocaleString()}</span></div>
     </div>
