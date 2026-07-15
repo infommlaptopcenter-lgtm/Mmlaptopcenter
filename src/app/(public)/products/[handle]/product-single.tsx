@@ -7,7 +7,7 @@ import { ChevronRight, ShoppingCart } from "@esmate/shadcn/pkgs/lucide-react";
 import { toast } from "sonner";
 
 import { ProductProvider, useCart } from "@/lib/commerce";
-import { addToCart as trackAddToCart, addToWishlist as trackAddToWishlist, viewContent } from "@/lib/pixel";
+import { addToCart as trackAddToCart, initiateCheckout, viewContent } from "@/lib/pixel";
 import { useVariantSelector } from "@/hooks/use-variant-selector";
 
 import { getProductSingle } from "./service";
@@ -82,8 +82,18 @@ export function ProductSingle({ data }: Props) {
     const price = parseFloat(
       data.variants?.nodes[0]?.price.amount || data.priceRange?.minVariantPrice?.amount || "0",
     );
-    viewContent(data.title, data.id, price);
-  }, [data.id, data.priceRange?.minVariantPrice?.amount, data.title, data.variants?.nodes]);
+    const initialVariant = data.variants?.nodes[0];
+    viewContent({
+      content_ids: [data.id],
+      contents: [{ id: data.id, quantity: 1, item_price: price, variant: initialVariant?.name }],
+      content_name: data.title,
+      content_category: data.productType || undefined,
+      content_type: "product",
+      value: price,
+      currency: "PKR",
+      num_items: 1,
+    });
+  }, [data.id, data.priceRange?.minVariantPrice?.amount, data.productType, data.title, data.variants?.nodes]);
 
   useEffect(() => {
     async function fetchReviewStats() {
@@ -167,7 +177,17 @@ export function ProductSingle({ data }: Props) {
         description: `${quantity} x ${selectedTitle}${selectedLabel ? ` (${selectedLabel})` : ""}`,
         icon: <ShoppingCart className="h-4 w-4" />,
       });
-      trackAddToCart(selectedTitle, merchandiseId, getSelectedPrice());
+      const price = getSelectedPrice();
+      trackAddToCart({
+        content_ids: [data.id],
+        contents: [{ id: data.id, quantity, item_price: price, variant: selectedLabel || selectedTitle }],
+        content_name: data.title,
+        content_category: data.productType || undefined,
+        content_type: "product",
+        value: price * quantity,
+        currency: "PKR",
+        num_items: quantity,
+      });
     } catch {
       toast.error("Failed to add to cart");
     }
@@ -177,7 +197,17 @@ export function ProductSingle({ data }: Props) {
     try {
       await linesAdd([{ merchandiseId: variant.id, quantity: 1 }]);
       toast.success("Added to cart", { description: variant.name || data.title, icon: <ShoppingCart className="h-4 w-4" /> });
-      trackAddToCart(variant.name || data.title, variant.id, parseFloat(variant.price.amount));
+      const price = parseFloat(variant.price.amount);
+      trackAddToCart({
+        content_ids: [data.id],
+        contents: [{ id: data.id, quantity: 1, item_price: price, variant: variant.name }],
+        content_name: data.title,
+        content_category: data.productType || undefined,
+        content_type: "product",
+        value: price,
+        currency: "PKR",
+        num_items: 1,
+      });
     } catch {
       toast.error("Failed to add to cart");
     }
@@ -205,6 +235,25 @@ export function ProductSingle({ data }: Props) {
     setBuyLoading(true);
     try {
       await linesAdd([{ merchandiseId, quantity }]);
+      const price = getSelectedPrice();
+      trackAddToCart({
+        content_ids: [data.id],
+        contents: [{ id: data.id, quantity, item_price: price, variant: selectedLabel || selectedTitle }],
+        content_name: data.title,
+        content_category: data.productType || undefined,
+        content_type: "product",
+        value: price * quantity,
+        currency: "PKR",
+        num_items: quantity,
+      });
+      initiateCheckout({
+        content_ids: [data.id],
+        contents: [{ id: data.id, quantity, item_price: price, variant: selectedLabel || selectedTitle }],
+        content_type: "product",
+        value: price * quantity,
+        currency: "PKR",
+        num_items: quantity,
+      });
       router.push("/checkout");
     } catch {
       toast.error("Checkout failed");
@@ -218,7 +267,7 @@ export function ProductSingle({ data }: Props) {
     toast.success(!wishlisted ? "Added to wishlist" : "Removed from wishlist");
 
     if (!wishlisted) {
-      trackAddToWishlist(data.title, variantId || selectedVariant?.id || data.handle, getSelectedPrice());
+      // Wishlist state is intentionally not sent as a required commerce event.
     }
   };
 

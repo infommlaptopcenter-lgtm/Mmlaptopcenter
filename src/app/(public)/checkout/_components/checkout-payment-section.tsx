@@ -13,9 +13,10 @@ type Props = {
   setProofUrl: (url: string) => void;
   reference: string;
   setReference: (value: string) => void;
+  onProofUploaded: () => void;
 };
 
-export function CheckoutPaymentSection({ subtotal, method, setMethod, proofUrl, setProofUrl, reference, setReference }: Props) {
+export function CheckoutPaymentSection({ subtotal, method, setMethod, proofUrl, setProofUrl, reference, setReference, onProofUploaded }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -40,6 +41,7 @@ export function CheckoutPaymentSection({ subtotal, method, setMethod, proofUrl, 
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Upload failed");
       setProofUrl(data.url);
+      onProofUploaded();
     } catch (error) {
       setUploadError(error instanceof Error ? error.message : "Upload failed");
     } finally {

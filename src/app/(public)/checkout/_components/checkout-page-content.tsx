@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FaWhatsapp } from "react-icons/fa";
 import { useCart } from "@/lib/commerce";
-import { addPaymentInfo, purchase } from "@/lib/pixel";
+import { addPaymentInfo, contact as trackContact, purchase, type MetaEventParameters } from "@/lib/pixel";
 import { ADMIN_WHATSAPP_NUMBER, isValidWhatsAppNumber } from "@/lib/whatsapp";
 import { calculateOrderPricing } from "@/lib/order-pricing";
 import { CheckoutCustomerForm } from "./checkout-customer-form";
@@ -32,6 +32,19 @@ export function CheckoutPageContent() {
   );
   const codTotal = useMemo(() => calculateOrderPricing(subtotal, true).total, [subtotal]);
   const prepaidTotal = useMemo(() => calculateOrderPricing(subtotal, false).total, [subtotal]);
+  const cartEventParameters = useMemo<MetaEventParameters>(() => ({
+    content_ids: cart.lines.map((line) => line.merchandise.product.id || line.merchandise.id.replace(/-simple$/, "")),
+    contents: cart.lines.map((line) => ({
+      id: line.merchandise.product.id || line.merchandise.id.replace(/-simple$/, ""),
+      quantity: line.quantity,
+      item_price: Number(line.merchandise.price.amount),
+      variant: line.merchandise.selectedOptions.map((option) => `${option.name}: ${option.value}`).join(", ") || undefined,
+    })),
+    content_type: "product",
+    value: pricing.total,
+    currency: "PKR",
+    num_items: cart.totalQuantity,
+  }), [cart.lines, cart.totalQuantity, pricing.total]);
 
   useEffect(() => {
     if (codTotal > COD_LIMIT && paymentMethod === "cod") setPaymentMethod("bank_transfer");
@@ -49,7 +62,6 @@ export function CheckoutPageContent() {
     if (paymentMethod !== "cod" && (!paymentProofUrl || !transactionReference.trim())) return setError("Please enter the transaction reference and upload its screenshot.");
     setSubmitting(true); setError(null);
     try {
-      addPaymentInfo();
       const response = await fetch("/api/orders", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         customerName: details.customerName, customerEmail: details.customerEmail, customerPhone: details.customerPhone,
         customerAddress: { line1: details.line1, line2: details.line2 || undefined, city: details.city, state: details.state || undefined, pincode: details.pincode || undefined, country: "PK" },
@@ -58,7 +70,8 @@ export function CheckoutPageContent() {
       }) });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "Failed to place order");
-      purchase(data.order.orderNumber, data.order.total ?? pricing.total); cart.clear(); router.push(`/checkout/success?orderNumber=${encodeURIComponent(data.order.orderNumber)}`);
+      purchase({ ...cartEventParameters, value: data.order.total ?? pricing.total, order_id: data.order.orderNumber });
+      cart.clear(); router.push(`/checkout/success?orderNumber=${encodeURIComponent(data.order.orderNumber)}`);
     } catch (caught) { setError(caught instanceof Error ? caught.message : "Failed to place order"); } finally { setSubmitting(false); }
   }
 
@@ -70,10 +83,10 @@ export function CheckoutPageContent() {
       <div className="space-y-6">
         {error ? <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</div> : null}
         <CheckoutCustomerForm values={details} setValue={(key, value) => setDetails((current) => ({ ...current, [key]: value }))} />
-        <CheckoutPaymentSection subtotal={subtotal} method={paymentMethod} setMethod={setPaymentMethod} proofUrl={paymentProofUrl} setProofUrl={setPaymentProofUrl} reference={transactionReference} setReference={setTransactionReference} />
+        <CheckoutPaymentSection subtotal={subtotal} method={paymentMethod} setMethod={setPaymentMethod} proofUrl={paymentProofUrl} setProofUrl={setPaymentProofUrl} reference={transactionReference} setReference={setTransactionReference} onProofUploaded={() => addPaymentInfo(cartEventParameters)} />
         <div className="grid grid-cols-2 gap-2 sm:gap-3">
           <button type="submit" disabled={submitting} className="min-w-0 whitespace-nowrap rounded-lg bg-[#f6a45d] px-2 py-2.5 text-[11px] font-bold text-white shadow-sm hover:bg-[#d8861f] disabled:opacity-50 sm:px-3 sm:py-3 sm:text-sm">{submitting ? "Placing order..." : paymentMethod === "cod" ? "Place COD order" : "Submit payment"}</button>
-          <a href={`https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${whatsappMessage}`} target="_blank" rel="noopener noreferrer" className="flex min-w-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-green-700 px-2 py-2.5 text-[11px] font-bold text-white hover:bg-green-800 sm:gap-2 sm:px-3 sm:py-3 sm:text-sm"><FaWhatsapp className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" /> WhatsApp help</a>
+          <a href={`https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${whatsappMessage}`} target="_blank" rel="noopener noreferrer" onClick={() => trackContact("WhatsApp checkout help")} className="flex min-w-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-green-700 px-2 py-2.5 text-[11px] font-bold text-white hover:bg-green-800 sm:gap-2 sm:px-3 sm:py-3 sm:text-sm"><FaWhatsapp className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" /> WhatsApp help</a>
         </div>
         <p className="text-center text-xs text-[#5A5E55]">Bank Transfer and JazzCash payments remain pending until an administrator verifies the transaction.</p>
       </div>

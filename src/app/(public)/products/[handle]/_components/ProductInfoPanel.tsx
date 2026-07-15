@@ -1,6 +1,7 @@
 "use client";
 
 import { FaWhatsapp } from "react-icons/fa";
+import { contact as trackContact } from "@/lib/pixel";
 import { Badge } from "@esmate/shadcn/components/ui/badge";
 import { Button } from "@esmate/shadcn/components/ui/button";
 import { Label } from "@esmate/shadcn/components/ui/label";
@@ -199,6 +200,7 @@ export function ProductInfoPanel({
             </Button>
             <a
               href={whatsAppHref}
+              onClick={() => trackContact("WhatsApp product order")}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex h-10 min-w-0 items-center justify-center whitespace-nowrap rounded-md bg-[#25D366] px-0.5 text-[9px] font-bold text-white transition hover:bg-[#1fb855] min-[360px]:px-1 min-[360px]:text-[10px] sm:px-2 sm:text-xs"

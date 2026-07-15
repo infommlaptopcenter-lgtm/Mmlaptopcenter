@@ -6,7 +6,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import { useCart } from "@/lib/commerce";
 import { toast } from "sonner";
 import { useState, useEffect, useMemo } from "react";
-import { addToCart as trackAddToCart } from "@/lib/pixel";
+import { addToCart as trackAddToCart, contact as trackContact } from "@/lib/pixel";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -232,7 +232,16 @@ export function StoreProductCard({
         },
       ]);
       toast.success("Added to cart", { description: title });
-      trackAddToCart(title, effectiveVariantId, parseFloat(price.amount));
+      trackAddToCart({
+        content_ids: [productId || effectiveVariantId],
+        contents: [{ id: productId || effectiveVariantId, quantity: 1, item_price: parseFloat(price.amount), variant: effectiveVariantId }],
+        content_name: title,
+        content_category: tag,
+        content_type: "product",
+        value: parseFloat(price.amount),
+        currency: "PKR",
+        num_items: 1,
+      });
     } catch {
       toast.error("Failed to add to cart");
     } finally {
@@ -361,6 +370,7 @@ export function StoreProductCard({
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md bg-green-700 px-4 py-2 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-green-800 active:scale-95"
             aria-label={`Order ${title} on WhatsApp`}
+            onClick={() => trackContact("WhatsApp product order")}
           >
             <FaWhatsapp className="h-4 w-4" />
             WhatsApp

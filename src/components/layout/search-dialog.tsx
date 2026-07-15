@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent, DialogTitle } from "@esmate/shadcn/components/ui/dialog";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@esmate/shadcn/components/ui/command";
@@ -20,11 +20,13 @@ export function SearchDialog({ open, onOpenChange }: Props) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, { wait: 300 });
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<Awaited<ReturnType<typeof searchProducts>>>([]);
   const [loading, setLoading] = useState(false);
+  const lastTrackedQuery = useRef("");
 
   useEffect(() => {
-    if (!debouncedQuery) {
+    const validQuery = debouncedQuery.trim();
+    if (validQuery.length < 3) {
       setResults([]);
       return;
     }
@@ -32,8 +34,12 @@ export function SearchDialog({ open, onOpenChange }: Props) {
     async function fetchResults() {
       setLoading(true);
       try {
-        const products = await searchProducts(debouncedQuery);
+        const products = await searchProducts(validQuery);
         setResults(products);
+        if (lastTrackedQuery.current !== validQuery) {
+          search(validQuery);
+          lastTrackedQuery.current = validQuery;
+        }
       } catch (e) {
         console.error(e);
         setResults([]);
@@ -50,13 +56,7 @@ export function SearchDialog({ open, onOpenChange }: Props) {
     router.push(`/products/${handle}`);
   };
 
-  const handleSearch = (value: string) => {
-    setQuery(value);
-    // Track Search event when user types a search query
-    if (value.trim().length >= 3) {
-      search(value);
-    }
-  };
+  const handleSearch = (value: string) => setQuery(value);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

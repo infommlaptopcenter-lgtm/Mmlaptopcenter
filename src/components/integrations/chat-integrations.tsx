@@ -6,6 +6,7 @@ import Script from "next/script";
 import { FaWhatsapp } from "react-icons/fa";
 import { ChatButton } from "@/components/chatbot/chat-button";
 import { ChatPopup } from "@/components/chatbot/chat-popup";
+import { contact as trackContact } from "@/lib/pixel";
 
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
 const TAWK_ID = process.env.NEXT_PUBLIC_TAWK_ID;
@@ -45,6 +46,7 @@ export function ChatIntegrations() {
         rel="noopener noreferrer"
         className="fixed bottom-28 md:bottom-28 right-5 z-50 hidden lg:flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-[#25D366] focus:ring-offset-2 lg:bottom-6 lg:right-6 lg:h-14 lg:w-14"
         aria-label="Chat on WhatsApp"
+        onClick={() => trackContact("WhatsApp floating button")}
       >
         <FaWhatsapp className="h-5 w-5 lg:h-8 lg:w-8" />
       </Link>

@@ -12,7 +12,7 @@ import {
   ChevronDown,
   Clock,
 } from "@esmate/shadcn/pkgs/lucide-react";
-import { lead } from "@/lib/pixel";
+import { contact as trackContact, lead } from "@/lib/pixel";
 
 const faqs = [
   {
@@ -71,7 +71,7 @@ export default function ContactClient() {
       }
 
       // Track Lead event on successful form submission
-      lead();
+      lead("contact form");
 
       setSubmitted(true);
       setName("");
@@ -79,8 +79,8 @@ export default function ContactClient() {
       setPhone("");
       setSubject("");
       setMessage("");
-    } catch (err: any) {
-      setError(err?.message || "Failed to send message");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to send message");
     } finally {
       setSubmitting(false);
     }
@@ -168,6 +168,7 @@ export default function ContactClient() {
                 href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackContact("WhatsApp contact page")}
                 className="inline-flex items-center gap-2 rounded-lg bg-[#f6a45d] px-5 py-3 text-sm font-semibold text-[#fcf5e8] transition hover:bg-[#d8861f]"
               >
                 <MessageCircle className="h-4 w-4" />

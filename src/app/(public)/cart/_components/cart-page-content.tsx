@@ -12,7 +12,7 @@ import {
   Money,
   useCart,
 } from "@/lib/commerce";
-import { viewCart, initiateCheckout } from "@/lib/pixel";
+import { contact as trackContact, initiateCheckout } from "@/lib/pixel";
 import {
   Card,
   CardContent,
@@ -114,18 +114,16 @@ export function CartPageContent() {
   const cart = useCart();
   const isCartEmpty = (cart?.totalQuantity ?? 0) === 0;
 
-  useEffect(() => {
-    if (!isCartEmpty) {
-      viewCart();
-    }
-  }, [isCartEmpty]);
-
   const handleCheckout = () => {
     const subtotal = cart.lines.reduce(
       (sum, line) => sum + Number(line.cost?.totalAmount?.amount || 0),
       0,
     );
-    initiateCheckout(subtotal);
+    initiateCheckout({
+      content_ids: cart.lines.map((line) => line.merchandise.product.id || line.merchandise.id.replace(/-simple$/, "")),
+      contents: cart.lines.map((line) => ({ id: line.merchandise.product.id || line.merchandise.id.replace(/-simple$/, ""), quantity: line.quantity, item_price: Number(line.merchandise.price.amount), variant: line.merchandise.selectedOptions.map((option) => `${option.name}: ${option.value}`).join(", ") || undefined })),
+      content_type: "product", value: subtotal, currency: "PKR", num_items: cart.totalQuantity,
+    });
     router.push("/checkout");
   };
 
@@ -249,6 +247,7 @@ export function CartPageContent() {
                 href={`https://wa.me/${WHATSAPP_NUMBER}?text=${buildWhatsAppMessage(cart)}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackContact("WhatsApp cart order")}
                 className="inline-flex h-12 w-full items-center justify-center rounded-full bg-[#25D366] text-sm font-semibold text-white transition hover:bg-[#128C7E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366]"
               >
                 <FaWhatsapp className="mr-2 h-5 w-5" />

@@ -11,6 +11,7 @@ import {
 } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { initiateCheckout } from "@/lib/pixel";
 
 type MoneyV2 = {
   amount: string;
@@ -18,6 +19,7 @@ type MoneyV2 = {
 };
 
 type ProductData = {
+  id: string;
   handle: string;
   title: string;
   variants: {
@@ -61,6 +63,7 @@ type CartLine = {
       value: string;
     }>;
     product: {
+      id?: string;
       handle: string;
       title: string;
     };
@@ -258,8 +261,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
                   altText: image.altText,
                 }
               : null,
-            selectedOptions: [],
+            selectedOptions: variant?.selectedOptions || [],
             product: {
+              id: product?.id || incomingLine.merchandiseId,
               handle: product?.handle || simpleProduct?.handle || incomingLine.merchandiseId,
               title: title,
             },
@@ -437,13 +441,31 @@ export function CartCheckoutButton({
   disabled?: boolean;
 }) {
   const router = useRouter();
+  const cart = useCart();
+
+  const startCheckout = () => {
+    initiateCheckout({
+      content_ids: cart.lines.map((line) => line.merchandise.product.id || line.merchandise.id.replace(/-simple$/, "")),
+      contents: cart.lines.map((line) => ({
+        id: line.merchandise.product.id || line.merchandise.id.replace(/-simple$/, ""),
+        quantity: line.quantity,
+        item_price: Number(line.merchandise.price.amount),
+        variant: line.merchandise.selectedOptions.map((option) => `${option.name}: ${option.value}`).join(", ") || undefined,
+      })),
+      content_type: "product",
+      value: cart.lines.reduce((sum, line) => sum + Number(line.cost.totalAmount.amount), 0),
+      currency: "PKR",
+      num_items: cart.totalQuantity,
+    });
+    router.push("/checkout");
+  };
 
   return (
     <button
       type="button"
       disabled={disabled}
       className={className}
-      onClick={() => router.push("/checkout")}
+      onClick={startCheckout}
     >
       {children}
     </button>

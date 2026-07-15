@@ -1,156 +1,75 @@
-export const FB_PIXEL_ID = "1520641896287637";
+export const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+export const META_CURRENCY = "PKR" as const;
+
+export type MetaContent = {
+  id: string;
+  quantity: number;
+  item_price: number;
+  variant?: string;
+};
+
+export type MetaEventParameters = {
+  content_ids?: string[];
+  contents?: MetaContent[];
+  content_name?: string;
+  content_category?: string;
+  content_type?: "product";
+  value?: number;
+  currency?: typeof META_CURRENCY;
+  num_items?: number;
+  order_id?: string;
+  search_string?: string;
+  contact_method?: string;
+};
+
+type MetaStandardEvent =
+  | "PageView"
+  | "ViewContent"
+  | "Search"
+  | "AddToCart"
+  | "InitiateCheckout"
+  | "AddPaymentInfo"
+  | "Purchase"
+  | "Contact"
+  | "Lead";
+
+type MetaPixelFunction = (
+  command: "track",
+  event: MetaStandardEvent,
+  parameters?: MetaEventParameters,
+) => void;
 
 declare global {
   interface Window {
-    fbq: (...args: any[]) => void;
+    fbq?: MetaPixelFunction;
   }
 }
 
-/**
- * Track PageView event
- * Automatically tracked via layout.tsx, but can be called manually if needed
- */
-export const pageview = (): void => {
-  if (typeof window !== "undefined" && typeof window.fbq === "function") {
-    window.fbq("track", "PageView");
-  }
-};
+function track(event: MetaStandardEvent, parameters?: MetaEventParameters): void {
+  if (typeof window === "undefined" || typeof window.fbq !== "function") return;
 
-/**
- * Track ViewContent event
- * Fire when a user views a product page
- */
-export const viewContent = (
-  productName: string,
-  productId: string,
-  price: number,
-): void => {
-  if (typeof window !== "undefined" && typeof window.fbq === "function") {
-    window.fbq("track", "ViewContent", {
-      content_name: productName,
-      content_ids: [productId],
-      content_type: "product",
-      value: price,
-      currency: "PKR",
-    });
+  try {
+    window.fbq("track", event, parameters);
+  } catch {
+    // Tracking must never interrupt shopping when Meta is blocked or unavailable.
   }
-};
+}
 
-/**
- * Track AddToCart event
- * Fire when a user adds an item to cart
- */
-export const addToCart = (
-  productName: string,
-  productId: string,
-  price: number,
-): void => {
-  if (typeof window !== "undefined" && typeof window.fbq === "function") {
-    window.fbq("track", "AddToCart", {
-      content_name: productName,
-      content_ids: [productId],
-      content_type: "product",
-      value: price,
-      currency: "PKR",
-    });
-  }
-};
+export const pageView = (): void => track("PageView");
+export const viewContent = (parameters: MetaEventParameters): void =>
+  track("ViewContent", parameters);
+export const search = (searchString: string): void =>
+  track("Search", { search_string: searchString });
+export const addToCart = (parameters: MetaEventParameters): void =>
+  track("AddToCart", parameters);
+export const initiateCheckout = (parameters: MetaEventParameters): void =>
+  track("InitiateCheckout", parameters);
+export const addPaymentInfo = (parameters: MetaEventParameters): void =>
+  track("AddPaymentInfo", parameters);
+export const purchase = (parameters: MetaEventParameters): void =>
+  track("Purchase", parameters);
+export const contact = (contactMethod = "WhatsApp"): void =>
+  track("Contact", { contact_method: contactMethod });
+export const lead = (contactMethod = "contact_form"): void =>
+  track("Lead", { contact_method: contactMethod });
 
-/**
- * Track ViewCart event
- * Fire when a user views their cart
- */
-export const viewCart = (): void => {
-  if (typeof window !== "undefined" && typeof window.fbq === "function") {
-    window.fbq("track", "ViewCart");
-  }
-};
-
-/**
- * Track InitiateCheckout event
- * Fire when a user starts the checkout process
- */
-export const initiateCheckout = (totalPrice: number): void => {
-  if (typeof window !== "undefined" && typeof window.fbq === "function") {
-    window.fbq("track", "InitiateCheckout", {
-      value: totalPrice,
-      currency: "PKR",
-    });
-  }
-};
-
-/**
- * Track AddPaymentInfo event
- * Fire when a user enters payment information
- */
-export const addPaymentInfo = (): void => {
-  if (typeof window !== "undefined" && typeof window.fbq === "function") {
-    window.fbq("track", "AddPaymentInfo");
-  }
-};
-
-/**
- * Track Purchase event
- * Fire when a user completes a purchase
- */
-export const purchase = (orderId: string, totalPrice: number): void => {
-  if (typeof window !== "undefined" && typeof window.fbq === "function") {
-    window.fbq("track", "Purchase", {
-      content_ids: [orderId],
-      content_type: "product",
-      value: totalPrice,
-      currency: "PKR",
-    });
-  }
-};
-
-/**
- * Track Search event
- * Fire when a user performs a search
- */
-export const search = (searchTerm: string): void => {
-  if (typeof window !== "undefined" && typeof window.fbq === "function") {
-    window.fbq("track", "Search", {
-      search_string: searchTerm,
-    });
-  }
-};
-
-/**
- * Track AddToWishlist event
- * Fire when a user adds an item to wishlist
- */
-export const addToWishlist = (
-  productName: string,
-  productId: string,
-  price: number,
-): void => {
-  if (typeof window !== "undefined" && typeof window.fbq === "function") {
-    window.fbq("track", "AddToWishlist", {
-      content_name: productName,
-      content_ids: [productId],
-      value: price,
-      currency: "PKR",
-    });
-  }
-};
-
-/**
- * Track CompleteRegistration event
- * Fire when a user completes registration
- */
-export const completeRegistration = (): void => {
-  if (typeof window !== "undefined" && typeof window.fbq === "function") {
-    window.fbq("track", "CompleteRegistration");
-  }
-};
-
-/**
- * Track Lead event
- * Fire when a user submits a lead form (contact, bulk order, etc.)
- */
-export const lead = (): void => {
-  if (typeof window !== "undefined" && typeof window.fbq === "function") {
-    window.fbq("track", "Lead");
-  }
-};

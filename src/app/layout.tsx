@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import Providers from "../components/providers/providers";
 import "./globals.css";
 import type { Metadata } from "next";
@@ -7,6 +7,7 @@ import ServiceWorkerRegistration from "@/components/core/service-worker-registra
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
+import { MetaPixel } from "@/components/integrations/meta-pixel";
 
 export const metadata: Metadata = {
   title: "MM Laptop Center – Premium Laptops & Tech",
@@ -52,21 +53,14 @@ export default function RootLayout({
           strategy="beforeInteractive"
           src="/performance-measure-guard.js"
         />
-        <Script id="meta-pixel" strategy="afterInteractive" src="/meta-pixel.js" />
+        <Suspense fallback={null}>
+          <MetaPixel />
+        </Suspense>
         <Providers>
           {children}
           <SpeedInsights />
           <Analytics />
         </Providers>
-        <noscript>
-          <img
-            height="1"
-            width="1"
-            style={{ display: 'none' }}
-            src="https://www.facebook.com/tr?id=1520641896287637&ev=PageView&noscript=1"
-            alt=""
-          />
-        </noscript>
         <InstallPrompt />
         <ServiceWorkerRegistration />
       </body>

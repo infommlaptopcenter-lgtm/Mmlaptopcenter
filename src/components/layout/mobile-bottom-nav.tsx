@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Home, Grid3X3, Phone } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { BsChatDots } from "react-icons/bs";
+import { contact as trackContact } from "@/lib/pixel";
 
 const PHONE_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "923048928282";
 
@@ -68,6 +69,7 @@ export function MobileBottomNav() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="WhatsApp"
+            onClick={() => trackContact("WhatsApp mobile navigation")}
             className="flex items-center justify-center px-4 py-2.5 transition-colors text-gray-400"
           >
             <FaWhatsapp className="h-5 w-5" />

@@ -21,9 +21,10 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CartDrawer } from "@/components/features/cart/cart-drawer";
 import { searchProducts } from "@/components/search/actions";
+import { search as trackSearch } from "@/lib/pixel";
 
 const mainMenuItems = [
   { text: "Home", href: "/" },
@@ -61,8 +62,9 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<Awaited<ReturnType<typeof searchProducts>>>([]);
   const [searchLoading, setSearchLoading] = useState(false);
+  const lastTrackedQuery = useRef("");
   const [cartOpen, setCartOpen] = useState(false);
   const [shopCategories, setShopCategories] = useState<
     { id: string; name: string; slug: string; image: string | null }[]
@@ -76,16 +78,21 @@ export function Header() {
 
   useEffect(() => {
     async function performSearch() {
-      if (!searchQuery.trim()) {
+      const validQuery = searchQuery.trim();
+      if (validQuery.length < 3) {
         setSearchResults([]);
         return;
       }
 
       setSearchLoading(true);
       try {
-        const products = await searchProducts(searchQuery);
+        const products = await searchProducts(validQuery);
         setSearchResults(products);
-      } catch (e) {
+        if (lastTrackedQuery.current !== validQuery) {
+          trackSearch(validQuery);
+          lastTrackedQuery.current = validQuery;
+        }
+      } catch {
         setSearchResults([]);
       } finally {
         setSearchLoading(false);

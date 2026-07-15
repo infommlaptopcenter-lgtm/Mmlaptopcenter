@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { CheckCircle, MessageCircle, PackageX, ShoppingCart } from "@esmate/shadcn/pkgs/lucide-react";
 import { formatMoney } from "./product-page-utils";
+import { contact as trackContact } from "@/lib/pixel";
 
 export type VariantCardItem = {
   id: string; name?: string; availableForSale: boolean; price: { amount: string; currencyCode: string };
@@ -28,7 +29,7 @@ export function ProductVariantsSection({ variants, selectedId, fallbackImage, on
               <div className="flex flex-wrap gap-1">{variant.selectedOptions.slice(0, 4).map((option) => <span key={option.name} className="rounded-full bg-orange-50 px-2 py-1 text-[10px] font-bold text-orange-800">{option.name}: {option.value}</span>)}</div>
               <div className={`flex items-center gap-1.5 text-xs font-bold ${variant.availableForSale ? "text-green-700" : "text-red-600"}`}>{variant.availableForSale ? <CheckCircle className="h-4 w-4" /> : <PackageX className="h-4 w-4" />}{variant.availableForSale ? "In Stock" : "Out of Stock"}</div>
               <div className="grid grid-cols-2 gap-2 pt-2">
-                <a href={getWhatsAppHref(variant)} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-1.5 rounded-lg bg-green-600 px-2 py-2.5 text-xs font-bold text-white transition hover:bg-green-700"><MessageCircle className="h-4 w-4" /> WhatsApp</a>
+                <a href={getWhatsAppHref(variant)} target="_blank" rel="noreferrer" onClick={() => trackContact("WhatsApp product order")} className="flex items-center justify-center gap-1.5 rounded-lg bg-green-600 px-2 py-2.5 text-xs font-bold text-white transition hover:bg-green-700"><MessageCircle className="h-4 w-4" /> WhatsApp</a>
                 <button type="button" disabled={!variant.availableForSale} onClick={() => onAddToCart(variant)} className="flex items-center justify-center gap-1.5 rounded-lg bg-orange-600 px-2 py-2.5 text-xs font-bold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:bg-gray-300"><ShoppingCart className="h-4 w-4" /> Add to Cart</button>
               </div>
             </div>
