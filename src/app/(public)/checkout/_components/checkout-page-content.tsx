@@ -22,7 +22,6 @@ export function CheckoutPageContent() {
   const [details, setDetails] = useState(initialDetails);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
   const [paymentProofUrl, setPaymentProofUrl] = useState("");
-  const [transactionReference, setTransactionReference] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const isEmpty = (cart.totalQuantity ?? 0) === 0;
@@ -59,14 +58,14 @@ export function CheckoutPageContent() {
     if (!isValidWhatsAppNumber(details.customerPhone)) return setError("Please enter a valid WhatsApp or phone number.");
     if (paymentMethod === "cod" && codTotal > COD_LIMIT) return setError(`Cash on delivery is only available up to Rs. ${COD_LIMIT.toLocaleString()}.`);
     if (paymentMethod === "jazzcash" && prepaidTotal > JAZZCASH_LIMIT) return setError(`JazzCash is only available up to Rs. ${JAZZCASH_LIMIT.toLocaleString()}.`);
-    if (paymentMethod !== "cod" && (!paymentProofUrl || !transactionReference.trim())) return setError("Please enter the transaction reference and upload its screenshot.");
+    if (paymentMethod !== "cod" && !paymentProofUrl) return setError("Please upload the payment screenshot.");
     setSubmitting(true); setError(null);
     try {
       const response = await fetch("/api/orders", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         customerName: details.customerName, customerEmail: details.customerEmail, customerPhone: details.customerPhone,
         customerAddress: { line1: details.line1, line2: details.line2 || undefined, city: details.city, state: details.state || undefined, pincode: details.pincode || undefined, country: "PK" },
         items: cart.lines.map((line) => ({ productId: line.merchandise.id.replace(/-simple$/, ""), quantity: line.quantity })),
-        paymentMethod, paymentProofUrl: paymentProofUrl || undefined, transactionReference: transactionReference || undefined, notes: details.notes || undefined,
+        paymentMethod, paymentProofUrl: paymentProofUrl || undefined, notes: details.notes || undefined,
       }) });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "Failed to place order");
@@ -83,7 +82,7 @@ export function CheckoutPageContent() {
       <div className="space-y-6">
         {error ? <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</div> : null}
         <CheckoutCustomerForm values={details} setValue={(key, value) => setDetails((current) => ({ ...current, [key]: value }))} />
-        <CheckoutPaymentSection subtotal={subtotal} method={paymentMethod} setMethod={setPaymentMethod} proofUrl={paymentProofUrl} setProofUrl={setPaymentProofUrl} reference={transactionReference} setReference={setTransactionReference} onProofUploaded={() => addPaymentInfo(cartEventParameters)} />
+        <CheckoutPaymentSection subtotal={subtotal} method={paymentMethod} setMethod={setPaymentMethod} proofUrl={paymentProofUrl} setProofUrl={setPaymentProofUrl} onProofUploaded={() => addPaymentInfo(cartEventParameters)} />
         <div className="grid grid-cols-2 gap-2 sm:gap-3">
           <button type="submit" disabled={submitting} className="min-w-0 whitespace-nowrap rounded-lg bg-[#f6a45d] px-2 py-2.5 text-[11px] font-bold text-white shadow-sm hover:bg-[#d8861f] disabled:opacity-50 sm:px-3 sm:py-3 sm:text-sm">{submitting ? "Placing order..." : paymentMethod === "cod" ? "Place COD order" : "Submit payment"}</button>
           <a href={`https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${whatsappMessage}`} target="_blank" rel="noopener noreferrer" onClick={() => trackContact("WhatsApp checkout help")} className="flex min-w-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-green-700 px-2 py-2.5 text-[11px] font-bold text-white hover:bg-green-800 sm:gap-2 sm:px-3 sm:py-3 sm:text-sm"><FaWhatsapp className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" /> WhatsApp help</a>

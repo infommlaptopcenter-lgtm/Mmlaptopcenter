@@ -109,7 +109,7 @@ export async function POST(request: Request) {
 
     if (input.paymentMethod === "cod" && total > COD_LIMIT) throw new Error(`Cash on delivery is only available for orders up to Rs. ${COD_LIMIT.toLocaleString()}.`);
     if (input.paymentMethod === "jazzcash" && total > JAZZCASH_LIMIT) throw new Error(`JazzCash is only available for orders up to Rs. ${JAZZCASH_LIMIT.toLocaleString()}. Please use bank transfer or bank cash deposit.`);
-    if (input.paymentMethod !== "cod" && (!input.paymentProofUrl || !input.transactionReference)) throw new Error("Transaction reference and payment screenshot are required for prepaid payment.");
+    if (input.paymentMethod !== "cod" && !input.paymentProofUrl) throw new Error("Payment screenshot is required for prepaid payment.");
 
     const orderNumber = generateOrderNumber();
 

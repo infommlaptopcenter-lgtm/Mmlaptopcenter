@@ -11,12 +11,10 @@ type Props = {
   setMethod: (method: PaymentMethod) => void;
   proofUrl: string;
   setProofUrl: (url: string) => void;
-  reference: string;
-  setReference: (value: string) => void;
   onProofUploaded: () => void;
 };
 
-export function CheckoutPaymentSection({ subtotal, method, setMethod, proofUrl, setProofUrl, reference, setReference, onProofUploaded }: Props) {
+export function CheckoutPaymentSection({ subtotal, method, setMethod, proofUrl, setProofUrl, onProofUploaded }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -69,13 +67,12 @@ export function CheckoutPaymentSection({ subtotal, method, setMethod, proofUrl, 
       {method === "bank_transfer" ? <div className="rounded-xl bg-[#fcf5e8] p-4 text-sm">
         <p className="font-bold text-[#1a1308]">Bank transfer / cash deposit instructions</p>
         <dl className="mt-3 grid gap-2 text-[#5A5E55] sm:grid-cols-[130px_1fr]"><dt className="font-semibold text-[#1a1308]">Bank</dt><dd>{bankAccount.bank}</dd><dt className="font-semibold text-[#1a1308]">Account Title</dt><dd>{bankAccount.title}</dd><dt className="font-semibold text-[#1a1308]">IBAN</dt><dd className="break-all">{bankAccount.iban}</dd><dt className="font-semibold text-[#1a1308]">Account Number</dt><dd>{bankAccount.number}</dd></dl>
-        <p className="mt-3 text-xs text-[#5A5E55]">Transfer the full order amount online or deposit cash at an HBL branch, then enter the reference and upload the receipt below.</p>
+        <p className="mt-3 text-xs text-[#5A5E55]">Transfer the full order amount online or deposit cash at an HBL branch, then upload the receipt below.</p>
       </div> : <div className="rounded-xl bg-[#fcf5e8] p-4 text-sm">
         <p className="font-bold text-[#1a1308]">JazzCash instructions</p>
         <dl className="mt-3 grid gap-2 text-[#5A5E55] sm:grid-cols-[130px_1fr]"><dt className="font-semibold text-[#1a1308]">Account Title</dt><dd>{jazzCashAccount.title}</dd><dt className="font-semibold text-[#1a1308]">Number</dt><dd>{jazzCashAccount.number}</dd></dl>
         <p className="mt-3 text-xs text-[#5A5E55]">Send the full amount (maximum PKR {JAZZCASH_LIMIT.toLocaleString()}), then enter the transaction ID and upload the payment screenshot below.</p>
       </div>}
-      <label className="block text-sm font-semibold text-[#1a1308]">Transaction ID / reference<input value={reference} onChange={(event) => setReference(event.target.value)} required className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-[#f6a45d] focus:outline-none focus:ring-2 focus:ring-[#f6a45d]/30" /></label>
       <div><input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => { const file = event.target.files?.[0]; if (file) void uploadProof(file); event.target.value = ""; }} /><button type="button" onClick={() => inputRef.current?.click()} disabled={uploading} className="inline-flex items-center gap-2 rounded-lg border border-[#d8a928]/30 bg-white px-4 py-2.5 text-sm font-bold text-[#1a1308] hover:bg-[#fcf5e8] disabled:opacity-60"><Upload className="h-4 w-4" />{uploading ? "Uploading..." : proofUrl ? "Replace payment screenshot" : "Upload payment screenshot"}</button><p className="mt-2 text-xs text-[#5A5E55]">Required. JPG, PNG, or WebP; maximum 5 MB.</p>{uploadError ? <p className="mt-1 text-xs font-semibold text-red-700">{uploadError}</p> : null}{proofUrl ? <p className="mt-1 text-xs font-semibold text-green-700">Screenshot uploaded successfully. Admin will verify it.</p> : null}</div>
     </div> : null}
   </section>;
