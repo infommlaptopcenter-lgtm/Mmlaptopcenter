@@ -142,7 +142,7 @@ function FeaturedProductRow({ title, categorySlug, products, productCard }: { ti
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-start gap-3 sm:gap-4">
+      <div className="flex flex-col items-center justify-center gap-3 text-center sm:flex-row sm:gap-4">
         <h3 className="font-serif text-xl font-bold text-gray-900 sm:text-2xl">{title}</h3>
         <Link
           href={`/category/${encodeURIComponent(categorySlug)}`}
@@ -154,7 +154,7 @@ function FeaturedProductRow({ title, categorySlug, products, productCard }: { ti
       </div>
       <div
         ref={rowRef}
-        className="flex snap-x gap-6 overflow-x-auto scroll-smooth pb-3 [scrollbar-width:thin]"
+        className="scrollbar-hide flex snap-x gap-6 overflow-x-auto scroll-smooth pb-3"
       >
         {products.map((product) => (
           <div key={product.handle} data-product-card className="w-[17.5rem] shrink-0 snap-start sm:w-[18.5rem] lg:w-[19rem]">

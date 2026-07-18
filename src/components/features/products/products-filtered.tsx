@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Filter, X } from "@esmate/shadcn/pkgs/lucide-react";
+import { useMemo, useState } from "react";
 import { StoreProductCard } from "@/components/features/products/store-product-card-wrapper";
 
 const FALLBACK_IMAGE = "/logo/mmlaptop.png";
@@ -114,7 +113,8 @@ export function ProductsFiltered({
   const categoryNodes = useMemo(() => buildCategoryNodes(categories), [categories]);
   const initialCategory = categoryNodes.find((category) => category.slug === initialCategorySlug);
   const [selectedCategoryId, setSelectedCategoryId] = useState(initialCategory?.id || "");
-  const [filtersOpen, setFiltersOpen] = useState(true);
+  const [priceRange, setPriceRange] = useState("all");
+  const [sortBy, setSortBy] = useState("featured");
 
   const categoryById = useMemo(
     () => new Map(categoryNodes.map((category) => [category.id, category])),
@@ -159,23 +159,41 @@ export function ProductsFiltered({
     ]);
   }, [categoryById, childIdsByParentId, selectedCategoryId]);
 
-  const selectedProducts = useMemo(() => {
-    if (!selectedCategoryIds) return initialProducts;
+  const filteredProducts = useMemo(() => {
+    const products = initialProducts.filter((product) => {
+      const price = Number(product.price || 0);
+      if (priceRange === "under-50000") return price < 50000;
+      if (priceRange === "50000-100000") return price >= 50000 && price <= 100000;
+      if (priceRange === "100000-200000") return price > 100000 && price <= 200000;
+      if (priceRange === "over-200000") return price > 200000;
+      return true;
+    });
 
-    return initialProducts.filter((product) => {
+    return [...products].sort((a, b) => {
+      if (sortBy === "price-low") return Number(a.price || 0) - Number(b.price || 0);
+      if (sortBy === "price-high") return Number(b.price || 0) - Number(a.price || 0);
+      if (sortBy === "name") return a.title.localeCompare(b.title);
+      return 0;
+    });
+  }, [initialProducts, priceRange, sortBy]);
+
+  const selectedProducts = useMemo(() => {
+    if (!selectedCategoryIds) return filteredProducts;
+
+    return filteredProducts.filter((product) => {
       const effectiveCategoryId = product.subcategoryId || product.categoryId;
       return Boolean(effectiveCategoryId && selectedCategoryIds.has(effectiveCategoryId));
     });
-  }, [initialProducts, selectedCategoryIds]);
+  }, [filteredProducts, selectedCategoryIds]);
 
   const otherProducts = useMemo(() => {
     if (!selectedCategoryIds) return [];
 
-    return initialProducts.filter((product) => {
+    return filteredProducts.filter((product) => {
       const effectiveCategoryId = product.subcategoryId || product.categoryId;
       return !effectiveCategoryId || !selectedCategoryIds.has(effectiveCategoryId);
     });
-  }, [initialProducts, selectedCategoryIds]);
+  }, [filteredProducts, selectedCategoryIds]);
 
   const buildRows = (sourceProducts: Product[]) => {
     const grouped = sourceProducts.reduce((map, product) => {
@@ -196,119 +214,62 @@ export function ProductsFiltered({
       .filter((row): row is ProductRow => Boolean(row));
   };
 
-  const selectedRows = useMemo(() => buildRows(selectedProducts), [categoryById, categoryNodes, selectedProducts]);
-  const otherRows = useMemo(() => buildRows(otherProducts), [categoryById, categoryNodes, otherProducts]);
-  const visibleRows = selectedCategoryId ? selectedRows : selectedRows;
+  const selectedRows = buildRows(selectedProducts);
+  const otherRows = buildRows(otherProducts);
+  const visibleRows = selectedRows;
 
   const pagedRows = visibleRows.filter((row) => row.products.length > 0);
 
   const pagedOtherRows = otherRows.filter((row) => row.products.length > 0);
 
-  const selectCategory = (categoryId: string) => {
-    setSelectedCategoryId((current) => (current === categoryId ? "" : categoryId));
-  };
-
   return (
     <div className="space-y-6">
-      <div className="flex items-center">
-        <button
-          onClick={() => setSelectedCategoryId("")}
-          className={`relative z-10 flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-            !selectedCategoryId
-              ? "bg-[#f6a45d] text-white"
-              : "border border-[#d8a928]/30 bg-white text-[#0a0a0a] hover:bg-[#fcf5e8]"
-          }`}
-        >
-          All
-        </button>
-
-        <div className="ml-2 flex-1 overflow-hidden">
-          <div className="flex gap-2 animate-scroll">
-            {[...categories, ...categories].map((category, index) => (
-              <button
-                key={`${category.id}-${index}`}
-                onClick={() => selectCategory(category.id)}
-                className={`flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                  selectedCategoryId === category.id
-                    ? "bg-[#f6a45d] text-white"
-                    : "border border-[#d8a928]/30 bg-white text-[#0a0a0a] hover:bg-[#fcf5e8]"
-                }`}
-              >
-                {category.name}
-              </button>
+      <div className="flex flex-col gap-3 rounded-2xl border border-[#d8a928]/20 bg-white p-4 shadow-sm sm:flex-row sm:flex-wrap sm:items-end sm:justify-end">
+        <label className="grid gap-1.5 text-xs font-bold uppercase tracking-wide text-[#5A5E55]">
+          Category
+          <select
+            value={selectedCategoryId}
+            onChange={(event) => setSelectedCategoryId(event.target.value)}
+            className="min-w-44 rounded-lg border border-[#d8a928]/30 bg-[#fcf5e8] px-3 py-2.5 text-sm font-semibold normal-case tracking-normal text-[#0a0a0a] outline-none transition focus:border-[#f6a45d] focus:ring-2 focus:ring-[#f6a45d]/20"
+          >
+            <option value="">All Products</option>
+            {categoriesWithProducts.map((category) => (
+              <option key={category.id} value={category.id}>{category.name}</option>
             ))}
-          </div>
-        </div>
+          </select>
+        </label>
+
+        <label className="grid gap-1.5 text-xs font-bold uppercase tracking-wide text-[#5A5E55]">
+          Price Range
+          <select
+            value={priceRange}
+            onChange={(event) => setPriceRange(event.target.value)}
+            className="min-w-44 rounded-lg border border-[#d8a928]/30 bg-[#fcf5e8] px-3 py-2.5 text-sm font-semibold normal-case tracking-normal text-[#0a0a0a] outline-none transition focus:border-[#f6a45d] focus:ring-2 focus:ring-[#f6a45d]/20"
+          >
+            <option value="all">All Prices</option>
+            <option value="under-50000">Under PKR 50,000</option>
+            <option value="50000-100000">PKR 50,000–100,000</option>
+            <option value="100000-200000">PKR 100,000–200,000</option>
+            <option value="over-200000">Over PKR 200,000</option>
+          </select>
+        </label>
+
+        <label className="grid gap-1.5 text-xs font-bold uppercase tracking-wide text-[#5A5E55]">
+          Sort By
+          <select
+            value={sortBy}
+            onChange={(event) => setSortBy(event.target.value)}
+            className="min-w-40 rounded-lg border border-[#d8a928]/30 bg-[#fcf5e8] px-3 py-2.5 text-sm font-semibold normal-case tracking-normal text-[#0a0a0a] outline-none transition focus:border-[#f6a45d] focus:ring-2 focus:ring-[#f6a45d]/20"
+          >
+            <option value="featured">Featured</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="name">Name: A to Z</option>
+          </select>
+        </label>
       </div>
 
       <div className="relative grid gap-6">
-        {filtersOpen ? (
-          <aside className="fixed left-0 top-24 z-50 w-44 max-w-[74vw] rounded-r-xl border-y border-r border-[#d8a928]/20 bg-white/95 p-2.5 shadow-2xl backdrop-blur lg:left-[max(1rem,calc((100vw-80rem)/2+1.5rem))] lg:top-28 lg:rounded-xl lg:border">
-            <div className="max-h-[70vh] overflow-y-auto">
-              <div className="mb-3 flex items-center justify-between gap-2">
-                <p className="text-xs font-bold uppercase tracking-wide text-[#0a0a0a]">
-                  Filters
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setFiltersOpen(false)}
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-[#fcf5e8] text-[#0a0a0a] hover:bg-[#ffedd5]"
-                  aria-label="Hide filters"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setSelectedCategoryId("")}
-                className={`mb-2 w-full rounded-md px-2.5 py-2 text-left text-xs font-semibold transition ${
-                  !selectedCategoryId
-                    ? "bg-[#f6a45d] text-white"
-                    : "bg-[#fcf5e8] text-[#0a0a0a] hover:bg-[#ffedd5]"
-                }`}
-              >
-                All Products
-              </button>
-
-              <div className="space-y-1.5">
-                {categoriesWithProducts.map((category) => (
-                  <button
-                    key={category.id}
-                    type="button"
-                    onClick={() => selectCategory(category.id)}
-                    className={`w-full rounded-md px-2.5 py-2 text-left text-xs font-semibold leading-snug transition ${
-                      selectedCategoryId === category.id
-                        ? "bg-[#f6a45d] text-white"
-                        : "text-[#0a0a0a] hover:bg-[#fcf5e8]"
-                    }`}
-                  >
-                    {category.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </aside>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setFiltersOpen(true)}
-            className="inline-flex w-fit items-center gap-2 rounded-lg border border-[#d8a928]/30 bg-white px-3 py-2 text-xs font-semibold text-[#0a0a0a] shadow-sm hover:bg-[#fcf5e8]"
-          >
-            <Filter className="h-3.5 w-3.5" />
-            Show Filters
-          </button>
-        )}
-
-        {filtersOpen ? (
-          <button
-            type="button"
-            aria-label="Close filters"
-            onClick={() => setFiltersOpen(false)}
-            className="fixed inset-0 z-40 bg-black/10"
-          />
-        ) : null}
-
         <section className="min-w-0 space-y-6">
           {pagedRows.length > 0 ? (
             pagedRows.map((row) => (
