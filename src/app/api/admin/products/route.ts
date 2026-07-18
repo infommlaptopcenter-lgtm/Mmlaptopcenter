@@ -31,6 +31,7 @@ const productSchema = z.object({
     title: z.string().min(1, "Detail title is required"),
     description: z.string().optional(),
     image: z.string().optional(),
+    videoUrl: z.string().optional(),
   })).default([]),
   color: z.string().optional(), size: z.string().optional(), storage: z.string().optional(), ram: z.string().optional(),
   processor: z.string().optional(), condition: z.string().optional(),

@@ -26,7 +26,7 @@ export function DetailsSection({
     <div className="col-span-1 rounded-xl border border-[#d8a928]/20 bg-[#fcf5e8]/60 p-4 lg:col-span-2 md:p-6">
       <div className="mb-4 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
         <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f6a45d]/10"><FaInfoCircle className="h-5 w-5 text-[#f6a45d]" /></div><div><h3 className="text-base font-semibold text-[#0a0a0a]">Additional Details</h3><p className="text-xs text-[#5A5E55]">Add extra information about your product</p></div></div>
-        <button type="button" onClick={() => setValues((v) => ({ ...v, details: [...v.details, { id: generateId(), title: "", description: "", image: "" }] }))} className="flex items-center gap-2 whitespace-nowrap rounded-lg bg-[#f6a45d] px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#d8861f] hover:shadow-md"><FaPlus className="h-4 w-4" />Add Detail</button>
+        <button type="button" onClick={() => setValues((v) => ({ ...v, details: [...v.details, { id: generateId(), title: "", description: "", image: "", videoUrl: "" }] }))} className="flex items-center gap-2 whitespace-nowrap rounded-lg bg-[#f6a45d] px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-[#d8861f] hover:shadow-md"><FaPlus className="h-4 w-4" />Add Detail</button>
       </div>
       <div className="space-y-4">
         {values.details.map((detail, idx) => (
@@ -73,7 +73,33 @@ function DetailCard({
       <div className="space-y-3">
         <Input label="Title" value={detail.title} onChange={(value) => updateDetail(detail.id, "title", value)} placeholder="e.g., Performance tuned for creators" />
         <label className="block text-xs text-[#5A5E55]">Rich Text Description<textarea value={detail.description} onChange={(e) => updateDetail(detail.id, "description", e.target.value)} className="mt-1.5 w-full resize-y rounded-lg border border-gray-300 px-4 py-2.5 text-sm leading-6 transition-all focus:border-[#f6a45d] focus:outline-none focus:ring-2 focus:ring-[#f6a45d]/50" rows={5} placeholder="Add product story, bullet-style lines, warranty notes, specs, or usage details..." /></label>
-        <label className="block text-xs text-[#5A5E55]">Image (optional)<AdminImageUpload label="Detail image" folder="mmlaptop/products/details" usedIn="product_detail" value={detail.image} onChange={(url) => updateDetail(detail.id, "image", url)} /></label>
+        <div className="grid gap-3 md:grid-cols-2">
+          <label className="block text-xs text-[#5A5E55]">
+            Image (optional)
+            <AdminImageUpload
+              label="Detail image"
+              folder="mmlaptop/products/details"
+              usedIn="product_detail"
+              value={detail.image}
+              onChange={(url) => {
+                updateDetail(detail.id, "image", url);
+                if (url) updateDetail(detail.id, "videoUrl", "");
+              }}
+            />
+          </label>
+          <div>
+            <Input
+              label="YouTube video URL (optional)"
+              value={detail.videoUrl || ""}
+              onChange={(value) => {
+                updateDetail(detail.id, "videoUrl", value);
+                if (value.trim()) updateDetail(detail.id, "image", "");
+              }}
+              placeholder="https://www.youtube.com/watch?v=..."
+            />
+            <p className="mt-1.5 text-xs text-[#5A5E55]">Adding a video replaces the image for this detail.</p>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -84,7 +110,7 @@ function Input({ label, value, onChange, placeholder }: { label: string; value: 
 }
 
 function EmptyDetails() {
-  return <div className="py-8 text-center"><div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-[#f6a45d]/10"><FaInfoCircle className="h-8 w-8 text-[#f6a45d]" /></div><p className="text-sm text-[#5A5E55]">No details added yet</p><p className="text-xs text-[#5A5E55]">Click "Add Detail" to create additional product information</p></div>;
+  return <div className="py-8 text-center"><div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-[#f6a45d]/10"><FaInfoCircle className="h-8 w-8 text-[#f6a45d]" /></div><p className="text-sm text-[#5A5E55]">No details added yet</p><p className="text-xs text-[#5A5E55]">Click &quot;Add Detail&quot; to create additional product information</p></div>;
 }
 
 function SaveDetailsButton({ saving, onClick }: { saving: boolean; onClick: () => Promise<void> }) {

@@ -8,6 +8,7 @@ export type ProductDetail = {
   title: string;
   description: string;
   image?: string;
+  videoUrl?: string;
 };
 
 export type ProductAttributes = {

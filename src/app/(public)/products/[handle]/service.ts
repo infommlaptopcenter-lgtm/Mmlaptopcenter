@@ -10,7 +10,7 @@ export async function getProductSingle(handle: string) {
   const customData = await prisma.product.findUnique({
     where: { handle },
   }) as {
-    details: Array<{ id: string; title: string; description: string; image?: string }>;
+    details: Array<{ id: string; title: string; description: string; image?: string; videoUrl?: string }>;
   } | null;
 
   return {

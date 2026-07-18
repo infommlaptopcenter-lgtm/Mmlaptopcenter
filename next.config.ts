@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   serverExternalPackages: ["dompurify"],
   images: {
-    domains: ["placehold.co", "res.cloudinary.com", "i.pinimg.com", "images.unsplash.com"],
+    domains: ["placehold.co", "res.cloudinary.com", "i.pinimg.com", "images.unsplash.com", "i.ytimg.com"],
     remotePatterns: [
       {
         protocol: "https",
@@ -22,6 +22,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com",
       },
     ],
   },

@@ -8,6 +8,7 @@ const detailSchema = z.object({
   title: z.string().min(1, "Detail title is required"),
   description: z.string().optional(),
   image: z.string().optional(),
+  videoUrl: z.string().optional(),
 });
 
 // GET /api/admin/products/[id]/details - Get all details for a product
