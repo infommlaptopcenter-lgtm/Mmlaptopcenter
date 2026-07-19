@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
       secret:
         process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET ?? "mmlaptop-dev-secret",
     });
-  } catch (error) {
+  } catch {
     // If token decryption fails, treat as no token
     token = null;
   }

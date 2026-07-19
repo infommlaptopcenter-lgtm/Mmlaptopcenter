@@ -15,7 +15,7 @@ const collectionSchema = z.object({
   isFeatured: z.boolean().default(false),
 });
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     await requireAdmin();
     const collections = await prisma.collection.findMany({ orderBy: { createdAt: "desc" } });

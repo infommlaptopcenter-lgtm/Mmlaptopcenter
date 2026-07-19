@@ -12,7 +12,7 @@ const certificateSchema = z.object({
   isVerifiedBy: z.boolean().default(false),
 });
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     await requireAdmin();
     const certificates = await prisma.certificate.findMany({

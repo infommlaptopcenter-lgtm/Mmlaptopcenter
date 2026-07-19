@@ -24,7 +24,7 @@ import { Button } from "@esmate/shadcn/components/ui/button";
 import { Separator } from "@esmate/shadcn/components/ui/separator";
 import { Badge } from "@esmate/shadcn/components/ui/badge";
 import { FaWhatsapp } from "react-icons/fa";
-import { Star } from "lucide-react";
+import { Star } from "@esmate/shadcn/pkgs/lucide-react";
 
 const WHATSAPP_NUMBER = "923234567890";
 

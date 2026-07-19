@@ -1,1 +1,0 @@
-export { ProductReviewsSlider } from "./product-reviews-slider";

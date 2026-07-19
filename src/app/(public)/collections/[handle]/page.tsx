@@ -3,6 +3,8 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { CollectionProductList } from "./collection-product-list";
 import { getCollection, getCollectionProducts } from "./service";
+import { JsonLd } from "@/components/seo/json-ld";
+import { absoluteUrl, breadcrumbSchema, createSeoMetadata } from "@/lib/seo";
 
 export const revalidate = 60;
 
@@ -16,40 +18,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   try {
     const collection = await getCollection(collectionHandle);
-    return {
-      title: collection.seo?.title ?? `${collection.title} | MM Laptop Center`,
-      description:
-        collection.seo?.description ||
-        collection.description ||
-        `Shop ${collection.title} at MM Laptop Center.`,
-      alternates: {
-        canonical: `https://mmlaptopcenter.com/collections/${collectionHandle}`,
-      },
-      openGraph: {
-        title: collection.seo?.title ?? collection.title,
-        description:
-          collection.seo?.description ||
-          collection.description ||
-          `Shop ${collection.title} at MM Laptop Center.`,
-        url: `https://mmlaptopcenter.com/collections/${collectionHandle}`,
-        siteName: "MM Laptop Center",
-        type: "website",
-        images: collection.image
-          ? [
-              {
-                url: collection.image.url,
-                width: collection.image.width,
-                height: collection.image.height,
-                alt: collection.image.altText || collection.title,
-              },
-            ]
-          : undefined,
-      },
-    };
+    return createSeoMetadata({
+      title: collection.seo?.title ?? `${collection.title} Pakistan`,
+      description: collection.seo?.description || collection.description || `Shop ${collection.title} in Pakistan from MM Laptop Center Charsadda with nationwide delivery.`,
+      path: `/collections/${collectionHandle}`,
+      image: collection.image?.url,
+      keywords: [collection.title, `${collection.title} Pakistan`, "Buy Laptop Pakistan"],
+    });
   } catch {
-    return {
-      title: "Collection Not Found",
-    };
+    return createSeoMetadata({ title: "Collection Not Found", description: "This collection is not available.", path: `/collections/${collectionHandle}`, noIndex: true });
   }
 }
 
@@ -75,6 +52,26 @@ export default async function Page({ params }: Props) {
 
   return (
     <main className="min-h-screen bg-[#fbf7ef]">
+      <JsonLd data={[
+        breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Collections", path: "/collections" }, { name: collection.title, path: `/collections/${collectionHandle}` }]),
+        {
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: collection.title,
+          description: collection.description || `Shop ${collection.title} in Pakistan.`,
+          url: absoluteUrl(`/collections/${collectionHandle}`),
+          mainEntity: {
+            "@type": "ItemList",
+            numberOfItems: productCount,
+            itemListElement: products.edges.map((edge, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              name: edge.node.title,
+              url: absoluteUrl(`/products/${edge.node.handle}`),
+            })),
+          },
+        },
+      ]} />
       <section className="relative overflow-hidden bg-[#1a1308] text-white">
         {heroImage && (
           <Image

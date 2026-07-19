@@ -1,4 +1,4 @@
-import { Award, CheckCircle, Edit3, Eye, Trash2, XCircle } from "lucide-react";
+import { Award, CheckCircle, Edit3, Eye, Trash2, XCircle } from "@esmate/shadcn/pkgs/lucide-react";
 import type { Review } from "./types";
 import { formatDate, StarRating, StatusBadge } from "./review-ui";
 

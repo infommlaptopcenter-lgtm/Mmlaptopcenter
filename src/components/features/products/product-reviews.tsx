@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Star, User, ThumbsUp, Flag, CheckCircle } from "lucide-react";
+import { Star, User, ThumbsUp, Flag, CheckCircle } from "@esmate/shadcn/pkgs/lucide-react";
 import { Button } from "@esmate/shadcn/components/ui/button";
 import { Textarea } from "@esmate/shadcn/components/ui/textarea";
 import { Input } from "@esmate/shadcn/components/ui/input";
@@ -348,6 +348,7 @@ export function ProductReviews({ productHandle }: ProductReviewsProps) {
                       <img
                         src={review.authorImage}
                         alt={review.authorName}
+                        loading="lazy"
                         className="h-full w-full rounded-full object-cover"
                       />
                     ) : (
@@ -371,6 +372,7 @@ export function ProductReviews({ productHandle }: ProductReviewsProps) {
                       key={idx}
                       src={img}
                       alt={`Review image ${idx + 1}`}
+                      loading="lazy"
                       className="h-16 w-16 rounded-lg object-cover border border-[#d8a928]/20"
                     />
                   ))}

@@ -1,4 +1,4 @@
-import { Star } from "lucide-react";
+import { Star } from "@esmate/shadcn/pkgs/lucide-react";
 import type { Review } from "./types";
 
 export function formatDate(dateString: string) {

@@ -81,7 +81,7 @@ export function ProductGallerySection({
                   : "border-transparent hover:border-[#f6a45d]/40"
               }`}
             >
-              <Image src={img.url} alt="" fill className="object-cover" sizes="64px" />
+              <Image src={img.url} alt={img.altText || `${title} thumbnail`} fill className="object-cover" sizes="64px" loading="lazy" />
             </button>
           ))}
         </div>

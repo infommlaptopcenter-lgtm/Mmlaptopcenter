@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Grid3X3, Phone } from "lucide-react";
+import { Home, Grid3X3, Phone } from "@esmate/shadcn/pkgs/lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { BsChatDots } from "react-icons/bs";
 import { contact as trackContact } from "@/lib/pixel";

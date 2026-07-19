@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "@esmate/shadcn/pkgs/lucide-react";
 import type { Pagination } from "./types";
 
 export function ReviewPagination({ pagination, setPagination }: { pagination: Pagination; setPagination: React.Dispatch<React.SetStateAction<Pagination>> }) {

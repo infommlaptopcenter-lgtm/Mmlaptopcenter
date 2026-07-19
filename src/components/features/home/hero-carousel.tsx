@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "@esmate/shadcn/pkgs/lucide-react";
 import { HeroSlide } from "@/types/hero";
 
 interface HeroCarouselProps {

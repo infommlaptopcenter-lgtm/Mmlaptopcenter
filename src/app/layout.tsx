@@ -8,9 +8,14 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 import { MetaPixel } from "@/components/integrations/meta-pixel";
+import { SITE_NAME, SITE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "MM Laptop Center – Premium Laptops & Tech",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "MM Laptop Center | Laptop Store Pakistan",
+    template: `%s | ${SITE_NAME}`,
+  },
   description:
     "MM Laptop Center – Shop premium laptops, gaming gear and accessories",
   manifest: "/manifest.json",
@@ -26,6 +31,12 @@ export const metadata: Metadata = {
     apple: [
       { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
     ],
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "google-site-verification-placeholder",
+    other: {
+      "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION || "bing-site-verification-placeholder",
+    },
   },
 };
 

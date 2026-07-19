@@ -16,7 +16,7 @@ const categorySchema = z.object({
   productIds: z.array(z.string()).default([]),
 });
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     await requireAdmin();
     const categories = await prisma.category.findMany({

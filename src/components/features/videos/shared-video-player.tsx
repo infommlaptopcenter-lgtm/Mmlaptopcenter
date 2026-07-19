@@ -63,7 +63,7 @@ export function SharedVideoPlayer({ videos, theme = "DEFAULT" }: { videos: Publi
               className={`flex w-[270px] shrink-0 items-center gap-3 overflow-hidden rounded-xl border bg-white p-2 text-left transition lg:w-full ${video.id === selected.id ? `${styles.active} ring-1` : `border-gray-200 ${styles.hover}`}`}
             >
               <span className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-lg bg-black ${video.format === "VERTICAL" ? "h-24 w-[54px]" : "h-[72px] w-32"}`}>
-                {video.thumbnail ? <Image src={video.thumbnail} alt="" fill sizes="128px" className="object-contain" /> : <Play className="h-7 w-7 text-white" />}
+                {video.thumbnail ? <Image src={video.thumbnail} alt={`${video.title} video thumbnail`} fill sizes="128px" className="object-contain" loading="lazy" /> : <Play className="h-7 w-7 text-white" />}
               </span>
               <span className="min-w-0">
                 <span className="line-clamp-2 text-sm font-bold leading-snug text-gray-950">{video.title}</span>

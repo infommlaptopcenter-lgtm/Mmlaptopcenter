@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { StoreProductCard } from "@/components/features/products/store-product-card-wrapper";
+import { JsonLd } from "@/components/seo/json-ld";
+import { absoluteUrl, breadcrumbSchema, createSeoMetadata } from "@/lib/seo";
 
 const FALLBACK_IMAGE = "/logo/mmlaptop.png";
 
@@ -17,11 +19,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const category = await prisma.category.findUnique({ where: { slug } });
-  if (!category) return { title: "Category not found" };
-  return {
-    title: `${category.name} | MM Laptop Center`,
-    description: category.description || `Explore ${category.name} products on MM Laptop Center.`,
-  };
+  if (!category) return createSeoMetadata({ title: "Category Not Found", description: "This category is not available.", path: `/category/${slug}`, noIndex: true });
+  return createSeoMetadata({
+    title: category.seoTitle || `${category.name} Pakistan`,
+    description: category.seoDescription || category.description || `Buy ${category.name} in Pakistan from MM Laptop Center Charsadda with expert local support and nationwide delivery.`,
+    path: `/category/${slug}`,
+    image: category.image,
+    keywords: [category.name, `${category.name} Pakistan`, `Buy ${category.name} Pakistan`, "Laptop Shop KPK"],
+  });
 }
 
 export default async function CategoryPage({
@@ -32,7 +37,7 @@ export default async function CategoryPage({
   const { slug } = await params;
   const category = await prisma.category.findUnique({
     where: { slug },
-    select: { id: true, name: true },
+    select: { id: true, name: true, description: true },
   });
   if (!category) notFound();
 
@@ -58,6 +63,26 @@ export default async function CategoryPage({
 
   return (
     <main className="mx-auto max-w-7xl space-y-8 px-6 py-8 lg:px-8">
+      <JsonLd data={[
+        breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Products", path: "/products" }, { name: category.name, path: `/category/${slug}` }]),
+        {
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: `${category.name} Pakistan`,
+          description: category.description || `Shop ${category.name} in Pakistan.`,
+          url: absoluteUrl(`/category/${slug}`),
+          mainEntity: {
+            "@type": "ItemList",
+            numberOfItems: categoryProducts.length,
+            itemListElement: categoryProducts.map((product, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              url: absoluteUrl(`/products/${product.handle}`),
+              name: product.title,
+            })),
+          },
+        },
+      ]} />
       {subcategories.length > 0 && (
         <section>
           <h2 className="mb-3 text-lg font-semibold text-[#0a0a0a]">Categories</h2>

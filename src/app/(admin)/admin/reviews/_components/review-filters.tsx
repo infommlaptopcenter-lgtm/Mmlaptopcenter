@@ -1,4 +1,4 @@
-import { Filter, Search } from "lucide-react";
+import { Filter, Search } from "@esmate/shadcn/pkgs/lucide-react";
 import type { Pagination } from "./types";
 
 export function ReviewFilters({

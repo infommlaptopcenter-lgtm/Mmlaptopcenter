@@ -1,8 +1,8 @@
-import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { serializeVideo } from "@/lib/video-utils";
 import { HomeHeroSection } from "./_components/HomeHeroSection";
 import { HomeContentSections } from "./_components/HomeContentSections";
+import { createSeoMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -22,15 +22,16 @@ async function safeHomeQuery<T>(
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "MM Laptop Center",
-  "url": "https://mmlaptopcenter.com",
-  "logo": "https://mmlaptopcenter.com/images/logo.png",
-  "sameAs": [
-    "https://www.facebook.com/mmlaptopcenter",
-    "https://www.instagram.com/mmlaptopcenter",
-    "https://twitter.com/mmlaptopcenter"
-  ]
+  "@type": "WebSite",
+  "@id": "https://mmlaptopcenter.com/#website",
+  name: "MM Laptop Center",
+  url: "https://mmlaptopcenter.com",
+  publisher: { "@id": "https://mmlaptopcenter.com/#organization" },
+  potentialAction: {
+    "@type": "SearchAction",
+    target: "https://mmlaptopcenter.com/products?q={search_term_string}",
+    "query-input": "required name=search_term_string",
+  },
 };
 
 function parseStringArray(value: unknown): string[] {
@@ -39,44 +40,15 @@ function parseStringArray(value: unknown): string[] {
     : [];
 }
 
-export const metadata: Metadata = {
-  title: "MM Laptop Center – Premium Laptops & Tech",
-  description:
-    "MM Laptop Center – Shop premium laptops, gaming gear and accessories",
-  keywords: [
-    "laptops",
-    "gaming laptops",
-    "business laptops",
-    "ultrabooks",
-    "budget laptops",
-    "laptop accessories",
-    "monitors",
-    "keyboards",
-    "mice",
-    "laptop bags",
-    "MM Laptop Center",
-    "tech store Pakistan",
-  ],
-  openGraph: {
-    title: "MM Laptop Center – Premium Laptops & Tech",
-    description:
-      "Shop premium laptops, gaming gear and accessories at MM Laptop Center.",
-    url: "https://mmlaptopcenter.com",
-    siteName: "MM Laptop Center",
-    type: "website",
-    images: ["https://placehold.co/1400x600?text=MM+Laptop+Center"],
-  },
-  alternates: {
-    canonical: "https://mmlaptopcenter.com",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+export const metadata = createSeoMetadata({
+  title: "Laptop Store Pakistan – MM Laptop Center Charsadda",
+  description: "Buy laptops in Pakistan from MM Laptop Center Charsadda. Shop gaming laptops, business laptops, Apple MacBooks, Windows laptops and accessories with nationwide delivery.",
+  path: "/",
+  keywords: ["Laptop Store Pakistan", "Buy Laptop Pakistan", "Laptop Shop Charsadda", "Gaming Laptops Pakistan", "Apple MacBook Pakistan"],
+});
 
 export default async function Page() {
-   const [categories, featuredCollections, featuredBlogs, essenceSection, homeVideos] = await Promise.all([
+   const [categories, featuredCollections, featuredBlogs, homeVideos] = await Promise.all([
      safeHomeQuery(
        "categories",
        () => prisma.category.findMany({
@@ -112,13 +84,6 @@ export default async function Page() {
         select: { id: true, title: true, slug: true, excerpt: true, featuredImage: true, publishedAt: true, content: true },
       }),
       [],
-    ),
-    safeHomeQuery(
-      "essence section",
-      () => prisma.homepageSection.findUnique({
-        where: { sectionKey: "essence" },
-      }),
-      null,
     ),
     safeHomeQuery(
       "home videos",
