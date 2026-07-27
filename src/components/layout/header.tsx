@@ -11,6 +11,7 @@ import {
 } from "@esmate/shadcn/components/ui/sheet";
 import {
   ChevronDown,
+  Download,
   Menu,
   Phone,
   Search,
@@ -25,6 +26,7 @@ import { useEffect, useRef, useState } from "react";
 import { CartDrawer } from "@/components/features/cart/cart-drawer";
 import { searchProducts } from "@/components/search/actions";
 import { search as trackSearch } from "@/lib/pixel";
+import { usePWAInstall } from "@/hooks/use-pwa-install";
 
 const mainMenuItems = [
   { text: "Home", href: "/" },
@@ -59,10 +61,13 @@ async function getShopCategories() {
 export function Header() {
   const pathname = usePathname();
   const { totalQuantity } = useCart();
+  const { canInstall, installApp, isInstalled } = usePWAInstall();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<Awaited<ReturnType<typeof searchProducts>>>([]);
+  const [searchResults, setSearchResults] = useState<
+    Awaited<ReturnType<typeof searchProducts>>
+  >([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const lastTrackedQuery = useRef("");
   const [cartOpen, setCartOpen] = useState(false);
@@ -110,7 +115,10 @@ export function Header() {
         <div className="flex h-10 w-full items-center justify-between px-4 text-xs sm:px-6">
           <div className="flex items-center gap-6">
             {topBarLeft.map((item) => (
-              <span key={item.text} className="flex items-center gap-2 font-medium">
+              <span
+                key={item.text}
+                className="flex items-center gap-2 font-medium"
+              >
                 <item.icon className="h-3.5 w-3.5 text-[#f6a45d]" />
                 {item.text}
               </span>
@@ -234,6 +242,20 @@ export function Header() {
                           </Link>
                         ))}
                     </div>
+
+                    {canInstall && !isInstalled ? (
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          await installApp();
+                          setMobileMenuOpen(false);
+                        }}
+                        className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#f6a45d] to-[#d8a928] px-4 py-3 text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
+                      >
+                        <Download className="h-4 w-4" />
+                        Install App
+                      </button>
+                    ) : null}
                   </div>
                 </div>
 
@@ -450,6 +472,17 @@ export function Header() {
 
         {/* ───────── search + icons ───────── */}
         <div className="hidden flex-1 items-center justify-end gap-3 lg:flex">
+          {canInstall && !isInstalled ? (
+            <button
+              type="button"
+              onClick={installApp}
+              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-gradient-to-r from-[#f6a45d] to-[#d8a928] px-4 py-2.5 text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
+            >
+              <Download className="h-4 w-4" />
+              Install App
+            </button>
+          ) : null}
+
           <div className="relative w-full max-w-xs">
             <div className="flex items-center overflow-hidden rounded-full border border-[#d8a928]/30 bg-white shadow-sm">
               <Search className="ml-4 h-4 w-4 shrink-0 text-[#5A5E55]" />
@@ -531,8 +564,6 @@ export function Header() {
               </Badge>
             )}
           </Button>
-
-
         </div>
       </nav>
 

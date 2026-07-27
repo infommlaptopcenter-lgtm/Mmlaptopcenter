@@ -2,7 +2,6 @@ import { ReactNode, Suspense } from "react";
 import Providers from "../components/providers/providers";
 import "./globals.css";
 import type { Metadata } from "next";
-import InstallPrompt from "@/components/core/install-prompt";
 import ServiceWorkerRegistration from "@/components/core/service-worker-registration";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
@@ -33,30 +32,41 @@ export const metadata: Metadata = {
     ],
   },
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "google-site-verification-placeholder",
+    google:
+      process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ||
+      "google-site-verification-placeholder",
     other: {
-      "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION || "bing-site-verification-placeholder",
+      "msvalidate.01":
+        process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION ||
+        "bing-site-verification-placeholder",
     },
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
-        <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="192x192"
+          href="/icons/icon-192x192.png"
+        />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
+        />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="MM Laptop Center" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#d8a928" />
-        <meta name="description" content="MM Laptop Center – Shop premium laptops, gaming gear and accessories" />
+        <meta
+          name="description"
+          content="MM Laptop Center – Shop premium laptops, gaming gear and accessories"
+        />
       </head>
       <body suppressHydrationWarning>
         <Script
@@ -72,7 +82,6 @@ export default function RootLayout({
           <SpeedInsights />
           <Analytics />
         </Providers>
-        <InstallPrompt />
         <ServiceWorkerRegistration />
       </body>
     </html>
