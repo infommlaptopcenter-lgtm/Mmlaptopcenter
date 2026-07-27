@@ -6,7 +6,10 @@ import { FaWhatsapp } from "react-icons/fa";
 import { useCart } from "@/lib/commerce";
 import { toast } from "sonner";
 import { useState, useEffect, useMemo } from "react";
-import { addToCart as trackAddToCart, contact as trackContact } from "@/lib/pixel";
+import {
+  addToCart as trackAddToCart,
+  contact as trackContact,
+} from "@/lib/pixel";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -58,12 +61,21 @@ function getDefaultReviewStats(seedText: string): ReviewStats {
   };
 }
 
-function ProductRating({ rating, totalReviews }: { rating: number; totalReviews: number }) {
+function ProductRating({
+  rating,
+  totalReviews,
+}: {
+  rating: number;
+  totalReviews: number;
+}) {
   const activeStars = Math.round(rating);
 
   return (
     <div className="flex items-center gap-1.5">
-      <span className="flex items-center gap-0.5 leading-none" aria-label={`${rating.toFixed(1)} out of 5 stars`}>
+      <span
+        className="flex items-center gap-0.5 leading-none"
+        aria-label={`${rating.toFixed(1)} out of 5 stars`}
+      >
         {Array.from({ length: 5 }).map((_, index) => (
           <span
             key={index}
@@ -96,28 +108,28 @@ export function StoreProductCard({
   productId,
 }: ProductCardProps) {
   const [loading, setLoading] = useState(false);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [, setIsImageHovered] = useState(false);
   const [failedImages, setFailedImages] = useState<string[]>([]);
   const [reviewStats, setReviewStats] = useState<ReviewStats | null>(null);
   const { linesAdd } = useCart();
 
   // ── Slide transition state ──
-  const [currentImg, setCurrentImg] = useState<string | null>(null);
-  const [incomingImg, setIncomingImg] = useState<string | null>(null);
-  const [slideIn, setSlideIn] = useState(false);
 
   const productImages = useMemo(() => {
     const urls = [featuredImageUrl, ...(imageUrls || [])]
-      .filter((url): url is string => typeof url === "string" && url.trim().length > 0)
+      .filter(
+        (url): url is string =>
+          typeof url === "string" && url.trim().length > 0,
+      )
       .filter((url, index, all) => all.indexOf(url) === index)
       .filter((url) => !failedImages.includes(url));
 
     return urls.length > 0 ? urls : [FALLBACK_IMAGE];
   }, [featuredImageUrl, imageUrls, failedImages]);
 
-  const displayImageIndex = activeImageIndex % productImages.length;
-  const displayImage = productImages[displayImageIndex] || FALLBACK_IMAGE;
+  const primaryImage = productImages[0] || FALLBACK_IMAGE;
+  const hoverImage = productImages[1];
+  const currentImg = primaryImage;
+  const incomingImg = hoverImage;
 
   const effectiveVariantId = variantId || productId;
 
@@ -126,14 +138,16 @@ export function StoreProductCard({
     : null;
   const defaultReviewStats = useMemo(
     () => getDefaultReviewStats(productId || handle || title),
-    [handle, productId, title]
+    [handle, productId, title],
   );
   const visibleReviewStats =
-    reviewStats && reviewStats.totalReviews > 0 ? reviewStats : defaultReviewStats;
+    reviewStats && reviewStats.totalReviews > 0
+      ? reviewStats
+      : defaultReviewStats;
 
   const productPath = `/products/${handle}`;
   const whatsappUrl = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || ""}?text=${encodeURIComponent(
-    `Hi, I want to order this product:\n\nProduct: ${title}\nPrice: ${formatPrice(price.amount)}\nLink: ${productPath}`
+    `Hi, I want to order this product:\n\nProduct: ${title}\nPrice: ${formatPrice(price.amount)}\nLink: ${productPath}`,
   )}`;
 
   // ── Fetch review stats ──
@@ -151,21 +165,14 @@ export function StoreProductCard({
   }, [handle]);
 
   useEffect(() => {
-    setActiveImageIndex(0);
     setFailedImages([]);
   }, [featuredImageUrl, imageUrls]);
 
+  /*
   // ── Slide transition: new image glides in from the right, old one glides out to the left ──
   useEffect(() => {
     // First image ever — just set it, no animation needed.
-    if (currentImg === null) {
-      setCurrentImg(displayImage);
-      return;
-    }
-    if (displayImage === currentImg || displayImage === incomingImg) return;
-
-    setIncomingImg(displayImage);
-    setSlideIn(false);
+    return;
 
     // Kick the animation off on the next paint so the browser registers the
     // starting (off-screen) position before we transition to the ending
@@ -174,16 +181,14 @@ export function StoreProductCard({
       // Force a layout read so the browser commits the starting transform
       // before we flip the class that starts the transition.
       void document.body.offsetHeight;
-      setSlideIn(true);
+      return;
     });
 
     // Match this to the transition duration below (ms). Kept in sync with
     // the Tailwind `duration-700` class used on the sliding layers.
     const SLIDE_DURATION = 700;
     const timeout = setTimeout(() => {
-      setCurrentImg(displayImage);
-      setIncomingImg(null);
-      setSlideIn(false);
+      return;
     }, SLIDE_DURATION);
 
     return () => {
@@ -191,17 +196,18 @@ export function StoreProductCard({
       clearTimeout(timeout);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [displayImage]);
+  }, []);
 
   useEffect(() => {
-    if (productImages.length <= 1) return;
+    return;
 
     const interval = window.setInterval(() => {
-      setActiveImageIndex((current) => (current + 1) % productImages.length);
+      return;
     }, 10000);
 
     return () => window.clearInterval(interval);
   }, [productImages.length]);
+  */
 
   // ── Add to cart ──
   const handleAddToCart = async () => {
@@ -220,7 +226,14 @@ export function StoreProductCard({
       toast.success("Added to cart", { description: title });
       trackAddToCart({
         content_ids: [productId || effectiveVariantId],
-        contents: [{ id: productId || effectiveVariantId, quantity: 1, item_price: parseFloat(price.amount), variant: effectiveVariantId }],
+        contents: [
+          {
+            id: productId || effectiveVariantId,
+            quantity: 1,
+            item_price: parseFloat(price.amount),
+            variant: effectiveVariantId,
+          },
+        ],
         content_name: title,
         content_category: tag,
         content_type: "product",
@@ -236,10 +249,7 @@ export function StoreProductCard({
   };
 
   return (
-    <div
-      className="group relative flex flex-col rounded-2xl bg-white overflow-hidden shadow-[0_0_14px_rgba(0,0,0,0.12)] transition-shadow duration-300 hover:shadow-[0_0_26px_rgba(0,0,0,0.22)]"
-    >
-
+    <div className="group relative flex flex-col rounded-2xl bg-white overflow-hidden shadow-[0_0_14px_rgba(0,0,0,0.12)] transition-shadow duration-300 hover:shadow-[0_0_26px_rgba(0,0,0,0.22)]">
       {/* ── Tag badge ─────────────────────────────────────── */}
       {/* ── WhatsApp floating button ───────────────────────── */}
       {discount !== null && (
@@ -252,28 +262,28 @@ export function StoreProductCard({
         <div className="text-sm font-extrabold leading-none text-[#0a0a0a]">
           {formatPrice(price.amount)}
         </div>
-        {discount !== null && compareAtPrice && parseFloat(compareAtPrice.amount) > parseFloat(price.amount) && (
-          <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[11px] font-bold leading-tight">
-            <span className="text-gray-500 line-through">
-              {formatPrice(compareAtPrice.amount)}
-            </span>
-          </div>
-        )}
+        {discount !== null &&
+          compareAtPrice &&
+          parseFloat(compareAtPrice.amount) > parseFloat(price.amount) && (
+            <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[11px] font-bold leading-tight">
+              <span className="text-gray-500 line-through">
+                {formatPrice(compareAtPrice.amount)}
+              </span>
+            </div>
+          )}
       </div>
 
       {/* ── Product image ──────────────────────────────────── */}
       <Link
         href={`/products/${handle}`}
-        className="block relative aspect-square w-full overflow-hidden bg-white"
-        onMouseEnter={() => setIsImageHovered(true)}
-        onMouseLeave={() => setIsImageHovered(false)}
-        onFocus={() => setIsImageHovered(true)}
-        onBlur={() => setIsImageHovered(false)}
+        className="relative block aspect-square w-full overflow-hidden bg-white"
       >
         {/* Current image — slides out to the left once a new image starts coming in */}
         <div
-          className={`absolute inset-0 transition-transform duration-700 ease-in-out will-change-transform group-hover:scale-110 ${
-            incomingImg && slideIn ? "-translate-x-full" : "translate-x-0"
+          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+            incomingImg
+              ? "group-hover:opacity-0 group-focus-within:opacity-0"
+              : ""
           }`}
         >
           {currentImg && (
@@ -285,7 +295,9 @@ export function StoreProductCard({
               className="object-contain p-5"
               onError={() =>
                 setFailedImages((current) =>
-                  current.includes(currentImg) ? current : [...current, currentImg]
+                  current.includes(currentImg)
+                    ? current
+                    : [...current, currentImg],
                 )
               }
             />
@@ -294,11 +306,7 @@ export function StoreProductCard({
 
         {/* Incoming image — starts fully off-screen to the right, glides in slowly */}
         {incomingImg && (
-          <div
-            className={`absolute inset-0 transition-transform duration-700 ease-in-out will-change-transform group-hover:scale-110 ${
-              slideIn ? "translate-x-0" : "translate-x-full"
-            }`}
-          >
+          <div className="absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out group-hover:opacity-100 group-focus-within:opacity-100">
             <Image
               src={incomingImg}
               alt={title}
@@ -307,7 +315,9 @@ export function StoreProductCard({
               className="object-contain p-5"
               onError={() =>
                 setFailedImages((current) =>
-                  current.includes(incomingImg) ? current : [...current, incomingImg]
+                  current.includes(incomingImg)
+                    ? current
+                    : [...current, incomingImg],
                 )
               }
             />
@@ -324,7 +334,10 @@ export function StoreProductCard({
           />
         </div>
 
-        <Link href={`/products/${handle}`} className="group/title block min-h-10">
+        <Link
+          href={`/products/${handle}`}
+          className="group/title block min-h-10"
+        >
           <h3 className="line-clamp-2 font-serif text-base font-extrabold leading-tight tracking-normal text-gray-950 transition-colors group-hover/title:text-orange-600 sm:text-lg">
             {title}
           </h3>
@@ -332,7 +345,6 @@ export function StoreProductCard({
 
         {/* Prices + Buy Now button */}
         <div className="mt-2 grid grid-cols-2 gap-2">
-
           {/* Buy Now — add to cart if variantId exists, else link to PDP */}
           {effectiveVariantId ? (
             <button

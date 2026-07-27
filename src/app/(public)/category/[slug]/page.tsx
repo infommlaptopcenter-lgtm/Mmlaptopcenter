@@ -19,13 +19,27 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const category = await prisma.category.findUnique({ where: { slug } });
-  if (!category) return createSeoMetadata({ title: "Category Not Found", description: "This category is not available.", path: `/category/${slug}`, noIndex: true });
+  if (!category)
+    return createSeoMetadata({
+      title: "Category Not Found",
+      description: "This category is not available.",
+      path: `/category/${slug}`,
+      noIndex: true,
+    });
   return createSeoMetadata({
     title: category.seoTitle || `${category.name} Pakistan`,
-    description: category.seoDescription || category.description || `Buy ${category.name} in Pakistan from MM Laptop Center Charsadda with expert local support and nationwide delivery.`,
+    description:
+      category.seoDescription ||
+      category.description ||
+      `Buy ${category.name} in Pakistan from MM Laptop Center Charsadda with expert local support and nationwide delivery.`,
     path: `/category/${slug}`,
     image: category.image,
-    keywords: [category.name, `${category.name} Pakistan`, `Buy ${category.name} Pakistan`, "Laptop Shop KPK"],
+    keywords: [
+      category.name,
+      `${category.name} Pakistan`,
+      `Buy ${category.name} Pakistan`,
+      "Laptop Shop KPK",
+    ],
   });
 }
 
@@ -48,47 +62,81 @@ export default async function CategoryPage({
       select: { id: true, name: true, slug: true },
     }),
     prisma.product.findMany({
-      where: { status: "ACTIVE", OR: [{ categoryId: category.id }, { subcategoryId: category.id }] },
+      where: {
+        status: "ACTIVE",
+        OR: [{ categoryId: category.id }, { subcategoryId: category.id }],
+      },
       orderBy: { updatedAt: "desc" },
       take: 48,
-      select: { id: true, handle: true, title: true, price: true, compareAtPrice: true, featuredImage: true, images: true, tags: true },
+      select: {
+        id: true,
+        handle: true,
+        title: true,
+        price: true,
+        compareAtPrice: true,
+        featuredImage: true,
+        images: true,
+        tags: true,
+      },
     }),
     prisma.product.findMany({
       where: { status: "ACTIVE" },
       orderBy: { updatedAt: "desc" },
       take: 48,
-      select: { id: true, handle: true, title: true, price: true, compareAtPrice: true, featuredImage: true, images: true, tags: true },
+      select: {
+        id: true,
+        handle: true,
+        title: true,
+        price: true,
+        compareAtPrice: true,
+        featuredImage: true,
+        images: true,
+        tags: true,
+      },
     }),
   ]);
 
   return (
     <main className="mx-auto max-w-7xl space-y-8 px-6 py-8 lg:px-8">
-      <JsonLd data={[
-        breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Products", path: "/products" }, { name: category.name, path: `/category/${slug}` }]),
-        {
-          "@context": "https://schema.org",
-          "@type": "CollectionPage",
-          name: `${category.name} Pakistan`,
-          description: category.description || `Shop ${category.name} in Pakistan.`,
-          url: absoluteUrl(`/category/${slug}`),
-          mainEntity: {
-            "@type": "ItemList",
-            numberOfItems: categoryProducts.length,
-            itemListElement: categoryProducts.map((product, index) => ({
-              "@type": "ListItem",
-              position: index + 1,
-              url: absoluteUrl(`/products/${product.handle}`),
-              name: product.title,
-            })),
+      <JsonLd
+        data={[
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Products", path: "/products" },
+            { name: category.name, path: `/category/${slug}` },
+          ]),
+          {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: `${category.name} Pakistan`,
+            description:
+              category.description || `Shop ${category.name} in Pakistan.`,
+            url: absoluteUrl(`/category/${slug}`),
+            mainEntity: {
+              "@type": "ItemList",
+              numberOfItems: categoryProducts.length,
+              itemListElement: categoryProducts.map((product, index) => ({
+                "@type": "ListItem",
+                position: index + 1,
+                url: absoluteUrl(`/products/${product.handle}`),
+                name: product.title,
+              })),
+            },
           },
-        },
-      ]} />
+        ]}
+      />
       {subcategories.length > 0 && (
         <section>
-          <h2 className="mb-3 text-lg font-semibold text-[#0a0a0a]">Categories</h2>
+          <h2 className="mb-3 text-lg font-semibold text-[#0a0a0a]">
+            Categories
+          </h2>
           <div className="flex flex-wrap gap-2">
             {subcategories.map((sub) => (
-              <Link key={sub.id} href={`/category/${sub.slug}`} className="rounded-full border border-[#d8a928]/30 bg-white px-4 py-2 text-sm text-[#0a0a0a] hover:bg-[#fcf5e8]">
+              <Link
+                key={sub.id}
+                href={`/category/${sub.slug}`}
+                className="rounded-full border border-[#d8a928]/30 bg-white px-4 py-2 text-sm text-[#0a0a0a] hover:bg-[#fcf5e8]"
+              >
                 {sub.name}
               </Link>
             ))}
@@ -97,9 +145,13 @@ export default async function CategoryPage({
       )}
 
       <section>
-        <h2 className="mb-4 text-xl font-semibold text-[#0a0a0a]">{category.name} Products</h2>
+        <h2 className="mb-4 text-xl font-semibold text-[#0a0a0a]">
+          {category.name} Products
+        </h2>
         {categoryProducts.length === 0 ? (
-          <div className="rounded-xl border border-[#d8a928]/20 bg-white p-8 text-sm text-[#5A5E55]">No products found in this category yet.</div>
+          <div className="rounded-xl border border-[#d8a928]/20 bg-white p-8 text-sm text-[#5A5E55]">
+            No products found in this category yet.
+          </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {categoryProducts.map((product) => {
@@ -114,9 +166,28 @@ export default async function CategoryPage({
                   key={product.handle}
                   handle={product.handle}
                   title={product.title}
-                  featuredImageUrl={product.featuredImage || firstImage || FALLBACK_IMAGE}
-                  price={{ amount: Number(product.price || 0).toFixed(2), currencyCode: "PKR" }}
-                  compareAtPrice={product.compareAtPrice ? { amount: Number(product.compareAtPrice).toFixed(2), currencyCode: "PKR" } : null}
+                  featuredImageUrl={
+                    product.featuredImage || firstImage || FALLBACK_IMAGE
+                  }
+                  imageUrls={
+                    Array.isArray(product.images)
+                      ? product.images.filter(
+                          (x): x is string => typeof x === "string",
+                        )
+                      : []
+                  }
+                  price={{
+                    amount: Number(product.price || 0).toFixed(2),
+                    currencyCode: "PKR",
+                  }}
+                  compareAtPrice={
+                    product.compareAtPrice
+                      ? {
+                          amount: Number(product.compareAtPrice).toFixed(2),
+                          currencyCode: "PKR",
+                        }
+                      : null
+                  }
                   tag={firstTag}
                   productId={product.id}
                 />
@@ -128,7 +199,9 @@ export default async function CategoryPage({
 
       {allProducts.length > 0 && (
         <section className="border-t border-[#d8a928]/20 pt-8">
-          <h2 className="mb-4 text-xl font-semibold text-[#0a0a0a]">Related Products</h2>
+          <h2 className="mb-4 text-xl font-semibold text-[#0a0a0a]">
+            Related Products
+          </h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {allProducts.map((product) => {
               const firstImage = Array.isArray(product.images)
@@ -142,9 +215,28 @@ export default async function CategoryPage({
                   key={product.handle}
                   handle={product.handle}
                   title={product.title}
-                  featuredImageUrl={product.featuredImage || firstImage || FALLBACK_IMAGE}
-                  price={{ amount: Number(product.price || 0).toFixed(2), currencyCode: "PKR" }}
-                  compareAtPrice={product.compareAtPrice ? { amount: Number(product.compareAtPrice).toFixed(2), currencyCode: "PKR" } : null}
+                  featuredImageUrl={
+                    product.featuredImage || firstImage || FALLBACK_IMAGE
+                  }
+                  imageUrls={
+                    Array.isArray(product.images)
+                      ? product.images.filter(
+                          (x): x is string => typeof x === "string",
+                        )
+                      : []
+                  }
+                  price={{
+                    amount: Number(product.price || 0).toFixed(2),
+                    currencyCode: "PKR",
+                  }}
+                  compareAtPrice={
+                    product.compareAtPrice
+                      ? {
+                          amount: Number(product.compareAtPrice).toFixed(2),
+                          currencyCode: "PKR",
+                        }
+                      : null
+                  }
                   tag={firstTag}
                   productId={product.id}
                 />

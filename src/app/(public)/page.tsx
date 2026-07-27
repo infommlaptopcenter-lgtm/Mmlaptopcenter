@@ -42,117 +42,190 @@ function parseStringArray(value: unknown): string[] {
 
 export const metadata = createSeoMetadata({
   title: "Laptop Store Pakistan – MM Laptop Center Charsadda",
-  description: "Buy laptops in Pakistan from MM Laptop Center Charsadda. Shop gaming laptops, business laptops, Apple MacBooks, Windows laptops and accessories with nationwide delivery.",
+  description:
+    "Buy laptops in Pakistan from MM Laptop Center Charsadda. Shop gaming laptops, business laptops, Apple MacBooks, Windows laptops and accessories with nationwide delivery.",
   path: "/",
-  keywords: ["Laptop Store Pakistan", "Buy Laptop Pakistan", "Laptop Shop Charsadda", "Gaming Laptops Pakistan", "Apple MacBook Pakistan"],
+  keywords: [
+    "Laptop Store Pakistan",
+    "Buy Laptop Pakistan",
+    "Laptop Shop Charsadda",
+    "Gaming Laptops Pakistan",
+    "Apple MacBook Pakistan",
+  ],
 });
 
 export default async function Page() {
-   const [categories, featuredCollections, featuredBlogs, homeVideos] = await Promise.all([
-     safeHomeQuery(
-       "categories",
-       () => prisma.category.findMany({
-         orderBy: [{ order: "asc" }, { name: "asc" }],
-         select: { id: true, name: true, slug: true, image: true, parentId: true, order: true },
-       }),
-       [],
-     ),
-    safeHomeQuery(
-      "featured collections",
-      () => prisma.collection.findMany({
-        where: {
-          OR: [
-            { isFeatured: true },
-            { handle: { in: ["new-arrivals", "best-sellers"] } },
-          ],
-        },
-        orderBy: [
-          { isFeatured: "desc" },
-          { updatedAt: "desc" },
-        ],
-        take: 20,
-        select: { id: true, handle: true, title: true, image: true, isFeatured: true, productHandles: true },
-      }),
-      [],
-    ),
-    safeHomeQuery(
-      "featured blogs",
-      () => prisma.blogPost.findMany({
-        where: { status: "published", isFeatured: true },
-        orderBy: { publishedAt: "desc" },
-        take: 20,
-        select: { id: true, title: true, slug: true, excerpt: true, featuredImage: true, publishedAt: true, content: true },
-      }),
-      [],
-    ),
-    safeHomeQuery(
-      "home videos",
-      () => prisma.video.findMany({
-        where: { active: true, placement: "HOMEPAGE" },
-        orderBy: [{ featured: "desc" }, { displayOrder: "asc" }, { createdAt: "desc" }],
-        take: 8,
-      }),
-      [],
-    ),
+  const [categories, featuredCollections, featuredBlogs, homeVideos] =
+    await Promise.all([
+      safeHomeQuery(
+        "categories",
+        () =>
+          prisma.category.findMany({
+            orderBy: [{ order: "asc" }, { name: "asc" }],
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              description: true,
+              image: true,
+              parentId: true,
+              order: true,
+            },
+          }),
+        [],
+      ),
+      safeHomeQuery(
+        "featured collections",
+        () =>
+          prisma.collection.findMany({
+            where: {
+              OR: [
+                { isFeatured: true },
+                { handle: { in: ["new-arrivals", "best-sellers"] } },
+              ],
+            },
+            orderBy: [{ isFeatured: "desc" }, { updatedAt: "desc" }],
+            take: 20,
+            select: {
+              id: true,
+              handle: true,
+              title: true,
+              image: true,
+              isFeatured: true,
+              productHandles: true,
+            },
+          }),
+        [],
+      ),
+      safeHomeQuery(
+        "featured blogs",
+        () =>
+          prisma.blogPost.findMany({
+            where: { status: "published", isFeatured: true },
+            orderBy: { publishedAt: "desc" },
+            take: 20,
+            select: {
+              id: true,
+              title: true,
+              slug: true,
+              excerpt: true,
+              featuredImage: true,
+              publishedAt: true,
+              content: true,
+            },
+          }),
+        [],
+      ),
+      safeHomeQuery(
+        "home videos",
+        () =>
+          prisma.video.findMany({
+            where: { active: true, placement: "HOMEPAGE" },
+            orderBy: [
+              { featured: "desc" },
+              { displayOrder: "asc" },
+              { createdAt: "desc" },
+            ],
+            take: 8,
+          }),
+        [],
+      ),
+    ]);
 
+  const homeCollections = featuredCollections.map((collection) => ({
+    ...collection,
+    productHandles: parseStringArray(collection.productHandles),
+  }));
+
+  const collectionProductHandles = homeCollections
+    .filter((collection) =>
+      ["new-arrivals", "best-sellers"].includes(collection.handle),
+    )
+    .flatMap((collection) => collection.productHandles);
+
+  const [recentProducts, collectionProducts] = await Promise.all([
+    safeHomeQuery(
+      "all products",
+      () =>
+        prisma.product.findMany({
+          where: { status: "ACTIVE" },
+          orderBy: { updatedAt: "desc" },
+          select: {
+            id: true,
+            handle: true,
+            title: true,
+            price: true,
+            compareAtPrice: true,
+            featuredImage: true,
+            images: true,
+            tags: true,
+            categoryId: true,
+            subcategoryId: true,
+            isFeatured: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        }),
+      [],
+    ),
+    collectionProductHandles.length
+      ? safeHomeQuery(
+          "home collection products",
+          () =>
+            prisma.product.findMany({
+              where: {
+                status: "ACTIVE",
+                handle: { in: collectionProductHandles },
+              },
+              select: {
+                id: true,
+                handle: true,
+                title: true,
+                price: true,
+                compareAtPrice: true,
+                featuredImage: true,
+                images: true,
+                tags: true,
+                categoryId: true,
+                subcategoryId: true,
+                isFeatured: true,
+                createdAt: true,
+                updatedAt: true,
+              },
+            }),
+          [],
+        )
+      : Promise.resolve([]),
   ]);
 
-const homeCollections = featuredCollections.map((collection) => ({
-  ...collection,
-  productHandles: parseStringArray(collection.productHandles),
-}));
+  const allProducts = Array.from(
+    new Map(
+      [...collectionProducts, ...recentProducts].map((product) => [
+        product.handle,
+        product,
+      ]),
+    ).values(),
+  );
 
-const collectionProductHandles = homeCollections
-  .filter((collection) => ["new-arrivals", "best-sellers"].includes(collection.handle))
-  .flatMap((collection) => collection.productHandles);
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <div className="flex flex-col bg-gray-50">
+        <HomeHeroSection />
+        <h1 className="sr-only">
+          MM Laptop Center – Premium Laptops, Gaming Gear & Tech Accessories
+        </h1>
 
-const [recentProducts, collectionProducts] = await Promise.all([
-  safeHomeQuery(
-    "all products",
-    () => prisma.product.findMany({
-      where: { status: "ACTIVE" },
-      orderBy: { updatedAt: "desc" },
-      take: 40,
-      select: { id: true, handle: true, title: true, price: true, compareAtPrice: true, featuredImage: true, images: true, tags: true, categoryId: true, subcategoryId: true, isFeatured: true, createdAt: true, updatedAt: true },
-    }),
-    [],
-  ),
-  collectionProductHandles.length
-    ? safeHomeQuery(
-        "home collection products",
-        () => prisma.product.findMany({
-          where: {
-            status: "ACTIVE",
-            handle: { in: collectionProductHandles },
-          },
-          select: { id: true, handle: true, title: true, price: true, compareAtPrice: true, featuredImage: true, images: true, tags: true, categoryId: true, subcategoryId: true, isFeatured: true, createdAt: true, updatedAt: true },
-        }),
-        [],
-      )
-    : Promise.resolve([]),
-]);
-
-const allProducts = Array.from(
-  new Map([...collectionProducts, ...recentProducts].map((product) => [product.handle, product])).values(),
-);
-
-return (
-       <>
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-          />
-        <div className="flex flex-col bg-gray-50">
-          <HomeHeroSection />
-          <h1 className="sr-only">MM Laptop Center – Premium Laptops, Gaming Gear & Tech Accessories</h1>
-
-          <HomeContentSections
-            categories={categories}
-            products={allProducts}
-            collections={homeCollections}
-            featuredBlogs={featuredBlogs}
-            homeVideos={homeVideos.map(serializeVideo)}
-          />
+        <HomeContentSections
+          categories={categories}
+          products={allProducts}
+          collections={homeCollections}
+          featuredBlogs={featuredBlogs}
+          homeVideos={homeVideos.map(serializeVideo)}
+        />
       </div>
     </>
   );

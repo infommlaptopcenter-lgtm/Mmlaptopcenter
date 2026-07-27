@@ -12,10 +12,15 @@ const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
 const TAWK_ID = process.env.NEXT_PUBLIC_TAWK_ID;
 const TAWK_WIDGET_ID = process.env.NEXT_PUBLIC_TAWK_WIDGET_ID;
 
-
 export function ChatIntegrations() {
   const [loadTawk, setLoadTawk] = useState(false);
   const [openChat, setOpenChat] = useState(false);
+
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent("mobile-chat-state", { detail: { open: openChat } }),
+    );
+  }, [openChat]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -25,18 +30,26 @@ export function ChatIntegrations() {
 
     window.addEventListener("scroll", onScroll, { passive: true });
 
-    const handleOpenMobileChat = () => setOpenChat(true);
-    window.addEventListener("open-mobile-chat", handleOpenMobileChat);
+    const handleToggleMobileChat = (event: Event) => {
+      const requested = (event as CustomEvent<{ open?: boolean }>).detail?.open;
+      setOpenChat((current) =>
+        typeof requested === "boolean" ? requested : !current,
+      );
+    };
+    window.addEventListener("toggle-mobile-chat", handleToggleMobileChat);
 
     return () => {
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("open-mobile-chat", handleOpenMobileChat);
+      window.removeEventListener("toggle-mobile-chat", handleToggleMobileChat);
     };
   }, []);
 
   return (
     <>
-      <ChatButton open={openChat} onClick={() => setOpenChat((prev) => !prev)} />
+      <ChatButton
+        open={openChat}
+        onClick={() => setOpenChat((prev) => !prev)}
+      />
       <ChatPopup open={openChat} onClose={() => setOpenChat(false)} />
 
       {/* WhatsApp Floating Button - Only on Desktop */}
