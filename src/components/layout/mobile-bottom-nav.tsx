@@ -60,6 +60,15 @@ export function MobileBottomNav() {
     setOverlay(nextOverlay);
   };
 
+  const closeOverlayForNavigation = () => {
+    if (overlay === "chat") {
+      window.dispatchEvent(
+        new CustomEvent("toggle-mobile-chat", { detail: { open: false } }),
+      );
+    }
+    setOverlay(null);
+  };
+
   const sendWhatsApp = () => {
     const url = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message.trim())}`;
     trackContact("WhatsApp mobile navigation");
@@ -167,6 +176,7 @@ export function MobileBottomNav() {
           </button>
           <Link
             href="/products"
+            onClick={closeOverlayForNavigation}
             aria-label="Products and categories"
             aria-current={productsActive ? "page" : undefined}
             className={itemClass(productsActive && !overlay)}
@@ -175,6 +185,7 @@ export function MobileBottomNav() {
           </Link>
           <Link
             href="/"
+            onClick={closeOverlayForNavigation}
             aria-label="Home"
             aria-current={pathname === "/" ? "page" : undefined}
             className={itemClass(pathname === "/" && !overlay)}

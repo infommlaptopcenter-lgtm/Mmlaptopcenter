@@ -45,9 +45,9 @@ const topBarLeft = [
 
 const topBarRight = [
   { text: "About", href: "/about-us" },
-  { text: "Reviews", href: "/reviews" },
-  { text: "Store Locator", href: "/store-locator" },
-  { text: "FAQs", href: "/faqs" },
+  { text: "Reviews", href: "/#reviews" },
+  { text: "Store Locator", href: "/contact" },
+  { text: "FAQs", href: "/faq" },
 ];
 
 const logoSrc = "/logo/mmlaptop.png";

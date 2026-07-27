@@ -40,6 +40,7 @@ export function ProductList(props: Props) {
               handle={node.handle}
               title={titleize(node.title)}
               featuredImageUrl={node.featuredImage?.url || FALLBACK_IMAGE}
+              imageUrls={node.images.nodes.map((image) => image.url)}
               price={node.priceRange.minVariantPrice}
               tag={node.tags?.[0]}
               productId={node.id}

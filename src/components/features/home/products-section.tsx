@@ -285,7 +285,7 @@ function CollectionSlider({ collections }: { collections: Collection[] }) {
         {displayCollections.map((collection, i) => (
           <Link
             key={`${collection.id}-${i}-${currentSlide}`}
-            href="/products"
+            href={`/collections/${encodeURIComponent(collection.handle)}`}
             className="group overflow-hidden rounded-2xl border border-[#d8a928]/20 bg-white"
           >
             <div className="relative aspect-[16/10]">
