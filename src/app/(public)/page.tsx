@@ -251,7 +251,7 @@ export default async function Page() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="flex flex-col bg-gray-50">
+      <div className="flex w-full min-w-0 flex-col overflow-x-clip bg-gray-50">
         <HomeHeroSection />
         <h1 className="sr-only">
           MM Laptop Center – Premium Laptops, Gaming Gear & Tech Accessories
