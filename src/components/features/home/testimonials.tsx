@@ -70,8 +70,36 @@ export default function Testimonials() {
   }, []);
 
   useEffect(() => {
-    const timer = window.setInterval(() => move(1), 4000);
-    return () => window.clearInterval(timer);
+    const track = trackRef.current;
+    if (!track) return;
+
+    let timer: number | undefined;
+
+    const stopAutoplay = () => {
+      if (timer === undefined) return;
+      window.clearInterval(timer);
+      timer = undefined;
+    };
+
+    const startAutoplay = () => {
+      if (timer !== undefined) return;
+      timer = window.setInterval(() => move(1), 4000);
+    };
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        startAutoplay();
+      } else {
+        stopAutoplay();
+      }
+    });
+
+    observer.observe(track);
+
+    return () => {
+      observer.disconnect();
+      stopAutoplay();
+    };
   }, [move]);
 
   return (
