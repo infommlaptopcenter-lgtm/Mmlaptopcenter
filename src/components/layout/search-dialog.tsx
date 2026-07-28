@@ -81,7 +81,7 @@ export function SearchDialog({ open, onOpenChange }: Props) {
                     <div className="flex items-center gap-4">
                       <div className="relative h-10 w-10 overflow-hidden rounded-md border">
                         {product.featuredImage && (
-                          <Image src={product.featuredImage.url} alt={product.featuredImage.altText || ""} fill className="object-cover" />
+                          <Image src={product.featuredImage.url} alt={product.featuredImage.altText || ""} fill sizes="40px" className="object-cover" />
                         )}
                       </div>
                       <div className="flex flex-col">

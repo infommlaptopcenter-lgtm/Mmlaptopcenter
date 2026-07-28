@@ -20,13 +20,21 @@ import {
   Truck,
 } from "@esmate/shadcn/pkgs/lucide-react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { CartDrawer } from "@/components/features/cart/cart-drawer";
 import { searchProducts } from "@/components/search/actions";
 import { search as trackSearch } from "@/lib/pixel";
 import { usePWAInstall } from "@/hooks/use-pwa-install";
+
+const CartDrawer = dynamic(
+  () =>
+    import("@/components/features/cart/cart-drawer").then(
+      (module) => module.CartDrawer,
+    ),
+  { ssr: false },
+);
 
 const mainMenuItems = [
   { text: "Home", href: "/" },
@@ -173,6 +181,7 @@ export function Header() {
                         src={logoSrc}
                         alt="MM Laptop Center"
                         fill
+                        sizes="130px"
                         className="object-contain"
                       />
                     </div>
@@ -215,6 +224,7 @@ export function Header() {
                                 src={item.image || logoSrc}
                                 alt={item.name}
                                 fill
+                                sizes="32px"
                                 className="object-cover"
                               />
                             </div>
@@ -301,6 +311,7 @@ export function Header() {
               src={logoSrc}
               alt="MM Laptop Center"
               fill
+              sizes="(max-width: 1023px) 120px, 140px"
               className="object-contain"
               priority
             />
@@ -527,6 +538,7 @@ export function Header() {
                             src={product.featuredImage.url}
                             alt={product.featuredImage.altText || ""}
                             fill
+                            sizes="40px"
                             className="object-cover"
                           />
                         )}
@@ -627,6 +639,7 @@ export function Header() {
                             src={product.featuredImage.url}
                             alt={product.featuredImage.altText || ""}
                             fill
+                            sizes="40px"
                             className="object-cover"
                           />
                         )}
@@ -653,7 +666,9 @@ export function Header() {
         </div>
       )}
 
-      <CartDrawer open={cartOpen} onOpenChange={setCartOpen} />
+      {cartOpen ? (
+        <CartDrawer open={cartOpen} onOpenChange={setCartOpen} />
+      ) : null}
     </header>
   );
 }

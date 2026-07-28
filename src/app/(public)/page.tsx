@@ -61,6 +61,7 @@ export default async function Page() {
     featuredBlogs,
     homeVideos,
     reviewGroups,
+    recentProducts,
   ] = await Promise.all([
     safeHomeQuery(
       "categories",
@@ -148,20 +149,6 @@ export default async function Page() {
         }),
       [],
     ),
-  ]);
-
-  const homeCollections = featuredCollections.map((collection) => ({
-    ...collection,
-    productHandles: parseStringArray(collection.productHandles),
-  }));
-
-  const collectionProductHandles = homeCollections
-    .filter((collection) =>
-      ["new-arrivals", "best-sellers"].includes(collection.handle),
-    )
-    .flatMap((collection) => collection.productHandles);
-
-  const [recentProducts, collectionProducts] = await Promise.all([
     safeHomeQuery(
       "all products",
       () =>
@@ -186,35 +173,23 @@ export default async function Page() {
         }),
       [],
     ),
-    collectionProductHandles.length
-      ? safeHomeQuery(
-          "home collection products",
-          () =>
-            prisma.product.findMany({
-              where: {
-                status: "ACTIVE",
-                handle: { in: collectionProductHandles },
-              },
-              select: {
-                id: true,
-                handle: true,
-                title: true,
-                price: true,
-                compareAtPrice: true,
-                featuredImage: true,
-                images: true,
-                tags: true,
-                categoryId: true,
-                subcategoryId: true,
-                isFeatured: true,
-                createdAt: true,
-                updatedAt: true,
-              },
-            }),
-          [],
-        )
-      : Promise.resolve([]),
   ]);
+
+  const homeCollections = featuredCollections.map((collection) => ({
+    ...collection,
+    productHandles: parseStringArray(collection.productHandles),
+  }));
+
+  const collectionProductHandles = homeCollections
+    .filter((collection) =>
+      ["new-arrivals", "best-sellers"].includes(collection.handle),
+    )
+    .flatMap((collection) => collection.productHandles);
+
+  const collectionProductHandleSet = new Set(collectionProductHandles);
+  const collectionProducts = recentProducts.filter((product) =>
+    collectionProductHandleSet.has(product.handle),
+  );
 
   const reviewStatsByHandle = new Map(
     reviewGroups

@@ -1,12 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import Script from "next/script";
 import { FaWhatsapp } from "react-icons/fa";
 import { ChatButton } from "@/components/chatbot/chat-button";
-import { ChatPopup } from "@/components/chatbot/chat-popup";
 import { contact as trackContact } from "@/lib/pixel";
+
+const ChatPopup = dynamic(
+  () =>
+    import("@/components/chatbot/chat-popup").then((module) => module.ChatPopup),
+  { ssr: false },
+);
 
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
 const TAWK_ID = process.env.NEXT_PUBLIC_TAWK_ID;
@@ -58,7 +64,9 @@ export function ChatIntegrations() {
         open={openChat}
         onClick={() => setOpenChat((prev) => !prev)}
       />
-      <ChatPopup open={openChat} onClose={() => setOpenChat(false)} />
+      {openChat ? (
+        <ChatPopup open={openChat} onClose={() => setOpenChat(false)} />
+      ) : null}
 
       {/* WhatsApp Floating Button - Only on Desktop */}
       <Link

@@ -10,10 +10,25 @@ let lastTrackedLocation: string | null = null;
 export function MetaPixel() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [shouldLoad, setShouldLoad] = useState(false);
   const [pixelReady, setPixelReady] = useState(false);
 
   const query = searchParams.toString();
   const location = query ? `${pathname}?${query}` : pathname;
+
+  useEffect(() => {
+    const enablePixel = () => setShouldLoad(true);
+    window.addEventListener("pointerdown", enablePixel, {
+      passive: true,
+      once: true,
+    });
+    window.addEventListener("keydown", enablePixel, { once: true });
+
+    return () => {
+      window.removeEventListener("pointerdown", enablePixel);
+      window.removeEventListener("keydown", enablePixel);
+    };
+  }, []);
 
   useEffect(() => {
     if (!pixelReady || lastTrackedLocation === location) return;
@@ -21,13 +36,13 @@ export function MetaPixel() {
     lastTrackedLocation = location;
   }, [location, pixelReady]);
 
-  if (!META_PIXEL_ID) return null;
+  if (!META_PIXEL_ID || !shouldLoad) return null;
 
   return (
     <>
       <Script
         id="meta-pixel"
-        strategy="lazyOnload"
+        strategy="afterInteractive"
         onReady={() => setPixelReady(true)}
       >
         {`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init',${JSON.stringify(META_PIXEL_ID)});`}

@@ -324,6 +324,7 @@ function CollectionSlider({ collections }: { collections: Collection[] }) {
                 src={collection.image || FALLBACK_IMAGE}
                 alt={collection.title}
                 fill
+                sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 33vw"
                 className="object-contain transition-transform duration-500 group-hover:scale-105"
               />
             </div>

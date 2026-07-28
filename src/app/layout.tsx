@@ -3,8 +3,6 @@ import Providers from "../components/providers/providers";
 import "./globals.css";
 import type { Metadata } from "next";
 import ServiceWorkerRegistration from "@/components/core/service-worker-registration";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 import { MetaPixel } from "@/components/integrations/meta-pixel";
 import { SITE_NAME, SITE_URL } from "@/lib/seo";
@@ -77,11 +75,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Suspense fallback={null}>
           <MetaPixel />
         </Suspense>
-        <Providers>
-          {children}
-          <SpeedInsights />
-          <Analytics />
-        </Providers>
+        <Providers>{children}</Providers>
         <ServiceWorkerRegistration />
       </body>
     </html>

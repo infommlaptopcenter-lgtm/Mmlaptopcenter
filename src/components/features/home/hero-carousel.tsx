@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
+import { getImageProps } from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "@esmate/shadcn/pkgs/lucide-react";
 import { HeroSlide } from "@/types/hero";
@@ -66,7 +66,26 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
     >
       {slides.map((slide, index) => {
         const isActive = index === active;
-        const hasMobileImage = Boolean(slide.mobileImageUrl);
+        const {
+          props: { srcSet: desktopSrcSet, ...desktopImageProps },
+        } = getImageProps({
+          src: slide.imageUrl,
+          alt: slide.imageAlt,
+          width: 1920,
+          height: 600,
+          sizes: "100vw",
+          priority: index === 0,
+        });
+        const mobileImage = slide.mobileImageUrl
+          ? getImageProps({
+              src: slide.mobileImageUrl,
+              alt: slide.imageAlt,
+              width: 768,
+              height: 600,
+              sizes: "100vw",
+              priority: index === 0,
+            }).props
+          : null;
 
         return (
           <div
@@ -76,30 +95,25 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
               isActive ? "z-0 opacity-100" : "pointer-events-none opacity-0"
             }`}
           >
-            <Image
-              src={slide.imageUrl}
-              alt={slide.imageAlt}
-              fill
-              priority={index === 0}
-              sizes="100vw"
-              className={`hero-desktop-image object-cover object-right ${
-                hasMobileImage ? "has-mobile-hero-image" : ""
-              } ${
-                isActive ? "hero-image-zoom" : ""
-              }`}
-            />
-            {slide.mobileImageUrl && (
-              <Image
-                src={slide.mobileImageUrl}
+            <picture className="absolute inset-0 block">
+              {mobileImage?.srcSet ? (
+                <source
+                  media="(max-width: 767px)"
+                  srcSet={mobileImage.srcSet}
+                  sizes={mobileImage.sizes}
+                />
+              ) : null}
+              {/* getImageProps keeps Next's optimized srcset while picture
+                  ensures only the matching mobile/desktop source downloads. */}
+              <img
+                {...desktopImageProps}
+                srcSet={desktopSrcSet}
                 alt={slide.imageAlt}
-                fill
-                priority={index === 0}
-                sizes="100vw"
-                className={`hero-mobile-image object-cover object-right ${
+                className={`absolute inset-0 h-full w-full object-cover object-right ${
                   isActive ? "hero-image-zoom" : ""
                 }`}
               />
-            )}
+            </picture>
           </div>
         );
       })}

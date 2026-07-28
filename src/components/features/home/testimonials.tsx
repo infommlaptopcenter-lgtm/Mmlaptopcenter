@@ -1,11 +1,7 @@
 "use client";
 
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "@esmate/shadcn/pkgs/lucide-react";
-import { useRef } from "react";
-
-import "swiper/css";
+import { useCallback, useEffect, useRef } from "react";
 
 const testimonials = [
   {
@@ -50,57 +46,87 @@ const testimonials = [
   },
 ];
 
-const Testimonials = () => {
-  const swiperRef = useRef<any>(null);
+export default function Testimonials() {
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  const move = useCallback((direction: 1 | -1) => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    const atEnd =
+      track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+    const atStart = track.scrollLeft <= 2;
+
+    if (direction === 1 && atEnd) {
+      track.scrollTo({ left: 0, behavior: "smooth" });
+    } else if (direction === -1 && atStart) {
+      track.scrollTo({ left: track.scrollWidth, behavior: "smooth" });
+    } else {
+      track.scrollBy({
+        left: direction * track.clientWidth,
+        behavior: "smooth",
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => move(1), 4000);
+    return () => window.clearInterval(timer);
+  }, [move]);
 
   return (
-    
     <div className="relative">
       <button
-        onClick={() => swiperRef.current?.slidePrev()}
-        className="absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-[#fcf5e8] p-2 shadow-md hover:bg-[#f6a45d] hover:text-white transition hidden md:block"
-        aria-label="Previous"
+        type="button"
+        onClick={() => move(-1)}
+        className="absolute left-0 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-[#fcf5e8] p-2 shadow-md transition hover:bg-[#f6a45d] hover:text-white md:block"
+        aria-label="Previous customer reviews"
       >
         <ChevronLeft className="h-5 w-5" />
       </button>
 
-      <Swiper
-        onSwiper={(swiper) => { swiperRef.current = swiper; }}
-        modules={[Autoplay]}
-        spaceBetween={24}
-        slidesPerView={1}
-        autoplay={{ delay: 4000, disableOnInteraction: false }}
-        breakpoints={{
-          640: { slidesPerView: 2 },
-          1024: { slidesPerView: 3 },
-        }}
-        className="px-8"
+      <div
+        ref={trackRef}
+        className="scrollbar-hide flex snap-x snap-mandatory gap-6 overflow-x-auto px-0 md:px-8"
       >
-        {testimonials.map((t, i) => (
-          <SwiperSlide key={i}>
-            <div className="rounded-xl border border-[#d8a928]/20 bg-[#f4f1e8] p-6 h-full">
-              <div className="flex gap-1 mb-3">
-                {Array.from({ length: 5 }).map((_, j) => (
-                  <span key={j} className="text-[#d8a928] text-lg">★</span>
+        {testimonials.map((testimonial) => (
+          <article
+            key={testimonial.name}
+            className="w-full shrink-0 snap-start sm:w-[calc(50%_-_0.75rem)] lg:w-[calc(33.333%_-_1rem)]"
+          >
+            <div className="h-full rounded-xl border border-[#d8a928]/20 bg-[#f4f1e8] p-6">
+              <div className="mb-3 flex gap-1">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <span
+                    key={index}
+                    aria-hidden="true"
+                    className="text-lg text-[#d8a928]"
+                  >
+                    ★
+                  </span>
                 ))}
+                <span className="sr-only">5 out of 5 stars</span>
               </div>
-              <p className="text-[#5A5E55] mb-4 text-sm leading-relaxed">&quot;{t.text}&quot;</p>
-              <p className="font-semibold text-[#0a0a0a]">{t.name}</p>
-              <p className="text-xs text-[#5A5E55]">{t.role}</p>
+              <p className="mb-4 text-sm leading-relaxed text-[#5A5E55]">
+                &quot;{testimonial.text}&quot;
+              </p>
+              <p className="font-semibold text-[#0a0a0a]">
+                {testimonial.name}
+              </p>
+              <p className="text-xs text-[#5A5E55]">{testimonial.role}</p>
             </div>
-          </SwiperSlide>
+          </article>
         ))}
-      </Swiper>
+      </div>
 
       <button
-        onClick={() => swiperRef.current?.slideNext()}
-        className="absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-[#fcf5e8] p-2 shadow-md hover:bg-[#f6a45d] hover:text-white transition hidden md:block"
-        aria-label="Next"
+        type="button"
+        onClick={() => move(1)}
+        className="absolute right-0 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-[#fcf5e8] p-2 shadow-md transition hover:bg-[#f6a45d] hover:text-white md:block"
+        aria-label="Next customer reviews"
       >
         <ChevronRight className="h-5 w-5" />
       </button>
     </div>
   );
-};
-
-export default Testimonials;
+}

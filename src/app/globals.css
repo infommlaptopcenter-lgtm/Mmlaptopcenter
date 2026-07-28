@@ -1,6 +1,17 @@
 @import "tailwindcss";
 
-@source "../../node_modules/@esmate/shadcn";
+@source "../../node_modules/@esmate/shadcn/dist/components/ui/badge.js";
+@source "../../node_modules/@esmate/shadcn/dist/components/ui/button.js";
+@source "../../node_modules/@esmate/shadcn/dist/components/ui/card.js";
+@source "../../node_modules/@esmate/shadcn/dist/components/ui/command.js";
+@source "../../node_modules/@esmate/shadcn/dist/components/ui/dialog.js";
+@source "../../node_modules/@esmate/shadcn/dist/components/ui/input.js";
+@source "../../node_modules/@esmate/shadcn/dist/components/ui/label.js";
+@source "../../node_modules/@esmate/shadcn/dist/components/ui/select.js";
+@source "../../node_modules/@esmate/shadcn/dist/components/ui/separator.js";
+@source "../../node_modules/@esmate/shadcn/dist/components/ui/sheet.js";
+@source "../../node_modules/@esmate/shadcn/dist/components/ui/skeleton.js";
+@source "../../node_modules/@esmate/shadcn/dist/components/ui/textarea.js";
 @import "@esmate/shadcn/styles/new-york.css";
 
 @theme {
