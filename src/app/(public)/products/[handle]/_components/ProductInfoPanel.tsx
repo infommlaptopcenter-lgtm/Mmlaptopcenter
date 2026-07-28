@@ -79,15 +79,7 @@ export function ProductInfoPanel({
   return (
     <aside className="h-full min-w-0 overflow-hidden rounded-3xl border border-orange-100 bg-[linear-gradient(145deg,rgba(255,247,237,0.98),rgba(255,255,255,0.96))] px-4 pb-5 pt-5 shadow-[0_18px_50px_rgba(26,19,8,0.07)] sm:min-h-[32rem] sm:px-6 sm:pb-6 sm:pt-6 lg:min-h-[36rem]">
       <div className="flex h-full min-w-0 flex-col gap-3 sm:overflow-y-auto sm:pr-1">
-        <div>
-          <h1
-            className={`break-words font-serif font-extrabold leading-tight tracking-normal text-gray-950 ${titleSizeClass}`}
-          >
-            {title}
-          </h1>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex min-h-7 flex-wrap items-center gap-2">
           <Badge
             className={`rounded-full px-2.5 py-0.5 text-[11px] text-white ${
               availableForSale
@@ -107,14 +99,15 @@ export function ProductInfoPanel({
           <span className="rounded-full border border-orange-200 bg-white/60 px-2.5 py-0.5 text-[11px] font-bold text-[#5A5E55]">
             {viewerCount} viewing now
           </span>
-        </div>
-
-        <div className="flex-1 space-y-2.5">
           <div className="flex flex-wrap items-center gap-2 text-xs text-gray-700 sm:text-sm">
-            <div className="flex items-center gap-1">
+            <div
+              className="flex items-center gap-1"
+              aria-label={`${reviewStats.averageRating.toFixed(1)} out of 5 stars`}
+            >
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star
                   key={star}
+                  aria-hidden="true"
                   className={`h-4 w-4 ${
                     star <= Math.round(reviewStats.averageRating)
                       ? "fill-[#d8a928] text-[#d8a928]"
@@ -128,7 +121,18 @@ export function ProductInfoPanel({
             </span>
             <span>{reviewStats.totalReviews} reviews</span>
           </div>
+        </div>
 
+        <div className="flex h-[5.75rem] min-w-0 items-start overflow-hidden sm:h-[6.25rem] lg:h-[6.75rem]">
+          <h1
+            className={`line-clamp-3 break-words font-serif font-extrabold leading-tight tracking-normal text-gray-950 ${titleSizeClass}`}
+            title={title}
+          >
+            {title}
+          </h1>
+        </div>
+
+        <div className="flex-1 space-y-2.5">
           {priceBlock && (
             <div className="rounded-xl bg-white/65 p-2.5 shadow-sm ring-1 ring-orange-100/80">
               <div className="flex flex-wrap items-center justify-between gap-3">
