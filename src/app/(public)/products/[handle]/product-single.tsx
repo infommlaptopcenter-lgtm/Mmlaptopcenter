@@ -422,7 +422,6 @@ export function ProductSingle({ data }: Props) {
 
             <ProductInfoPanel
               title={selectedTitle}
-              description={data.description}
               priceBlock={priceBlock}
               reviewStats={visibleReviewStats}
               inventory={inventory}

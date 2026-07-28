@@ -29,7 +29,6 @@ type VariantOption = {
 
 type ProductInfoPanelProps = {
   title: string;
-  description?: string | null;
   priceBlock: PriceBlock | null;
   reviewStats: ReviewStats;
   inventory: number | null;
@@ -49,7 +48,6 @@ type ProductInfoPanelProps = {
 
 export function ProductInfoPanel({
   title,
-  description,
   priceBlock,
   reviewStats,
   inventory,
@@ -87,11 +85,6 @@ export function ProductInfoPanel({
           >
             {title}
           </h1>
-          {description?.trim() ? (
-            <p className="mt-2.5 whitespace-pre-line text-sm leading-6 text-gray-600 sm:mt-3 sm:text-[15px] sm:leading-6">
-              {description}
-            </p>
-          ) : null}
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
