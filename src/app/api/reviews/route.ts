@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import type { Prisma } from "@prisma/client";
 
 const submitReviewSchema = z.object({
   authorName: z.string().min(1, "Name is required"),
@@ -19,13 +20,44 @@ export async function GET(request: Request) {
     const productHandle = searchParams.get("productHandle");
     const sortBy = searchParams.get("sortBy") || "newest"; // newest, highest, lowest
     const limit = parseInt(searchParams.get("limit") || "50");
+    const statsOnly = searchParams.get("statsOnly") === "1";
 
     if (!productHandle) {
-      return NextResponse.json({ error: "Product handle is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Product handle is required" },
+        { status: 400 },
+      );
+    }
+
+    if (statsOnly) {
+      const stats = await prisma.review.aggregate({
+        where: {
+          productHandle,
+          status: "approved",
+        },
+        _avg: { rating: true },
+        _count: { id: true },
+      });
+
+      return NextResponse.json(
+        {
+          statistics: {
+            averageRating: stats._avg.rating || 0,
+            totalReviews: stats._count.id,
+          },
+        },
+        {
+          headers: {
+            "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+          },
+        },
+      );
     }
 
     // Build sort order
-    let orderBy: any = { createdAt: "desc" };
+    let orderBy: Prisma.ReviewOrderByWithRelationInput = {
+      createdAt: "desc",
+    };
     if (sortBy === "highest") {
       orderBy = { rating: "desc" };
     } else if (sortBy === "lowest") {
@@ -72,9 +104,15 @@ export async function GET(request: Request) {
       _count: { id: true },
     });
 
-    const distribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    const distribution: Record<number, number> = {
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 0,
+    };
     ratingDistribution.forEach((r) => {
-      if (r._count && typeof r._count === 'object' && 'id' in r._count) {
+      if (r._count && typeof r._count === "object" && "id" in r._count) {
         distribution[r.rating] = (r._count as { id: number }).id;
       }
     });
@@ -89,7 +127,10 @@ export async function GET(request: Request) {
     });
   } catch (error: unknown) {
     console.error("Failed to fetch reviews:", error);
-    return NextResponse.json({ error: "Failed to fetch reviews" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch reviews" },
+      { status: 500 },
+    );
   }
 }
 
@@ -102,7 +143,7 @@ export async function POST(request: Request) {
     if (!validated.productId && !validated.productHandle) {
       return NextResponse.json(
         { error: "Product ID or handle is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -119,7 +160,7 @@ export async function POST(request: Request) {
       if (existingReview) {
         return NextResponse.json(
           { error: "You have already submitted a review for this product" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -140,20 +181,23 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(
-      { 
-        review, 
-        message: "Your review has been submitted and is awaiting approval" 
+      {
+        review,
+        message: "Your review has been submitted and is awaiting approval",
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Failed to submit review:", error);
-    return NextResponse.json({ error: "Failed to submit review" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to submit review" },
+      { status: 500 },
+    );
   }
 }

@@ -2,7 +2,6 @@ import { ReactNode } from "react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ChatIntegrations } from "@/components/integrations/chat-integrations";
-import { SiteLoader } from "@/components/core/site-loader";
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SITE_URL } from "@/lib/seo";
@@ -15,7 +14,10 @@ const businessSchemas = [
     name: "MM Laptop Center",
     url: SITE_URL,
     logo: `${SITE_URL}/logo/mmlaptop.png`,
-    sameAs: ["https://www.facebook.com/mmlaptopcenter", "https://www.instagram.com/mmlaptopcenter"],
+    sameAs: [
+      "https://www.facebook.com/mmlaptopcenter",
+      "https://www.instagram.com/mmlaptopcenter",
+    ],
   },
   {
     "@context": "https://schema.org",
@@ -41,7 +43,6 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
     <div className="public-site flex min-h-screen flex-col">
       <JsonLd data={businessSchemas} />
       <Header />
-      <SiteLoader />
       <main className="flex-grow bg-[#f5f5f5] pb-16 md:pb-0">{children}</main>
       <Footer />
       <MobileBottomNav />
@@ -49,4 +50,3 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
     </div>
   );
 }
-

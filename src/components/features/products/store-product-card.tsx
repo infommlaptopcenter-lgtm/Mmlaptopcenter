@@ -23,11 +23,34 @@ type ProductCardProps = {
   tag?: string;
   variantId?: string;
   productId?: string;
+  initialReviewStats?: ReviewStats | null;
 };
 
 interface ReviewStats {
   averageRating: number;
   totalReviews: number;
+}
+
+const reviewStatsRequests = new Map<string, Promise<ReviewStats | null>>();
+
+function loadReviewStats(handle: string) {
+  const existing = reviewStatsRequests.get(handle);
+  if (existing) return existing;
+
+  const request = fetch(
+    `/api/reviews?productHandle=${encodeURIComponent(handle)}&statsOnly=1`,
+  )
+    .then(async (response) => {
+      if (!response.ok) return null;
+      const data = (await response.json()) as {
+        statistics?: ReviewStats;
+      };
+      return data.statistics ?? null;
+    })
+    .catch(() => null);
+
+  reviewStatsRequests.set(handle, request);
+  return request;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -106,10 +129,13 @@ export function StoreProductCard({
   tag,
   variantId,
   productId,
+  initialReviewStats,
 }: ProductCardProps) {
   const [loading, setLoading] = useState(false);
   const [failedImages, setFailedImages] = useState<string[]>([]);
-  const [reviewStats, setReviewStats] = useState<ReviewStats | null>(null);
+  const [reviewStats, setReviewStats] = useState<ReviewStats | null>(
+    initialReviewStats ?? null,
+  );
   const { linesAdd } = useCart();
 
   // ── Slide transition state ──
@@ -152,17 +178,18 @@ export function StoreProductCard({
 
   // ── Fetch review stats ──
   useEffect(() => {
+    if (initialReviewStats) return;
+    let active = true;
+
     async function fetchReviewStats() {
-      try {
-        const res = await fetch(`/api/reviews?productHandle=${handle}&limit=1`);
-        const data = await res.json();
-        if (data.statistics) setReviewStats(data.statistics);
-      } catch {
-        // silently fail
-      }
+      const statistics = await loadReviewStats(handle);
+      if (active && statistics) setReviewStats(statistics);
     }
-    fetchReviewStats();
-  }, [handle]);
+    void fetchReviewStats();
+    return () => {
+      active = false;
+    };
+  }, [handle, initialReviewStats]);
 
   useEffect(() => {
     setFailedImages([]);

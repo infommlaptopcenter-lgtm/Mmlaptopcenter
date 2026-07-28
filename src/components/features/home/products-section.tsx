@@ -32,6 +32,10 @@ export interface HomeProduct {
   isFeatured: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  reviewStats?: {
+    averageRating: number;
+    totalReviews: number;
+  } | null;
 }
 
 interface Collection {
@@ -97,6 +101,7 @@ function ProductGrid({
               }
               tag={firstTag}
               productId={product.id}
+              initialReviewStats={product.reviewStats}
             />
           );
         })}
@@ -174,11 +179,22 @@ function FeaturedProductRow({
     let frame = 0;
     let previousTime = 0;
     let paused = false;
+    let visible = false;
+    let documentVisible = document.visibilityState === "visible";
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     const halfWidth = () => row.scrollWidth / 2;
     if (direction === "right") row.scrollLeft = halfWidth();
 
     const move = (time: number) => {
-      if (previousTime && !paused) {
+      if (
+        previousTime &&
+        !paused &&
+        visible &&
+        documentVisible &&
+        !reduceMotion
+      ) {
         const distance = ((time - previousTime) / 1000) * 22;
         row.scrollLeft += direction === "left" ? distance : -distance;
         const half = halfWidth();
@@ -207,9 +223,24 @@ function FeaturedProductRow({
     row.addEventListener("pointerleave", resume);
     row.addEventListener("focusin", pause);
     row.addEventListener("focusout", onFocusOut);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+        previousTime = performance.now();
+      },
+      { rootMargin: "200px 0px" },
+    );
+    const onVisibilityChange = () => {
+      documentVisible = document.visibilityState === "visible";
+      previousTime = performance.now();
+    };
+    observer.observe(row);
+    document.addEventListener("visibilitychange", onVisibilityChange);
     frame = requestAnimationFrame(move);
     return () => {
       cancelAnimationFrame(frame);
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       row.removeEventListener("pointerenter", pause);
       row.removeEventListener("pointerleave", resume);
       row.removeEventListener("focusin", pause);
@@ -404,6 +435,7 @@ export function ProductsSection({
         }
         tag={firstTag}
         productId={product.id}
+        initialReviewStats={product.reviewStats}
       />
     );
   };

@@ -36,7 +36,6 @@ type HomeContentSectionsProps = {
     excerpt?: string | null;
     featuredImage?: string | null;
     publishedAt?: Date | string | null;
-    content?: string | null;
   }>;
   homeVideos: PublicVideo[];
 };

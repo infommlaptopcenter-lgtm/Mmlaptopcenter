@@ -5,7 +5,6 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   serverExternalPackages: ["dompurify"],
   images: {
-    domains: ["placehold.co", "res.cloudinary.com", "i.pinimg.com", "images.unsplash.com", "i.ytimg.com"],
     remotePatterns: [
       {
         protocol: "https",
@@ -31,6 +30,45 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "SAMEORIGIN",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
+        ],
+      },
+      {
+        source: "/logo/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/icons/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
       {
         source: "/manifest.json",
         headers: [

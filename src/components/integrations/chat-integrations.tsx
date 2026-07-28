@@ -23,12 +23,18 @@ export function ChatIntegrations() {
   }, [openChat]);
 
   useEffect(() => {
-    const onScroll = () => {
+    const loadSupportWidget = () => {
       setLoadTawk(true);
-      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("pointerdown", loadSupportWidget);
+      window.removeEventListener("keydown", loadSupportWidget);
     };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("pointerdown", loadSupportWidget, {
+      passive: true,
+      once: true,
+    });
+    window.addEventListener("keydown", loadSupportWidget, { once: true });
+    const fallbackTimer = window.setTimeout(loadSupportWidget, 30000);
 
     const handleToggleMobileChat = (event: Event) => {
       const requested = (event as CustomEvent<{ open?: boolean }>).detail?.open;
@@ -39,7 +45,9 @@ export function ChatIntegrations() {
     window.addEventListener("toggle-mobile-chat", handleToggleMobileChat);
 
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      window.clearTimeout(fallbackTimer);
+      window.removeEventListener("pointerdown", loadSupportWidget);
+      window.removeEventListener("keydown", loadSupportWidget);
       window.removeEventListener("toggle-mobile-chat", handleToggleMobileChat);
     };
   }, []);
@@ -66,7 +74,7 @@ export function ChatIntegrations() {
 
       {/* Load Tawk.to only after scroll */}
       {loadTawk && (
-        <Script id="tawk-to-script" strategy="afterInteractive">
+        <Script id="tawk-to-script" strategy="lazyOnload">
           {`
             var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
             (function () {

@@ -4,7 +4,7 @@ import { HomeHeroSection } from "./_components/HomeHeroSection";
 import { HomeContentSections } from "./_components/HomeContentSections";
 import { createSeoMetadata } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 async function safeHomeQuery<T>(
   label: string,
@@ -55,82 +55,100 @@ export const metadata = createSeoMetadata({
 });
 
 export default async function Page() {
-  const [categories, featuredCollections, featuredBlogs, homeVideos] =
-    await Promise.all([
-      safeHomeQuery(
-        "categories",
-        () =>
-          prisma.category.findMany({
-            orderBy: [{ order: "asc" }, { name: "asc" }],
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              description: true,
-              image: true,
-              parentId: true,
-              order: true,
-            },
-          }),
-        [],
-      ),
-      safeHomeQuery(
-        "featured collections",
-        () =>
-          prisma.collection.findMany({
-            where: {
-              OR: [
-                { isFeatured: true },
-                { handle: { in: ["new-arrivals", "best-sellers"] } },
-              ],
-            },
-            orderBy: [{ isFeatured: "desc" }, { updatedAt: "desc" }],
-            take: 20,
-            select: {
-              id: true,
-              handle: true,
-              title: true,
-              image: true,
-              isFeatured: true,
-              productHandles: true,
-            },
-          }),
-        [],
-      ),
-      safeHomeQuery(
-        "featured blogs",
-        () =>
-          prisma.blogPost.findMany({
-            where: { status: "published", isFeatured: true },
-            orderBy: { publishedAt: "desc" },
-            take: 20,
-            select: {
-              id: true,
-              title: true,
-              slug: true,
-              excerpt: true,
-              featuredImage: true,
-              publishedAt: true,
-              content: true,
-            },
-          }),
-        [],
-      ),
-      safeHomeQuery(
-        "home videos",
-        () =>
-          prisma.video.findMany({
-            where: { active: true, placement: "HOMEPAGE" },
-            orderBy: [
-              { featured: "desc" },
-              { displayOrder: "asc" },
-              { createdAt: "desc" },
+  const [
+    categories,
+    featuredCollections,
+    featuredBlogs,
+    homeVideos,
+    reviewGroups,
+  ] = await Promise.all([
+    safeHomeQuery(
+      "categories",
+      () =>
+        prisma.category.findMany({
+          orderBy: [{ order: "asc" }, { name: "asc" }],
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            description: true,
+            image: true,
+            parentId: true,
+            order: true,
+          },
+        }),
+      [],
+    ),
+    safeHomeQuery(
+      "featured collections",
+      () =>
+        prisma.collection.findMany({
+          where: {
+            OR: [
+              { isFeatured: true },
+              { handle: { in: ["new-arrivals", "best-sellers"] } },
             ],
-            take: 8,
-          }),
-        [],
-      ),
-    ]);
+          },
+          orderBy: [{ isFeatured: "desc" }, { updatedAt: "desc" }],
+          take: 20,
+          select: {
+            id: true,
+            handle: true,
+            title: true,
+            image: true,
+            isFeatured: true,
+            productHandles: true,
+          },
+        }),
+      [],
+    ),
+    safeHomeQuery(
+      "featured blogs",
+      () =>
+        prisma.blogPost.findMany({
+          where: { status: "published", isFeatured: true },
+          orderBy: { publishedAt: "desc" },
+          take: 20,
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            excerpt: true,
+            featuredImage: true,
+            publishedAt: true,
+          },
+        }),
+      [],
+    ),
+    safeHomeQuery(
+      "home videos",
+      () =>
+        prisma.video.findMany({
+          where: { active: true, placement: "HOMEPAGE" },
+          orderBy: [
+            { featured: "desc" },
+            { displayOrder: "asc" },
+            { createdAt: "desc" },
+          ],
+          take: 8,
+        }),
+      [],
+    ),
+    safeHomeQuery(
+      "product review summaries",
+      () =>
+        prisma.review.groupBy({
+          by: ["productHandle"],
+          where: {
+            status: "approved",
+            productHandle: { not: null },
+          },
+          _avg: { rating: true },
+          _count: { id: true },
+        }),
+      [],
+    ),
+  ]);
 
   const homeCollections = featuredCollections.map((collection) => ({
     ...collection,
@@ -198,14 +216,59 @@ export default async function Page() {
       : Promise.resolve([]),
   ]);
 
+  const reviewStatsByHandle = new Map(
+    reviewGroups
+      .filter(
+        (
+          group,
+        ): group is typeof group & {
+          productHandle: string;
+        } => Boolean(group.productHandle),
+      )
+      .map((group) => [
+        group.productHandle,
+        {
+          averageRating: group._avg.rating ?? 0,
+          totalReviews: group._count.id,
+        },
+      ]),
+  );
+
+  const subcategoryIdsByParentId = categories.reduce((map, category) => {
+    if (!category.parentId) return map;
+    const ids = map.get(category.parentId) ?? [];
+    ids.push(category.id);
+    map.set(category.parentId, ids);
+    return map;
+  }, new Map<string, string[]>());
+
+  const categoryProducts = categories
+    .filter((category) => !category.parentId)
+    .flatMap((category) => {
+      const categoryIds = new Set([
+        category.id,
+        ...(subcategoryIdsByParentId.get(category.id) ?? []),
+      ]);
+      return recentProducts
+        .filter(
+          (product) =>
+            (product.categoryId && categoryIds.has(product.categoryId)) ||
+            (product.subcategoryId && categoryIds.has(product.subcategoryId)),
+        )
+        .slice(0, 12);
+    });
+
   const allProducts = Array.from(
     new Map(
-      [...collectionProducts, ...recentProducts].map((product) => [
+      [...collectionProducts, ...categoryProducts].map((product) => [
         product.handle,
         product,
       ]),
     ).values(),
-  );
+  ).map((product) => ({
+    ...product,
+    reviewStats: reviewStatsByHandle.get(product.handle) ?? null,
+  }));
 
   return (
     <>
