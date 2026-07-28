@@ -16,7 +16,11 @@ import {
   Truck,
   Zap,
 } from "@esmate/shadcn/pkgs/lucide-react";
-import { formatMoney, type PriceBlock, type ReviewStats } from "./product-page-utils";
+import {
+  formatMoney,
+  type PriceBlock,
+  type ReviewStats,
+} from "./product-page-utils";
 
 type VariantOption = {
   name: string;
@@ -25,6 +29,7 @@ type VariantOption = {
 
 type ProductInfoPanelProps = {
   title: string;
+  description?: string | null;
   priceBlock: PriceBlock | null;
   reviewStats: ReviewStats;
   inventory: number | null;
@@ -44,6 +49,7 @@ type ProductInfoPanelProps = {
 
 export function ProductInfoPanel({
   title,
+  description,
   priceBlock,
   reviewStats,
   inventory,
@@ -60,7 +66,8 @@ export function ProductInfoPanel({
   onBuyNow,
   whatsAppHref,
 }: ProductInfoPanelProps) {
-  const limitedStock = inventory === null ? 7 : Math.max(1, Math.min(inventory, 9));
+  const limitedStock =
+    inventory === null ? 7 : Math.max(1, Math.min(inventory, 9));
   const viewerCount = 18 + (title.length % 24);
   const titleSizeClass =
     title.length > 80
@@ -72,13 +79,35 @@ export function ProductInfoPanel({
           : "text-2xl sm:text-3xl lg:text-[2.2rem]";
 
   return (
-    <aside className="h-full min-w-0 overflow-hidden rounded-2xl border border-orange-200/80 bg-[linear-gradient(135deg,rgba(255,247,237,0.96),rgba(255,255,255,0.92))] px-3 pb-4 pt-3.5 shadow-[0_18px_45px_rgba(26,19,8,0.08)] sm:min-h-[32rem] sm:px-4 sm:pb-5 sm:pt-4 lg:min-h-[36rem]">
-      <div className="flex h-full min-w-0 flex-col gap-2.5 sm:overflow-y-auto sm:pr-1">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <Badge className="rounded-full bg-[#12372a] px-2.5 py-0.5 text-[11px] text-white hover:bg-[#12372a]">
-            In Stock
+    <aside className="h-full min-w-0 overflow-hidden rounded-3xl border border-orange-100 bg-[linear-gradient(145deg,rgba(255,247,237,0.98),rgba(255,255,255,0.96))] px-4 pb-5 pt-5 shadow-[0_18px_50px_rgba(26,19,8,0.07)] sm:min-h-[32rem] sm:px-6 sm:pb-6 sm:pt-6 lg:min-h-[36rem]">
+      <div className="flex h-full min-w-0 flex-col gap-3 sm:overflow-y-auto sm:pr-1">
+        <div>
+          <h1
+            className={`break-words font-serif font-extrabold leading-tight tracking-normal text-gray-950 ${titleSizeClass}`}
+          >
+            {title}
+          </h1>
+          {description?.trim() ? (
+            <p className="mt-2.5 whitespace-pre-line text-sm leading-6 text-gray-600 sm:mt-3 sm:text-[15px] sm:leading-6">
+              {description}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge
+            className={`rounded-full px-2.5 py-0.5 text-[11px] text-white ${
+              availableForSale
+                ? "bg-[#12372a] hover:bg-[#12372a]"
+                : "bg-red-600 hover:bg-red-600"
+            }`}
+          >
+            {availableForSale ? "In Stock" : "Out of Stock"}
           </Badge>
-          <Badge variant="outline" className="rounded-full border-orange-300/80 bg-white/70 px-2.5 py-0.5 text-[11px] font-bold text-orange-700 shadow-sm">
+          <Badge
+            variant="outline"
+            className="rounded-full border-orange-300/80 bg-white/70 px-2.5 py-0.5 text-[11px] font-bold text-orange-700 shadow-sm"
+          >
             <Flame className="mr-1 h-3 w-3" />
             Selling fast
           </Badge>
@@ -87,13 +116,7 @@ export function ProductInfoPanel({
           </span>
         </div>
 
-        <div className="flex min-h-0 flex-1 items-center py-1">
-          <h1 className={`break-words font-serif font-extrabold leading-tight tracking-normal text-gray-950 ${titleSizeClass}`}>
-            {title}
-          </h1>
-        </div>
-
-        <div className="space-y-2.5">
+        <div className="flex-1 space-y-2.5">
           <div className="flex flex-wrap items-center gap-2 text-xs text-gray-700 sm:text-sm">
             <div className="flex items-center gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -107,7 +130,9 @@ export function ProductInfoPanel({
                 />
               ))}
             </div>
-            <span className="font-bold text-gray-950">{reviewStats.averageRating.toFixed(1)}</span>
+            <span className="font-bold text-gray-950">
+              {reviewStats.averageRating.toFixed(1)}
+            </span>
             <span>{reviewStats.totalReviews} reviews</span>
           </div>
 
@@ -118,11 +143,17 @@ export function ProductInfoPanel({
                   <div className="flex flex-wrap items-end gap-x-2 gap-y-1">
                     {priceBlock.hasDiscount && priceBlock.compareAt ? (
                       <span className="pb-0.5 text-xs font-semibold text-gray-500 line-through">
-                        {formatMoney(priceBlock.compareAt, priceBlock.displayPrice.currencyCode)}
+                        {formatMoney(
+                          priceBlock.compareAt,
+                          priceBlock.displayPrice.currencyCode,
+                        )}
                       </span>
                     ) : null}
                     <span className="text-2xl font-extrabold leading-none text-orange-600 sm:text-[1.7rem]">
-                      {formatMoney(priceBlock.displayPrice.amount, priceBlock.displayPrice.currencyCode)}
+                      {formatMoney(
+                        priceBlock.displayPrice.amount,
+                        priceBlock.displayPrice.currencyCode,
+                      )}
                     </span>
                     {priceBlock.hasDiscount ? (
                       <Badge className="rounded-full bg-orange-500 px-2 py-0.5 text-[11px] text-white hover:bg-orange-500">
@@ -131,8 +162,12 @@ export function ProductInfoPanel({
                     ) : null}
                   </div>
                   <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] font-bold text-gray-700">
-                    <span className="rounded-full bg-orange-50 px-2 py-0.5 text-orange-700">Only {limitedStock} left</span>
-                    <span className="rounded-full bg-orange-50 px-2 py-0.5 text-orange-700">Ends in 02:14:36</span>
+                    <span className="rounded-full bg-orange-50 px-2 py-0.5 text-orange-700">
+                      Only {limitedStock} left
+                    </span>
+                    <span className="rounded-full bg-orange-50 px-2 py-0.5 text-orange-700">
+                      Ends in 02:14:36
+                    </span>
                   </div>
                 </div>
 
@@ -149,7 +184,9 @@ export function ProductInfoPanel({
                     >
                       <Minus className="h-3.5 w-3.5" />
                     </Button>
-                    <span className="w-8 text-center text-sm font-bold text-gray-950">{quantity}</span>
+                    <span className="w-8 text-center text-sm font-bold text-gray-950">
+                      {quantity}
+                    </span>
                     <Button
                       type="button"
                       size="icon"
@@ -170,31 +207,92 @@ export function ProductInfoPanel({
 
           {options.length > 0 || sku ? (
             <div className="space-y-2.5 rounded-xl bg-white/65 p-2.5 shadow-sm ring-1 ring-orange-100/80">
-            <div className="flex items-center justify-between"><h2 className="text-sm font-extrabold text-gray-950">Variants</h2>{sku ? <span className="text-[11px] font-semibold text-gray-500">SKU: {sku}</span> : null}</div>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-5">
-            {options.map((option) => (
-              <div key={option.name} className="space-y-1.5">
-                <Label className="text-[10px] font-bold uppercase tracking-wide text-gray-600">{option.name}</Label>
-                <select value={option.values.find((value) => value.selected)?.value || ""} onChange={(event) => selectOption(option.name, event.target.value)} className="h-9 w-full rounded-lg border border-orange-200 bg-white px-2 text-xs font-semibold text-gray-950 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200">
-                  <option value="">Any</option>
-                  {option.values.map((value) => <option key={value.value} value={value.value} disabled={value.disabled}>{option.name === "Price" ? formatMoney(value.value, priceBlock?.displayPrice.currencyCode || "PKR") : value.value}</option>)}
-                </select>
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-extrabold text-gray-950">
+                  Variants
+                </h2>
+                {sku ? (
+                  <span className="text-[11px] font-semibold text-gray-500">
+                    SKU: {sku}
+                  </span>
+                ) : null}
               </div>
-            ))}
-            </div>
-            {selectedLabel ? <p className="truncate text-[11px] font-semibold text-gray-500">Selected: {selectedLabel}</p> : <p className="text-[11px] font-semibold text-gray-500">Main product selected. Choose a filter only if you want a variant.</p>}
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-5">
+                {options.map((option) => (
+                  <div key={option.name} className="space-y-1.5">
+                    <Label className="text-[10px] font-bold uppercase tracking-wide text-gray-600">
+                      {option.name}
+                    </Label>
+                    <select
+                      value={
+                        option.values.find((value) => value.selected)?.value ||
+                        ""
+                      }
+                      onChange={(event) =>
+                        selectOption(option.name, event.target.value)
+                      }
+                      className="h-9 w-full rounded-lg border border-orange-200 bg-white px-2 text-xs font-semibold text-gray-950 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
+                    >
+                      <option value="">Any</option>
+                      {option.values.map((value) => (
+                        <option
+                          key={value.value}
+                          value={value.value}
+                          disabled={value.disabled}
+                        >
+                          {option.name === "Price"
+                            ? formatMoney(
+                                value.value,
+                                priceBlock?.displayPrice.currencyCode || "PKR",
+                              )
+                            : value.value}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+              </div>
+              {selectedLabel ? (
+                <p className="truncate text-[11px] font-semibold text-gray-500">
+                  Selected: {selectedLabel}
+                </p>
+              ) : (
+                <p className="text-[11px] font-semibold text-gray-500">
+                  Main product selected. Choose a filter only if you want a
+                  variant.
+                </p>
+              )}
             </div>
           ) : null}
-          {Object.keys(specifications).length ? <div className="flex flex-wrap gap-1.5">{Object.entries(specifications).map(([name, value]) => <span key={name} className="rounded-full bg-orange-50 px-2 py-1 text-[11px] font-semibold text-orange-800">{name}: {value}</span>)}</div> : null}
+          {Object.keys(specifications).length ? (
+            <div className="flex flex-wrap gap-1.5">
+              {Object.entries(specifications).map(([name, value]) => (
+                <span
+                  key={name}
+                  className="rounded-full bg-orange-50 px-2 py-1 text-[11px] font-semibold text-orange-800"
+                >
+                  {name}: {value}
+                </span>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         <div className="space-y-2.5 pt-1">
           <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
-            <Button onClick={onAddToCart} disabled={!availableForSale} className="h-10 min-w-0 rounded-md bg-orange-500 px-0.5 text-[9px] font-bold text-white shadow-[0_10px_22px_rgba(249,115,22,0.2)] hover:bg-orange-600 min-[360px]:px-1 min-[360px]:text-[10px] sm:px-2 sm:text-xs">
+            <Button
+              onClick={onAddToCart}
+              disabled={!availableForSale}
+              className="h-10 min-w-0 rounded-md bg-orange-500 px-0.5 text-[9px] font-bold text-white shadow-[0_10px_22px_rgba(249,115,22,0.2)] hover:bg-orange-600 min-[360px]:px-1 min-[360px]:text-[10px] sm:px-2 sm:text-xs"
+            >
               <ShoppingCart className="mr-0.5 h-3 w-3 shrink-0 min-[360px]:mr-1 min-[360px]:h-3.5 min-[360px]:w-3.5 sm:h-4 sm:w-4" />
               Add Cart
             </Button>
-            <Button onClick={onBuyNow} disabled={buyLoading || !availableForSale} className="h-10 min-w-0 rounded-md bg-[#1a1308] px-0.5 text-[9px] font-bold text-white hover:bg-[#2a2118] min-[360px]:px-1 min-[360px]:text-[10px] sm:px-2 sm:text-xs">
+            <Button
+              onClick={onBuyNow}
+              disabled={buyLoading || !availableForSale}
+              className="h-10 min-w-0 rounded-md bg-[#1a1308] px-0.5 text-[9px] font-bold text-white hover:bg-[#2a2118] min-[360px]:px-1 min-[360px]:text-[10px] sm:px-2 sm:text-xs"
+            >
               <Zap className="mr-0.5 h-3 w-3 shrink-0 min-[360px]:mr-1 min-[360px]:h-3.5 min-[360px]:w-3.5 sm:h-4 sm:w-4" />
               {buyLoading ? "Processing" : "Buy Now"}
             </Button>
@@ -218,7 +316,9 @@ export function ProductInfoPanel({
             ].map((item) => (
               <div key={item.label} className="text-center">
                 <item.icon className="mx-auto h-3.5 w-3.5 text-orange-600" />
-                <div className="mt-0.5 text-[10px] font-bold text-gray-950 sm:text-[11px]">{item.label}</div>
+                <div className="mt-0.5 text-[10px] font-bold text-gray-950 sm:text-[11px]">
+                  {item.label}
+                </div>
                 <div className="text-[10px] text-gray-600">{item.text}</div>
               </div>
             ))}

@@ -2,7 +2,11 @@ import Image from "next/image";
 import { Badge } from "@esmate/shadcn/components/ui/badge";
 import { Button } from "@esmate/shadcn/components/ui/button";
 import { Skeleton } from "@esmate/shadcn/components/ui/skeleton";
-import { Heart } from "@esmate/shadcn/pkgs/lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+} from "@esmate/shadcn/pkgs/lucide-react";
 
 type GalleryImage = {
   id: string;
@@ -31,57 +35,115 @@ export function ProductGallerySection({
   wishlistActive,
   discountBadge,
 }: ProductGallerySectionProps) {
+  const currentIndex = Math.max(
+    0,
+    images.findIndex((image) => image.id === currentImage?.id),
+  );
+  const hasMultipleImages = images.length > 1;
+  const selectAdjacentImage = (direction: -1 | 1) => {
+    if (!hasMultipleImages) return;
+    const nextIndex =
+      (currentIndex + direction + images.length) % images.length;
+    onSelectImage(images[nextIndex]);
+  };
+
   return (
-    <div className="h-full min-w-0 space-y-4 rounded-2xl border border-orange-100/80 bg-white/45 p-2 sm:p-4">
-      <div className="relative mx-auto aspect-square w-full max-w-md overflow-hidden rounded-xl border border-[#d8a928]/20 bg-[#f4f1e8] shadow-md">
-        <div className="absolute inset-0 bg-[#f4f1e8]" />
+    <div className="h-full min-w-0 space-y-3 rounded-3xl border border-orange-100 bg-white p-3 shadow-[0_18px_50px_rgba(26,19,8,0.07)] sm:space-y-4 sm:p-5">
+      <div className="group/gallery relative mx-auto aspect-square w-full max-w-xl overflow-hidden rounded-2xl border border-orange-100 bg-[#f8f6f0]">
         {currentImage ? (
           <>
             <Image
+              key={currentImage.id}
               src={currentImage.url}
               alt={currentImage.altText || title}
               fill
               priority
-              className="object-contain p-2 transition-transform duration-300 hover:scale-[1.03] sm:p-4"
+              className="animate-in fade-in object-contain p-3 duration-[350ms] ease-out lg:transition-transform lg:duration-500 lg:group-hover/gallery:scale-[1.045] sm:p-5"
               sizes="(max-width: 768px) 100vw, 50vw"
             />
-            <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-white/10 via-transparent to-black/5" />
+            <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-white/15 via-transparent to-black/[0.03]" />
           </>
         ) : (
           <Skeleton className="h-full w-full" />
         )}
 
         <Button
+          type="button"
           size="icon"
           variant="secondary"
-          className="absolute right-3 top-3 h-8 w-8 bg-white/90 shadow-md backdrop-blur-sm hover:bg-white"
+          aria-label={
+            wishlistActive ? "Remove from wishlist" : "Add to wishlist"
+          }
+          className="absolute right-3 top-3 z-20 h-10 w-10 rounded-full border border-white/80 bg-white/90 shadow-lg backdrop-blur-sm transition hover:scale-105 hover:bg-white"
           onClick={onToggleWishlist}
         >
-          <Heart className={`h-4 w-4 ${wishlistActive ? "fill-[#d8a928] text-[#d8a928]" : "text-[#0a0a0a]"}`} />
+          <Heart
+            className={`h-4 w-4 ${
+              wishlistActive
+                ? "fill-[#f97316] text-[#f97316]"
+                : "text-[#0a0a0a]"
+            }`}
+          />
         </Button>
 
         {discountBadge?.hasDiscount && (
-          <div className="absolute left-3 top-3">
-            <Badge className="bg-[#d8a928] px-2 py-1 text-xs font-semibold text-[#0a0a0a] shadow">
-              -{discountBadge.savedPct}%
+          <div className="absolute left-3 top-3 z-20">
+            <Badge className="flex flex-col items-start gap-0 rounded-xl border border-red-400/40 bg-gradient-to-br from-orange-500 to-red-600 px-3 py-2 text-left text-white shadow-lg hover:from-orange-500 hover:to-red-600">
+              <span className="text-sm font-extrabold leading-none sm:text-base">
+                Up to {discountBadge.savedPct}% OFF
+              </span>
+              <span className="mt-1 text-[10px] font-bold uppercase tracking-wide text-white/90">
+                Minimum quantity: 1
+              </span>
             </Badge>
           </div>
         )}
+
+        {hasMultipleImages ? (
+          <>
+            <button
+              type="button"
+              onClick={() => selectAdjacentImage(-1)}
+              aria-label="Show previous product image"
+              className="absolute left-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/80 bg-white/90 text-gray-900 shadow-lg backdrop-blur transition duration-200 hover:scale-105 hover:bg-orange-500 hover:text-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange-200 sm:left-4 sm:h-11 sm:w-11"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => selectAdjacentImage(1)}
+              aria-label="Show next product image"
+              className="absolute right-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/80 bg-white/90 text-gray-900 shadow-lg backdrop-blur transition duration-200 hover:scale-105 hover:bg-orange-500 hover:text-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange-200 sm:right-4 sm:h-11 sm:w-11"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </>
+        ) : null}
       </div>
 
-      <div className="w-full overflow-x-auto px-0.5">
-        <div className="flex w-max min-w-full max-w-md justify-start gap-2 pb-2 sm:mx-auto">
+      <div className="scrollbar-hide w-full overflow-x-auto px-0.5">
+        <div className="flex w-max min-w-full justify-start gap-2.5 pb-1 sm:justify-center">
           {images.map((img) => (
             <button
               key={img.id}
+              type="button"
               onClick={() => onSelectImage(img)}
-              className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border-2 bg-[#f4f1e8] sm:h-16 sm:w-16 ${
+              aria-label={`Show ${img.altText || title}`}
+              aria-pressed={img.id === currentImage?.id}
+              className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border-2 bg-[#f8f6f0] transition-all duration-200 sm:h-16 sm:w-16 ${
                 img.id === currentImage?.id
-                  ? "border-[#f6a45d] ring-2 ring-[#f6a45d] ring-offset-1"
-                  : "border-transparent hover:border-[#f6a45d]/40"
+                  ? "scale-[1.03] border-orange-500 shadow-md ring-4 ring-orange-100"
+                  : "border-transparent opacity-80 hover:-translate-y-0.5 hover:border-orange-300 hover:opacity-100 hover:shadow-sm"
               }`}
             >
-              <Image src={img.url} alt={img.altText || `${title} thumbnail`} fill className="object-cover" sizes="64px" loading="lazy" />
+              <Image
+                src={img.url}
+                alt={img.altText || `${title} thumbnail`}
+                fill
+                className="object-contain p-1"
+                sizes="64px"
+                loading="lazy"
+              />
             </button>
           ))}
         </div>
