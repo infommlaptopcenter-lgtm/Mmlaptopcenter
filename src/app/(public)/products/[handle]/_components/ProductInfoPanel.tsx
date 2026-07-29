@@ -29,6 +29,7 @@ type VariantOption = {
 
 type ProductInfoPanelProps = {
   title: string;
+  shortDescription?: string | null;
   priceBlock: PriceBlock | null;
   reviewStats: ReviewStats;
   inventory: number | null;
@@ -39,7 +40,6 @@ type ProductInfoPanelProps = {
   selectOption: (name: string, value: string) => void;
   quantity: number;
   changeQuantity: (amount: number) => void;
-  selectedLabel: string;
   buyLoading: boolean;
   onAddToCart: () => Promise<void>;
   onBuyNow: () => Promise<void>;
@@ -48,6 +48,7 @@ type ProductInfoPanelProps = {
 
 export function ProductInfoPanel({
   title,
+  shortDescription,
   priceBlock,
   reviewStats,
   inventory,
@@ -58,7 +59,6 @@ export function ProductInfoPanel({
   selectOption,
   quantity,
   changeQuantity,
-  selectedLabel,
   buyLoading,
   onAddToCart,
   onBuyNow,
@@ -66,7 +66,6 @@ export function ProductInfoPanel({
 }: ProductInfoPanelProps) {
   const limitedStock =
     inventory === null ? 7 : Math.max(1, Math.min(inventory, 9));
-  const viewerCount = 18 + (title.length % 24);
   const titleSizeClass =
     title.length > 80
       ? "text-lg sm:text-xl lg:text-[1.35rem]"
@@ -77,9 +76,9 @@ export function ProductInfoPanel({
           : "text-2xl sm:text-3xl lg:text-[2.2rem]";
 
   return (
-    <aside className="h-full min-w-0 overflow-hidden rounded-3xl border border-orange-100 bg-[linear-gradient(145deg,rgba(255,247,237,0.98),rgba(255,255,255,0.96))] px-4 pb-5 pt-5 shadow-[0_18px_50px_rgba(26,19,8,0.07)] sm:min-h-[32rem] sm:px-6 sm:pb-6 sm:pt-6 lg:min-h-[36rem]">
-      <div className="flex h-full min-w-0 flex-col gap-3 sm:overflow-y-auto sm:pr-1">
-        <div className="flex min-h-7 flex-wrap items-center gap-2">
+    <aside className="min-w-0 overflow-hidden rounded-3xl border border-orange-100 bg-[linear-gradient(145deg,rgba(255,247,237,0.98),rgba(255,255,255,0.96))] px-4 py-5 shadow-[0_18px_50px_rgba(26,19,8,0.07)] sm:px-6 sm:py-6 lg:h-[36rem]">
+      <div className="flex h-full min-w-0 flex-col gap-3">
+        <div className="flex h-7 shrink-0 flex-nowrap items-center gap-2 overflow-hidden">
           <Badge
             className={`rounded-full px-2.5 py-0.5 text-[11px] text-white ${
               availableForSale
@@ -97,9 +96,29 @@ export function ProductInfoPanel({
             Selling fast
           </Badge>
           <span className="rounded-full border border-orange-200 bg-white/60 px-2.5 py-0.5 text-[11px] font-bold text-[#5A5E55]">
-            {viewerCount} viewing now
+            18 viewing now
           </span>
-          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-700 sm:text-sm">
+        </div>
+
+        <div className="h-[10.5rem] min-w-0 shrink-0 overflow-hidden sm:h-[11rem] lg:h-[11.5rem]">
+          <h1
+            className={`line-clamp-2 break-words font-serif font-extrabold leading-tight tracking-normal text-gray-950 ${titleSizeClass}`}
+            title={title}
+          >
+            {title}
+          </h1>
+          {shortDescription ? (
+            <p
+              className="mt-2 line-clamp-4 break-words text-xs leading-5 text-gray-700 sm:text-sm sm:leading-5"
+              title={shortDescription}
+            >
+              {shortDescription}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="flex min-h-0 flex-1 flex-col gap-2.5">
+          <div className="flex h-6 shrink-0 items-center gap-2 overflow-hidden text-xs text-gray-700 sm:text-sm">
             <div
               className="flex items-center gap-1"
               aria-label={`${reviewStats.averageRating.toFixed(1)} out of 5 stars`}
@@ -121,20 +140,9 @@ export function ProductInfoPanel({
             </span>
             <span>{reviewStats.totalReviews} reviews</span>
           </div>
-        </div>
 
-        <div className="flex h-[5.75rem] min-w-0 items-start overflow-hidden sm:h-[6.25rem] lg:h-[6.75rem]">
-          <h1
-            className={`line-clamp-3 break-words font-serif font-extrabold leading-tight tracking-normal text-gray-950 ${titleSizeClass}`}
-            title={title}
-          >
-            {title}
-          </h1>
-        </div>
-
-        <div className="flex-1 space-y-2.5">
           {priceBlock && (
-            <div className="rounded-xl bg-white/65 p-2.5 shadow-sm ring-1 ring-orange-100/80">
+            <div className="h-[4.5rem] shrink-0 overflow-hidden rounded-xl bg-white/65 p-2.5 shadow-sm ring-1 ring-orange-100/80">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-end gap-x-2 gap-y-1">
@@ -203,7 +211,7 @@ export function ProductInfoPanel({
           )}
 
           {options.length > 0 || sku ? (
-            <div className="space-y-2.5 rounded-xl bg-white/65 p-2.5 shadow-sm ring-1 ring-orange-100/80">
+            <div className="h-[5.25rem] shrink-0 overflow-hidden rounded-xl bg-white/65 p-2.5 shadow-sm ring-1 ring-orange-100/80">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-extrabold text-gray-950">
                   Variants
@@ -214,7 +222,7 @@ export function ProductInfoPanel({
                   </span>
                 ) : null}
               </div>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-5">
+              <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-5">
                 {options.map((option) => (
                   <div key={option.name} className="space-y-1.5">
                     <Label className="text-[10px] font-bold uppercase tracking-wide text-gray-600">
@@ -249,20 +257,10 @@ export function ProductInfoPanel({
                   </div>
                 ))}
               </div>
-              {selectedLabel ? (
-                <p className="truncate text-[11px] font-semibold text-gray-500">
-                  Selected: {selectedLabel}
-                </p>
-              ) : (
-                <p className="text-[11px] font-semibold text-gray-500">
-                  Main product selected. Choose a filter only if you want a
-                  variant.
-                </p>
-              )}
             </div>
           ) : null}
           {Object.keys(specifications).length ? (
-            <div className="flex flex-wrap gap-1.5">
+            <div className="hidden">
               {Object.entries(specifications).map(([name, value]) => (
                 <span
                   key={name}
@@ -275,7 +273,7 @@ export function ProductInfoPanel({
           ) : null}
         </div>
 
-        <div className="space-y-2.5 pt-1">
+        <div className="mt-auto shrink-0 space-y-2.5 pt-1">
           <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
             <Button
               onClick={onAddToCart}

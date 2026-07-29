@@ -422,6 +422,7 @@ export function ProductSingle({ data }: Props) {
 
             <ProductInfoPanel
               title={selectedTitle}
+              shortDescription={data.description}
               priceBlock={priceBlock}
               reviewStats={visibleReviewStats}
               inventory={inventory}
@@ -432,7 +433,6 @@ export function ProductSingle({ data }: Props) {
               selectOption={selectOption}
               quantity={quantity}
               changeQuantity={changeQuantity}
-              selectedLabel={selectedLabel}
               buyLoading={buyLoading}
               onAddToCart={addToCart}
               onBuyNow={buyNow}
