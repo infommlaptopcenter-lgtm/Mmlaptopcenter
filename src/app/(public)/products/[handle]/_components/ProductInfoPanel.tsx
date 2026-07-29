@@ -211,7 +211,7 @@ export function ProductInfoPanel({
           )}
 
           {options.length > 0 || sku ? (
-            <div className="h-[5.25rem] shrink-0 overflow-hidden rounded-xl bg-white/65 p-2.5 shadow-sm ring-1 ring-orange-100/80">
+            <div className="h-24 shrink-0 overflow-hidden rounded-xl bg-white/65 p-2.5 shadow-sm ring-1 ring-orange-100/80">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-extrabold text-gray-950">
                   Variants
