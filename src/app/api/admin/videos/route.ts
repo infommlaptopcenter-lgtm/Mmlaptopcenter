@@ -26,12 +26,12 @@ export async function GET(request: Request) {
     if (featured === "true" || featured === "false") where.featured = featured === "true";
     if (q) {
       where.OR = [
-        { title: { contains: q, mode: "insensitive" } },
-        { description: { contains: q, mode: "insensitive" } },
-        { videoUrl: { contains: q, mode: "insensitive" } },
-        { buttonText: { contains: q, mode: "insensitive" } },
-        { seoTitle: { contains: q, mode: "insensitive" } },
-        { seoDescription: { contains: q, mode: "insensitive" } },
+        { title: { contains: q } },
+        { description: { contains: q } },
+        { videoUrl: { contains: q } },
+        { buttonText: { contains: q } },
+        { seoTitle: { contains: q } },
+        { seoDescription: { contains: q } },
       ];
     }
 

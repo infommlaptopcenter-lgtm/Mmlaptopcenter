@@ -562,10 +562,10 @@ export async function searchProducts(query: string) {
     where: {
       status: "ACTIVE",
       OR: [
-        { title: { contains: normalizedQuery, mode: "insensitive" } },
-        { description: { contains: normalizedQuery, mode: "insensitive" } },
-        { seoTitle: { contains: normalizedQuery, mode: "insensitive" } },
-        { seoDescription: { contains: normalizedQuery, mode: "insensitive" } },
+        { title: { contains: normalizedQuery } },
+        { description: { contains: normalizedQuery } },
+        { seoTitle: { contains: normalizedQuery } },
+        { seoDescription: { contains: normalizedQuery } },
       ],
     },
     take: 20,

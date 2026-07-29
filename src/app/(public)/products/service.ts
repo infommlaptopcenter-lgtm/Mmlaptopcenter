@@ -137,9 +137,9 @@ export async function getProductsAdvanced(params: {
       ...(params.q
         ? {
             OR: [
-              { title: { contains: params.q, mode: "insensitive" } },
-              { description: { contains: params.q, mode: "insensitive" } },
-              { seoTitle: { contains: params.q, mode: "insensitive" } },
+              { title: { contains: params.q } },
+              { description: { contains: params.q } },
+              { seoTitle: { contains: params.q } },
             ],
           }
         : {}),

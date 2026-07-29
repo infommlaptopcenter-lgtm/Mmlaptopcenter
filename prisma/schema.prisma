@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -11,8 +11,8 @@ model Product {
   id               String   @id @default(cuid())
   handle           String   @unique
   title            String
-  description      String?
-  descriptionHtml  String?
+  description      String?  @db.Text
+  descriptionHtml  String?  @db.Text
   price            Float
   compareAtPrice   Float?
   sku              String?
@@ -20,7 +20,7 @@ model Product {
   availableForSale Boolean  @default(true)
   status           String   @default("ACTIVE")
   seoTitle         String?
-  seoDescription   String?
+  seoDescription   String?  @db.Text
   images           Json     @default("[]")
   featuredImage    String?
   productType      String?
@@ -52,7 +52,7 @@ model ProductVariation {
   id               String   @id @default(cuid())
   name             String
   value            String   @default("")
-  description      String?
+  description      String?  @db.Text
   price            Float
   compareAtPrice   Float?
   sku              String?
@@ -80,11 +80,11 @@ model Collection {
   id              String   @id @default(cuid())
   handle          String   @unique
   title           String
-  description     String?
+  description     String?  @db.Text
   descriptionHtml String?
   image           String?
   seoTitle        String?
-  seoDescription  String?
+  seoDescription  String?  @db.Text
   productHandles  Json     @default("[]")
   isFeatured      Boolean  @default(false)
   createdAt       DateTime @default(now())
@@ -151,13 +151,13 @@ model Category {
   id              String      @id @default(cuid())
   name            String      @unique
   slug            String      @unique
-  description     String?
+  description     String?  @db.Text
   image           String?
   parentId        String?
   order           Int         @default(0)
   featured        Boolean     @default(false)
   seoTitle        String?
-  seoDescription  String?
+  seoDescription  String?  @db.Text
   productIds      Json        @default("[]")
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
@@ -168,7 +168,7 @@ model BlogPost {
   title           String
   slug            String      @unique
   excerpt         String?
-  content         String?
+  content         String?  @db.Text
   featuredImage   String?
   categoryId      String?
   author          String
@@ -273,7 +273,7 @@ enum VideoFormat {
 model Video {
   id              String         @id @default(cuid())
   title           String
-  description     String?
+  description     String?       @db.Text
   thumbnail       String?
   videoUrl        String
   embedUrl        String?
@@ -286,7 +286,7 @@ model Video {
   active          Boolean        @default(true)
   displayOrder    Int            @default(0)
   seoTitle        String?
-  seoDescription  String?
+  seoDescription  String?       @db.Text
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 
