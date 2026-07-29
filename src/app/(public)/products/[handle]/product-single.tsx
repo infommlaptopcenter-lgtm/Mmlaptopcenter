@@ -405,7 +405,7 @@ export function ProductSingle({ data }: Props) {
             </span>
           </nav>
 
-          <div className="grid w-full min-w-0 grid-cols-1 items-start gap-5 sm:gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-8">
+          <div className="grid w-full min-w-0 grid-cols-1 items-start gap-5 sm:gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-stretch lg:gap-8">
             <ProductGallerySection
               title={selectedTitle}
               images={selectedImages}

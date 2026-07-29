@@ -76,7 +76,7 @@ export function ProductInfoPanel({
           : "text-2xl sm:text-3xl lg:text-[2.2rem]";
 
   return (
-    <aside className="min-w-0 overflow-hidden rounded-3xl border border-orange-100 bg-[linear-gradient(145deg,rgba(255,247,237,0.98),rgba(255,255,255,0.96))] px-4 py-5 shadow-[0_18px_50px_rgba(26,19,8,0.07)] sm:px-6 sm:py-6 lg:h-[36rem]">
+    <aside className="min-w-0 overflow-hidden rounded-3xl border border-orange-100 bg-[linear-gradient(145deg,rgba(255,247,237,0.98),rgba(255,255,255,0.96))] px-4 py-5 shadow-[0_18px_50px_rgba(26,19,8,0.07)] sm:px-6 sm:py-6 lg:h-full">
       <div className="flex h-full min-w-0 flex-col gap-3">
         <div className="flex h-7 shrink-0 flex-nowrap items-center gap-2 overflow-hidden">
           <Badge
