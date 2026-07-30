@@ -38,7 +38,6 @@ const CartDrawer = dynamic(
 
 const mainMenuItems = [
   { text: "Home", href: "/" },
-  { text: "All Products", href: "/products" },
   { text: "Laptops", href: "/products" },
   { text: "Accessories", href: "/category/accessories" },
   { text: "Deals", href: "/collections/hot-deals" },
@@ -215,7 +214,7 @@ export function Header() {
 
                     <div className="mt-4">
                       <div className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-[#7a6333]">
-                        Shop Categories
+                        Shop
                       </div>
 
                       <div className="space-y-1">
@@ -317,12 +316,12 @@ export function Header() {
 
         {/* ───────── logo — kept tight to the left edge ───────── */}
         <Link href="/" className="flex h-full shrink-0 items-center gap-1.5 lg:gap-2">
-          <div className="relative h-16 w-16 shrink-0 lg:h-20 lg:w-20">
+          <div className="relative h-14 w-14 shrink-0 lg:h-[72px] lg:w-[72px]">
             <Image
               src={logoSrc}
               alt="MM Laptop Center"
               fill
-              sizes="(max-width: 1023px) 64px, 80px"
+              sizes="(max-width: 1023px) 56px, 72px"
               className="object-contain"
               priority
             />
@@ -384,7 +383,7 @@ export function Header() {
                       : "text-[#1a1308]"
                   }`}
                 >
-                  Categories
+                  Shop
                 </Link>
                 <ChevronDown className="h-4 w-4 text-[#7a6333] transition-transform duration-200 group-hover:rotate-180" />
               </div>
@@ -441,17 +440,6 @@ export function Header() {
                 </div>
               </div>
             </div>
-          </div>
-
-          <div className="relative">
-            <Link
-              href="/products"
-              className={`text-sm font-semibold transition-colors hover:text-[#b57910] ${
-                isActive("/products") ? "text-[#8a5b00]" : "text-[#1a1308]"
-              }`}
-            >
-              All Products
-            </Link>
           </div>
 
           <div className="relative">

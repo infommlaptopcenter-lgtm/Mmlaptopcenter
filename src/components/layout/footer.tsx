@@ -50,11 +50,6 @@ export function Footer() {
             <h3 className="text-sm font-semibold leading-6 text-gray-900">Shop</h3>
             <ul role="list" className="mt-4 space-y-2">
               <li>
-                <Link href="/collections" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-                  All Products
-                </Link>
-              </li>
-              <li>
                 <Link href="/category/gaming-laptops" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
                   Gaming Laptops
                 </Link>
