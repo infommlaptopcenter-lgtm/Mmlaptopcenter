@@ -9,15 +9,23 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
           {/* Brand / Logo */}
           <div className="space-y-4">
-            <Link href="/" className="-m-1.5 p-1.5 block">
+            <Link href="/" className="-m-1.5 flex items-center gap-3 p-1.5">
               <span className="sr-only">MM Laptop Center</span>
               <Image
                 src="/logo/new logo.png"
                 alt="MM Laptop Center"
-                width={150}
-                height={150}
-                className="max-w-[150px] h-auto"
+                width={72}
+                height={72}
+                className="h-[72px] w-[72px] object-contain"
               />
+              <span className="leading-tight">
+                <span className="block text-lg font-bold tracking-wide text-[#172533]">
+                  MM LAPTOP CENTER
+                </span>
+                <span className="mt-1 block text-xs text-[#6b6255]">
+                  Premium Laptops &amp; Tech
+                </span>
+              </span>
             </Link>
 
             <p className="text-sm text-gray-600 leading-relaxed max-w-xs">

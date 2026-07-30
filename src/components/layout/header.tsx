@@ -174,15 +174,27 @@ export function Header() {
               <SheetTitle className="sr-only">Mobile menu</SheetTitle>
               <div className="flex h-full flex-col">
                 <div className="p-6">
-                  <Link href="/" onClick={() => setMobileMenuOpen(false)}>
-                    <div className="relative h-14 w-[130px]">
+                  <Link
+                    href="/"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3"
+                  >
+                    <div className="relative h-14 w-14 shrink-0">
                       <Image
                         src={logoSrc}
                         alt="MM Laptop Center"
                         fill
-                        sizes="130px"
+                        sizes="56px"
                         className="object-contain"
                       />
+                    </div>
+                    <div className="leading-tight">
+                      <div className="text-base font-bold tracking-wide text-[#172533]">
+                        MM LAPTOP CENTER
+                      </div>
+                      <div className="mt-1 text-xs text-[#6b6255]">
+                        Premium Laptops &amp; Tech
+                      </div>
                     </div>
                   </Link>
                 </div>
@@ -304,16 +316,24 @@ export function Header() {
         </div>
 
         {/* ───────── logo — kept tight to the left edge ───────── */}
-        <Link href="/" className="flex shrink-0 items-center">
-          <div className="relative h-10 w-[120px] lg:h-12 lg:w-[140px]">
+        <Link href="/" className="flex shrink-0 items-center gap-2 lg:gap-3">
+          <div className="relative h-10 w-10 shrink-0 lg:h-12 lg:w-12">
             <Image
               src={logoSrc}
               alt="MM Laptop Center"
               fill
-              sizes="(max-width: 1023px) 120px, 140px"
+              sizes="(max-width: 1023px) 40px, 48px"
               className="object-contain"
               priority
             />
+          </div>
+          <div className="hidden leading-tight sm:block">
+            <div className="text-sm font-bold tracking-wide text-[#172533] lg:text-base">
+              MM LAPTOP CENTER
+            </div>
+            <div className="mt-0.5 hidden text-[10px] text-[#6b6255] lg:block">
+              Premium Laptops &amp; Tech
+            </div>
           </div>
         </Link>
 
