@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-const FALLBACK_IMAGE = "/logo/mmlaptop.png";
+const FALLBACK_IMAGE = "/logo/new logo.png";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

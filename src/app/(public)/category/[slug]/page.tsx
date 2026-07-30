@@ -6,7 +6,7 @@ import { StoreProductCard } from "@/components/features/products/store-product-c
 import { JsonLd } from "@/components/seo/json-ld";
 import { absoluteUrl, breadcrumbSchema, createSeoMetadata } from "@/lib/seo";
 
-const FALLBACK_IMAGE = "/logo/mmlaptop.png";
+const FALLBACK_IMAGE = "/logo/new logo.png";
 
 export const revalidate = 60;
 

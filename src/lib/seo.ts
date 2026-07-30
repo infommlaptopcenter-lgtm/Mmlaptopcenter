@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const SITE_NAME = "MM Laptop Center";
 export const SITE_URL = "https://mmlaptopcenter.com";
-export const DEFAULT_OG_IMAGE = "/logo/mmlaptop.png";
+export const DEFAULT_OG_IMAGE = "/logo/new logo.png";
 
 export const pakistanLaptopKeywords = [
   "Laptop Store Pakistan",

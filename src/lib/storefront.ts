@@ -4,7 +4,7 @@ import type { Prisma } from "@prisma/client";
 
 const DEFAULT_CURRENCY = "PKR";
 const DEFAULT_PAGE_SIZE = 12;
-const PLACEHOLDER_IMAGE = "/logo/mmlaptop.png";
+const PLACEHOLDER_IMAGE = "/logo/new logo.png";
 
 type MoneyV2 = {
   amount: string;

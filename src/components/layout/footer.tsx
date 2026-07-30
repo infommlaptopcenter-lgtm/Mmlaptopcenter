@@ -12,7 +12,7 @@ export function Footer() {
             <Link href="/" className="-m-1.5 p-1.5 block">
               <span className="sr-only">MM Laptop Center</span>
               <Image
-                src="/logo/mmlaptop.png"
+                src="/logo/new logo.png"
                 alt="MM Laptop Center"
                 width={150}
                 height={150}

@@ -88,7 +88,7 @@ export function RelatedProductsSection({ products }: { products: RelatedProduct[
               key={product.handle}
               handle={product.handle}
               title={titleize(product.title)}
-              featuredImageUrl={product.featuredImage?.url || galleryImages[0] || "/logo/mmlaptop.png"}
+              featuredImageUrl={product.featuredImage?.url || galleryImages[0] || "/logo/new logo.png"}
               imageUrls={galleryImages}
               price={product.priceRange.minVariantPrice}
               compareAtPrice={product.compareAtPrice}

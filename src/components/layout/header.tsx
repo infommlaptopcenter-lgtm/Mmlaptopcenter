@@ -54,11 +54,10 @@ const topBarLeft = [
 const topBarRight = [
   { text: "About", href: "/about-us" },
   { text: "Reviews", href: "/#reviews" },
-  { text: "Store Locator", href: "/contact" },
   { text: "FAQs", href: "/faq" },
 ];
 
-const logoSrc = "/logo/mmlaptop.png";
+const logoSrc = "/logo/new logo.png";
 
 async function getShopCategories() {
   const res = await fetch("/api/categories", { next: { revalidate: 60 } });

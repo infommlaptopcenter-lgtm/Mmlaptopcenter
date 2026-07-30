@@ -9,7 +9,7 @@ import { useRequest } from "@esmate/react/ahooks";
 import { titleize } from "@esmate/utils/string";
 import { StoreProductCard } from "@/components/features/products/store-product-card-wrapper";
 
-const FALLBACK_IMAGE = "/logo/mmlaptop.png";
+const FALLBACK_IMAGE = "/logo/new logo.png";
 type ProductMoney = { amount: string; currencyCode: string };
 type ProductNode = Awaited<ReturnType<typeof getCollectionProducts>>["edges"][number]["node"] & {
   compareAtPrice?: ProductMoney | null;

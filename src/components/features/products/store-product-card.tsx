@@ -55,7 +55,7 @@ function loadReviewStats(handle: string) {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const FALLBACK_IMAGE = "/logo/mmlaptop.png";
+const FALLBACK_IMAGE = "/logo/new logo.png";
 
 function discountPercent(compare: string, current: string): number | null {
   const c = parseFloat(compare);

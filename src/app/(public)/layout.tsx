@@ -13,7 +13,7 @@ const businessSchemas = [
     "@id": `${SITE_URL}/#organization`,
     name: "MM Laptop Center",
     url: SITE_URL,
-    logo: `${SITE_URL}/logo/mmlaptop.png`,
+    logo: `${SITE_URL}/logo/new logo.png`,
     sameAs: [
       "https://www.facebook.com/mmlaptopcenter",
       "https://www.instagram.com/mmlaptopcenter",
@@ -25,7 +25,7 @@ const businessSchemas = [
     "@id": `${SITE_URL}/#localbusiness`,
     name: "MM Laptop Center",
     url: SITE_URL,
-    image: `${SITE_URL}/logo/mmlaptop.png`,
+    image: `${SITE_URL}/logo/new logo.png`,
     priceRange: "PKR",
     address: {
       "@type": "PostalAddress",

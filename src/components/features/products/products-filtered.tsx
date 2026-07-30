@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { StoreProductCard } from "@/components/features/products/store-product-card-wrapper";
 
-const FALLBACK_IMAGE = "/logo/mmlaptop.png";
+const FALLBACK_IMAGE = "/logo/new logo.png";
 
 interface Subcategory {
   id: string;
