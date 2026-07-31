@@ -466,18 +466,6 @@ export function Header() {
 
           <div className="relative">
             <Link
-              href="/collections/new-arrivals"
-              className="text-sm font-semibold text-[#1a1308] transition-colors hover:text-[#b57910]"
-            >
-              New Arrivals
-            </Link>
-            <span className="absolute -right-3 -top-2.5 rounded-full bg-emerald-500 px-1.5 py-[1px] text-[8px] font-bold uppercase leading-tight tracking-wide text-white shadow-sm">
-              New
-            </span>
-          </div>
-
-          <div className="relative">
-            <Link
               href="/videos"
               className={`text-sm font-semibold transition-colors hover:text-[#b57910] ${
                 isActive("/videos") ? "text-[#8a5b00]" : "text-[#1a1308]"

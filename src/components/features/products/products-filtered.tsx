@@ -224,27 +224,30 @@ export function ProductsFiltered({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 rounded-2xl border border-[#d8a928]/20 bg-white p-4 shadow-sm sm:flex-row sm:flex-wrap sm:items-end sm:justify-end">
-        <label className="grid gap-1.5 text-xs font-bold uppercase tracking-wide text-[#5A5E55]">
-          Category
-          <select
-            value={selectedCategoryId}
-            onChange={(event) => setSelectedCategoryId(event.target.value)}
-            className="min-w-44 rounded-lg border border-[#d8a928]/30 bg-[#fcf5e8] px-3 py-2.5 text-sm font-semibold normal-case tracking-normal text-[#0a0a0a] outline-none transition focus:border-[#f6a45d] focus:ring-2 focus:ring-[#f6a45d]/20"
-          >
-            <option value="">All Products</option>
-            {categoriesWithProducts.map((category) => (
-              <option key={category.id} value={category.id}>{category.name}</option>
-            ))}
-          </select>
-        </label>
+      <div className="sticky top-16 z-30 -mx-2 flex justify-end bg-background/90 px-2 py-2 backdrop-blur-md lg:top-[120px]">
+        <div className="grid w-full grid-cols-3 gap-1.5 sm:w-auto sm:flex sm:items-end sm:gap-2">
+          <label className="grid min-w-0 gap-1 text-[9px] font-bold uppercase tracking-wide text-[#5A5E55] sm:text-[10px]">
+            Category
+            <select
+              value={selectedCategoryId}
+              onChange={(event) => setSelectedCategoryId(event.target.value)}
+              className="h-8 w-full min-w-0 rounded-md border border-[#d8a928]/30 bg-[#fcf5e8] px-1.5 text-[10px] font-semibold normal-case tracking-normal text-[#0a0a0a] outline-none transition focus:border-[#f6a45d] focus:ring-2 focus:ring-[#f6a45d]/20 sm:w-44 sm:px-2.5 sm:text-xs"
+            >
+              <option value="">All Products</option>
+              {categoriesWithProducts.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </label>
 
-        <label className="grid gap-1.5 text-xs font-bold uppercase tracking-wide text-[#5A5E55]">
+          <label className="grid min-w-0 gap-1 text-[9px] font-bold uppercase tracking-wide text-[#5A5E55] sm:text-[10px]">
           Price Range
           <select
             value={priceRange}
             onChange={(event) => setPriceRange(event.target.value)}
-            className="min-w-44 rounded-lg border border-[#d8a928]/30 bg-[#fcf5e8] px-3 py-2.5 text-sm font-semibold normal-case tracking-normal text-[#0a0a0a] outline-none transition focus:border-[#f6a45d] focus:ring-2 focus:ring-[#f6a45d]/20"
+            className="h-8 w-full min-w-0 rounded-md border border-[#d8a928]/30 bg-[#fcf5e8] px-1.5 text-[10px] font-semibold normal-case tracking-normal text-[#0a0a0a] outline-none transition focus:border-[#f6a45d] focus:ring-2 focus:ring-[#f6a45d]/20 sm:w-44 sm:px-2.5 sm:text-xs"
           >
             <option value="all">All Prices</option>
             <option value="under-50000">Under PKR 50,000</option>
@@ -252,21 +255,22 @@ export function ProductsFiltered({
             <option value="100000-200000">PKR 100,000–200,000</option>
             <option value="over-200000">Over PKR 200,000</option>
           </select>
-        </label>
+          </label>
 
-        <label className="grid gap-1.5 text-xs font-bold uppercase tracking-wide text-[#5A5E55]">
+          <label className="grid min-w-0 gap-1 text-[9px] font-bold uppercase tracking-wide text-[#5A5E55] sm:text-[10px]">
           Sort By
           <select
             value={sortBy}
             onChange={(event) => setSortBy(event.target.value)}
-            className="min-w-40 rounded-lg border border-[#d8a928]/30 bg-[#fcf5e8] px-3 py-2.5 text-sm font-semibold normal-case tracking-normal text-[#0a0a0a] outline-none transition focus:border-[#f6a45d] focus:ring-2 focus:ring-[#f6a45d]/20"
+            className="h-8 w-full min-w-0 rounded-md border border-[#d8a928]/30 bg-[#fcf5e8] px-1.5 text-[10px] font-semibold normal-case tracking-normal text-[#0a0a0a] outline-none transition focus:border-[#f6a45d] focus:ring-2 focus:ring-[#f6a45d]/20 sm:w-40 sm:px-2.5 sm:text-xs"
           >
             <option value="featured">Featured</option>
             <option value="price-low">Price: Low to High</option>
             <option value="price-high">Price: High to Low</option>
             <option value="name">Name: A to Z</option>
           </select>
-        </label>
+          </label>
+        </div>
       </div>
 
       <div className="relative grid gap-6">
