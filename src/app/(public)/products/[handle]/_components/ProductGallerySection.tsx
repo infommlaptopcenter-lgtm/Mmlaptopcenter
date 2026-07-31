@@ -87,12 +87,12 @@ export function ProductGallerySection({
 
         {discountBadge?.hasDiscount && (
           <div className="absolute left-2 top-2 z-20 sm:left-3 sm:top-3">
-            <Badge className="inline-flex rounded-md border-0 bg-orange-500 px-2 py-1 text-white shadow-sm hover:bg-orange-500 sm:px-2.5 sm:py-1.5">
-              <span className="text-[11px] font-extrabold leading-none sm:text-xs">
+            <Badge className="flex h-[62px] w-[72px] flex-col items-center justify-center rounded-lg border border-white/70 bg-orange-500 p-1 text-center text-white shadow-md hover:bg-orange-500 sm:h-[70px] sm:w-[82px]">
+              <span className="text-base font-black leading-none sm:text-lg">
                 {discountBadge.savedPct}% OFF
               </span>
-              <span className="ml-1 text-[8px] font-semibold leading-none text-white/90 sm:text-[9px]">
-                5+ items
+              <span className="mt-1.5 text-[9px] font-bold uppercase leading-none text-white/90 sm:text-[10px]">
+                For 5+ items
               </span>
             </Badge>
           </div>
