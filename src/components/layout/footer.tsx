@@ -6,9 +6,9 @@ export function Footer() {
   return (
     <footer className="bg-[#f4f1e8] border-t border-[#d8a928]/30">
       <div className="w-full px-4 py-12 sm:px-6">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
           {/* Brand / Logo */}
-          <div className="space-y-4">
+          <div className="col-span-2 space-y-4 lg:col-span-1">
             <Link href="/" className="-m-1.5 flex items-center gap-3 p-1.5">
               <span className="sr-only">MM Laptop Center</span>
               <Image
@@ -116,7 +116,7 @@ export function Footer() {
           </div>
 
           {/* Contact Info */}
-          <div>
+          <div className="col-span-2 lg:col-span-1">
             <h3 className="text-sm font-semibold leading-6 text-gray-900 mb-4">Contact Us</h3>
             <div className="space-y-4 text-sm text-gray-600">
               <div className="flex items-start gap-3">

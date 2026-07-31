@@ -56,6 +56,13 @@ const topBarRight = [
   { text: "FAQs", href: "/faq" },
 ];
 
+const legalMenuItems = [
+  { text: "FAQs", href: "/faq" },
+  { text: "Privacy Policy", href: "/privacy" },
+  { text: "Terms & Conditions", href: "/terms" },
+  { text: "Refund Policy", href: "/refund-policy" },
+];
+
 const logoSrc = "/logo/new logo.png?v=20260731";
 
 async function getShopCategories() {
@@ -261,6 +268,26 @@ export function Header() {
                             {item.text}
                           </Link>
                         ))}
+
+                      <div className="mt-3 border-t border-[#d8a928]/20 pt-3">
+                        <div className="px-3 pb-1.5 text-xs font-semibold uppercase tracking-wider text-[#7a6333]">
+                          Legal Pages
+                        </div>
+                        {legalMenuItems.map((item) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className={`flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                              isActive(item.href)
+                                ? "bg-[#d8a928]/20 text-[#8a5b00]"
+                                : "text-[#1a1308] hover:bg-[#d8a928]/12"
+                            }`}
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            {item.text}
+                          </Link>
+                        ))}
+                      </div>
                     </div>
 
                     {canInstall && !isInstalled ? (
@@ -473,6 +500,37 @@ export function Header() {
             >
               Videos
             </Link>
+          </div>
+
+          <div className="group relative">
+            <button
+              type="button"
+              className={`flex items-center gap-1 text-sm font-semibold transition-colors hover:text-[#b57910] ${
+                legalMenuItems.some((item) => isActive(item.href))
+                  ? "text-[#8a5b00]"
+                  : "text-[#1a1308]"
+              }`}
+            >
+              Legal Pages
+              <ChevronDown className="h-3.5 w-3.5 transition-transform group-hover:rotate-180 group-focus-within:rotate-180" />
+            </button>
+
+            <div className="absolute left-0 top-full h-4 w-32" />
+            <div className="pointer-events-none absolute left-0 top-full z-50 mt-4 w-52 translate-y-1 rounded-xl border border-[#d8a928]/25 bg-white p-2 opacity-0 shadow-xl transition-all group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100">
+              {legalMenuItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                    isActive(item.href)
+                      ? "bg-[#d8a928]/15 text-[#8a5b00]"
+                      : "text-[#1a1308] hover:bg-[#d8a928]/10 hover:text-[#8a5b00]"
+                  }`}
+                >
+                  {item.text}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
 
