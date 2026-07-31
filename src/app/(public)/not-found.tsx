@@ -24,7 +24,7 @@ export default function NotFound() {
         <link
           rel="icon"
           type="image/png"
-          href="//mobarakfoods.com/cdn/shop/files/mubarak_foods_logo-removebg-preview.png?crop=center&height=32&v=1764223344&width=32"
+          href="/favicon.png?v=20260731"
         />
 
         <meta property="og:site_name" content="MM Laptop Center" />
@@ -36,7 +36,7 @@ export default function NotFound() {
         />
         <meta
           property="og:image"
-          content="https://mobarakfoods.com/cdn/shop/files/mubarak_foods_logo-removebg-preview.png?height=628&width=1200"
+          content="https://mmlaptopcenter.com/logo/new%20logo.png?v=20260731"
         />
         <meta name="twitter:card" content="summary_large_image" />
       </Head>

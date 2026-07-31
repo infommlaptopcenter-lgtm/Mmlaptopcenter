@@ -56,7 +56,7 @@ const topBarRight = [
   { text: "FAQs", href: "/faq" },
 ];
 
-const logoSrc = "/logo/new logo.png";
+const logoSrc = "/logo/new logo.png?v=20260731";
 
 async function getShopCategories() {
   const res = await fetch("/api/categories", { next: { revalidate: 60 } });

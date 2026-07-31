@@ -1,11 +1,11 @@
-const CACHE_NAME = "mmlaptop-v3";
+const CACHE_NAME = "mmlaptop-v4";
 const OFFLINE_URL = "/offline.html";
 
 const STATIC_ASSETS = [
   "/manifest.json",
   "/offline.html",
-  "/icons/icon-192x192.png",
-  "/icons/icon-512x512.png",
+  "/icons/icon-192x192.png?v=20260731",
+  "/icons/icon-512x512.png?v=20260731",
 ];
 
 self.addEventListener("install", (event) => {
@@ -83,7 +83,7 @@ self.addEventListener("fetch", (event) => {
         })
         .catch(() => {
           if (request.destination === "image") {
-            return caches.match("/icons/icon-192x192.png");
+            return caches.match("/icons/icon-192x192.png?v=20260731");
           }
         });
     }),

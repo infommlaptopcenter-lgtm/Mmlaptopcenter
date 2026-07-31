@@ -23,10 +23,20 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/favicon.png?v=20260731", sizes: "48x48", type: "image/png" },
+      {
+        url: "/icons/icon-192x192.png?v=20260731",
+        sizes: "192x192",
+        type: "image/png",
+      },
     ],
+    shortcut: [{ url: "/favicon.png?v=20260731", type: "image/png" }],
     apple: [
-      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      {
+        url: "/icons/icon-192x192.png?v=20260731",
+        sizes: "192x192",
+        type: "image/png",
+      },
     ],
   },
   verification: {
@@ -48,10 +58,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link
           rel="icon"
           type="image/png"
-          sizes="192x192"
-          href="/icons/icon-192x192.png"
+          sizes="48x48"
+          href="/favicon.png?v=20260731"
         />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <link
+          rel="apple-touch-icon"
+          sizes="192x192"
+          href="/icons/icon-192x192.png?v=20260731"
+        />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
