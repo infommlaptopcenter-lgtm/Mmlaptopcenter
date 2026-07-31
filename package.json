@@ -4,7 +4,7 @@
   "description": "MM Laptop Center – A full-stack laptop e-commerce store built with Next.js, Prisma, NextAuth, and Cloudinary.",
   "license": "MIT",
   "scripts": {
-    "start": "next start",
+    "start": "node .next/standalone/server.js",
     "dev": "esmate task dev",
     "build": "esmate task build",
     "fix": "esmate task fix",
