@@ -1,8 +1,21 @@
 import Link from "next/link";
 import { Facebook, Instagram, Twitter, Mail, MapPin, Phone } from "@esmate/shadcn/pkgs/lucide-react";
 import Image from "next/image";
+import { prisma } from "@/lib/prisma";
 
-export function Footer() {
+export async function Footer() {
+  const categories = await prisma.category
+    .findMany({
+      where: { parentId: null },
+      orderBy: [{ order: "asc" }, { name: "asc" }],
+      take: 8,
+      select: { id: true, name: true, slug: true },
+    })
+    .catch((error) => {
+      console.warn("Unable to load footer categories:", error);
+      return [];
+    });
+
   return (
     <footer className="bg-[#f4f1e8] border-t border-[#d8a928]/30">
       <div className="w-full px-4 py-12 sm:px-6">
@@ -49,26 +62,16 @@ export function Footer() {
           <div>
             <h3 className="text-sm font-semibold leading-6 text-gray-900">Shop</h3>
             <ul role="list" className="mt-4 space-y-2">
-              <li>
-                <Link href="/category/gaming-laptops" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-                  Gaming Laptops
-                </Link>
-              </li>
-              <li>
-                <Link href="/category/business-laptops" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-                  Business Laptops
-                </Link>
-              </li>
-              <li>
-                <Link href="/category/accessories" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-                  Accessories
-                </Link>
-              </li>
-              <li>
-                <Link href="/collections/hot-deals" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
-                  Hot Deals
-                </Link>
-              </li>
+              {categories.map((category) => (
+                <li key={category.id}>
+                  <Link
+                    href={`/category/${category.slug}`}
+                    className="text-sm text-gray-600 transition-colors hover:text-gray-900"
+                  >
+                    {category.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
