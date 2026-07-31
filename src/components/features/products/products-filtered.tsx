@@ -224,8 +224,48 @@ export function ProductsFiltered({
 
   return (
     <div className="space-y-6">
-      <div className="sticky top-16 z-30 -mx-2 flex justify-end bg-background/90 px-2 py-2 backdrop-blur-md lg:top-[120px]">
-        <div className="grid w-full grid-cols-3 gap-1.5 sm:w-auto sm:flex sm:items-end sm:gap-2">
+      <div className="sticky top-16 z-30 -mx-2 flex flex-col gap-1.5 bg-background/90 px-2 py-2 backdrop-blur-md lg:top-[120px] lg:flex-row lg:items-end">
+        <div className="category-marquee order-1 min-w-0 overflow-hidden lg:order-2 lg:flex-1 lg:self-center">
+          <div className="category-marquee-track w-max">
+            {[0, 1].map((copyIndex) => (
+              <div
+                key={copyIndex}
+                className="flex shrink-0 items-center gap-2 pr-2"
+                aria-hidden={copyIndex === 1 ? true : undefined}
+              >
+                <button
+                  type="button"
+                  onClick={() => setSelectedCategoryId("")}
+                  tabIndex={copyIndex === 1 ? -1 : undefined}
+                  className={`whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-semibold transition sm:text-xs ${
+                    selectedCategoryId === ""
+                      ? "bg-[#d8a928] text-white"
+                      : "bg-[#fcf5e8] text-[#5A5E55] hover:text-[#8a5b00]"
+                  }`}
+                >
+                  All Products
+                </button>
+                {categoriesWithProducts.map((category) => (
+                  <button
+                    key={`${copyIndex}-${category.id}`}
+                    type="button"
+                    onClick={() => setSelectedCategoryId(category.id)}
+                    tabIndex={copyIndex === 1 ? -1 : undefined}
+                    className={`whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-semibold transition sm:text-xs ${
+                      selectedCategoryId === category.id
+                        ? "bg-[#d8a928] text-white"
+                        : "bg-[#fcf5e8] text-[#5A5E55] hover:text-[#8a5b00]"
+                    }`}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="order-2 grid w-full shrink-0 grid-cols-3 gap-1.5 sm:w-auto sm:flex sm:items-end sm:gap-2 lg:order-1">
           <label className="grid min-w-0 gap-1 text-[9px] font-bold uppercase tracking-wide text-[#5A5E55] sm:text-[10px]">
             Category
             <select
