@@ -6,6 +6,11 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   serverExternalPackages: ["dompurify"],
   images: {
+    localPatterns: [
+      {
+        pathname: "/**",
+      },
+    ],
     remotePatterns: [
       {
         protocol: "https",
