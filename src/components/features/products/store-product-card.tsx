@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FaWhatsapp } from "react-icons/fa";
+import { FiShoppingCart } from "react-icons/fi";
 import { useCart } from "@/lib/commerce";
 import { toast } from "sonner";
 import { useState, useEffect, useMemo } from "react";
@@ -370,35 +371,36 @@ export function StoreProductCard({
           </h3>
         </Link>
 
-        {/* Prices + Buy Now button */}
-        <div className="mt-2 grid grid-cols-2 gap-2">
-          {/* Buy Now — add to cart if variantId exists, else link to PDP */}
+        {/* Product actions */}
+        <div className="mt-2 grid grid-cols-[minmax(0,1fr)_2.75rem] gap-2">
+          {/* Add directly when a variant is available; otherwise open the product. */}
           {effectiveVariantId ? (
             <button
               onClick={handleAddToCart}
               disabled={loading}
-              className="whitespace-nowrap rounded-md bg-orange-400 px-4 py-2 text-sm font-bold text-white shadow-[0_8px_18px_rgba(251,146,60,0.18)] transition-all hover:-translate-y-0.5 hover:bg-orange-500 active:scale-95 disabled:opacity-60"
+              className="inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md bg-[#f6a45d]/75 px-3 text-sm font-bold text-white shadow-[0_8px_18px_rgba(246,164,93,0.14)] transition-all hover:-translate-y-0.5 hover:bg-[#f47b20] hover:shadow-[0_10px_22px_rgba(244,123,32,0.28)] active:scale-95 disabled:opacity-60"
             >
-              {loading ? "Adding…" : "Buy Now"}
+              <FiShoppingCart className="h-5 w-5" />
+              {loading ? "Adding…" : "Add to Cart"}
             </button>
           ) : (
             <Link
               href={`/products/${handle}`}
-              className="whitespace-nowrap rounded-md bg-orange-400 px-4 py-2 text-center text-sm font-bold text-white shadow-[0_8px_18px_rgba(251,146,60,0.18)] transition-all hover:-translate-y-0.5 hover:bg-orange-500 active:scale-95"
+              className="inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md bg-[#f6a45d]/75 px-3 text-sm font-bold text-white shadow-[0_8px_18px_rgba(246,164,93,0.14)] transition-all hover:-translate-y-0.5 hover:bg-[#f47b20] hover:shadow-[0_10px_22px_rgba(244,123,32,0.28)] active:scale-95"
             >
-              Buy Now
+              <FiShoppingCart className="h-5 w-5" />
+              Add to Cart
             </Link>
           )}
           <a
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md bg-green-700 px-4 py-2 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-green-800 active:scale-95"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-md bg-[#079447] p-0 text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#047a3a] hover:shadow-md active:scale-95"
             aria-label={`Order ${title} on WhatsApp`}
             onClick={() => trackContact("WhatsApp product order")}
           >
-            <FaWhatsapp className="h-4 w-4" />
-            WhatsApp
+            <FaWhatsapp className="h-5 w-5" />
           </a>
         </div>
       </div>
