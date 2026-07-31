@@ -263,7 +263,7 @@ function FeaturedProductRow({
         ) : null}
         <Link
           href={`/category/${encodeURIComponent(categorySlug)}`}
-          className="group inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#d8a928]/50 bg-[#fcf5e8] px-4 py-2 text-xs font-bold uppercase tracking-wide text-[#8a5b00] shadow-sm transition hover:-translate-y-0.5 hover:border-[#f6a45d] hover:bg-[#f6a45d] hover:text-white hover:shadow-md sm:text-sm"
+          className="group inline-flex shrink-0 items-center gap-1.5 rounded-full border border-orange-500 bg-orange-500 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white shadow-[0_8px_18px_rgba(249,115,22,0.22)] transition hover:-translate-y-0.5 hover:border-orange-600 hover:bg-orange-600 hover:shadow-md sm:text-sm"
         >
           Shop Now
           <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
