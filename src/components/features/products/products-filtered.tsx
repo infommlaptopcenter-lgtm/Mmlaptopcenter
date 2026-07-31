@@ -224,8 +224,8 @@ export function ProductsFiltered({
 
   return (
     <div className="space-y-6">
-      <div className="sticky top-16 z-30 -mx-2 flex flex-col gap-1.5 bg-background/90 px-2 py-2 backdrop-blur-md lg:top-[120px] lg:flex-row lg:items-end">
-        <div className="category-marquee order-1 min-w-0 overflow-hidden lg:order-2 lg:flex-1 lg:self-center">
+      <div className="sticky top-16 z-30 -mx-2 flex flex-col gap-1.5 bg-background/90 px-2 py-2 backdrop-blur-md lg:top-[120px] lg:flex-row lg:items-center">
+        <div className="category-marquee order-1 min-w-0 overflow-hidden lg:flex-1">
           <div className="category-marquee-track w-max">
             {[0, 1].map((copyIndex) => (
               <div
@@ -237,7 +237,7 @@ export function ProductsFiltered({
                   type="button"
                   onClick={() => setSelectedCategoryId("")}
                   tabIndex={copyIndex === 1 ? -1 : undefined}
-                  className={`whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-semibold transition sm:text-xs ${
+                  className={`flex h-8 items-center whitespace-nowrap rounded-md px-2.5 text-[10px] font-semibold transition sm:text-xs ${
                     selectedCategoryId === ""
                       ? "bg-[#d8a928] text-white"
                       : "bg-[#fcf5e8] text-[#5A5E55] hover:text-[#8a5b00]"
@@ -251,7 +251,7 @@ export function ProductsFiltered({
                     type="button"
                     onClick={() => setSelectedCategoryId(category.id)}
                     tabIndex={copyIndex === 1 ? -1 : undefined}
-                    className={`whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-semibold transition sm:text-xs ${
+                    className={`flex h-8 items-center whitespace-nowrap rounded-md px-2.5 text-[10px] font-semibold transition sm:text-xs ${
                       selectedCategoryId === category.id
                         ? "bg-[#d8a928] text-white"
                         : "bg-[#fcf5e8] text-[#5A5E55] hover:text-[#8a5b00]"
@@ -265,9 +265,9 @@ export function ProductsFiltered({
           </div>
         </div>
 
-        <div className="order-2 grid w-full shrink-0 grid-cols-3 gap-1.5 sm:w-auto sm:flex sm:items-end sm:gap-2 lg:order-1">
-          <label className="grid min-w-0 gap-1 text-[9px] font-bold uppercase tracking-wide text-[#5A5E55] sm:text-[10px]">
-            Category
+        <div className="order-2 grid w-full shrink-0 grid-cols-3 gap-1.5 sm:w-auto sm:flex sm:gap-2">
+          <label className="min-w-0">
+            <span className="sr-only">Category</span>
             <select
               value={selectedCategoryId}
               onChange={(event) => setSelectedCategoryId(event.target.value)}
@@ -282,8 +282,8 @@ export function ProductsFiltered({
             </select>
           </label>
 
-          <label className="grid min-w-0 gap-1 text-[9px] font-bold uppercase tracking-wide text-[#5A5E55] sm:text-[10px]">
-          Price Range
+          <label className="min-w-0">
+          <span className="sr-only">Price Range</span>
           <select
             value={priceRange}
             onChange={(event) => setPriceRange(event.target.value)}
@@ -297,8 +297,8 @@ export function ProductsFiltered({
           </select>
           </label>
 
-          <label className="grid min-w-0 gap-1 text-[9px] font-bold uppercase tracking-wide text-[#5A5E55] sm:text-[10px]">
-          Sort By
+          <label className="min-w-0">
+          <span className="sr-only">Sort By</span>
           <select
             value={sortBy}
             onChange={(event) => setSortBy(event.target.value)}
