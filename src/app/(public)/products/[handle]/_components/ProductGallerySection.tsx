@@ -48,8 +48,8 @@ export function ProductGallerySection({
   };
 
   return (
-    <div className="h-full min-w-0 space-y-3 rounded-3xl border border-orange-100 bg-white p-3 shadow-[0_18px_50px_rgba(26,19,8,0.07)] sm:space-y-4 sm:p-5">
-      <div className="group/gallery relative mx-auto aspect-square w-full max-w-xl overflow-hidden rounded-2xl border border-orange-100 bg-[#f8f6f0]">
+    <div className="h-full min-w-0 space-y-3 sm:space-y-4">
+      <div className="group/gallery relative mx-auto aspect-square w-full max-w-xl overflow-hidden rounded-2xl bg-[#f7f7f5]">
         {currentImage ? (
           <>
             <Image
@@ -58,10 +58,9 @@ export function ProductGallerySection({
               alt={currentImage.altText || title}
               fill
               priority
-              className="animate-in fade-in object-contain p-3 duration-[350ms] ease-out lg:transition-transform lg:duration-500 lg:group-hover/gallery:scale-[1.045] sm:p-5"
+              className="animate-in fade-in object-contain p-3 duration-[350ms] ease-out lg:transition-transform lg:duration-500 lg:group-hover/gallery:scale-[1.035] sm:p-5"
               sizes="(max-width: 768px) 100vw, 50vw"
             />
-            <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-white/15 via-transparent to-black/[0.03]" />
           </>
         ) : (
           <Skeleton className="h-full w-full" />
@@ -87,13 +86,13 @@ export function ProductGallerySection({
         </Button>
 
         {discountBadge?.hasDiscount && (
-          <div className="absolute left-3 top-3 z-20 sm:left-5 sm:top-5">
-            <Badge className="flex min-w-[8.5rem] rotate-[-1.5deg] flex-col items-center rounded-[1.25rem] border-2 border-white/80 bg-gradient-to-br from-[#ff591f] to-[#ef281d] px-5 py-3.5 text-center text-white shadow-[0_12px_28px_rgba(239,40,29,0.28)] hover:from-[#ff591f] hover:to-[#ef281d] sm:min-w-[10.5rem] sm:px-6 sm:py-4">
-              <span className="text-2xl font-black leading-none tracking-tight sm:text-3xl">
+          <div className="absolute left-2 top-2 z-20 sm:left-3 sm:top-3">
+            <Badge className="inline-flex rounded-md border-0 bg-orange-500 px-2 py-1 text-white shadow-sm hover:bg-orange-500 sm:px-2.5 sm:py-1.5">
+              <span className="text-[11px] font-extrabold leading-none sm:text-xs">
                 {discountBadge.savedPct}% OFF
               </span>
-              <span className="mt-1.5 text-[10px] font-extrabold uppercase tracking-wide text-white sm:text-xs">
-                For 5+ items
+              <span className="ml-1 text-[8px] font-semibold leading-none text-white/90 sm:text-[9px]">
+                5+ items
               </span>
             </Badge>
           </div>
@@ -130,10 +129,10 @@ export function ProductGallerySection({
               onClick={() => onSelectImage(img)}
               aria-label={`Show ${img.altText || title}`}
               aria-pressed={img.id === currentImage?.id}
-              className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border-2 bg-[#f8f6f0] transition-all duration-200 sm:h-16 sm:w-16 ${
+              className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border bg-[#f7f7f5] transition-all duration-200 sm:h-16 sm:w-16 ${
                 img.id === currentImage?.id
-                  ? "scale-[1.03] border-orange-500 shadow-md ring-4 ring-orange-100"
-                  : "border-transparent opacity-80 hover:-translate-y-0.5 hover:border-orange-300 hover:opacity-100 hover:shadow-sm"
+                  ? "border-orange-500"
+                  : "border-transparent opacity-80 hover:border-orange-300 hover:opacity-100"
               }`}
             >
               <Image
