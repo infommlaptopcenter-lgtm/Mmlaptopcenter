@@ -326,8 +326,8 @@ export function Header() {
               priority
             />
           </div>
-          <div className="hidden leading-tight sm:block">
-            <div className="text-base font-bold tracking-wide text-[#172533] lg:text-lg">
+          <div className="leading-tight">
+            <div className="whitespace-nowrap text-[10px] font-bold tracking-wide text-[#172533] sm:text-base lg:text-lg">
               MM LAPTOP CENTER
             </div>
             <div className="mt-0.5 hidden text-[11px] text-[#6b6255] lg:block">
