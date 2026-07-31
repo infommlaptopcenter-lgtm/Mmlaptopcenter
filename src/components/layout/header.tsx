@@ -27,6 +27,7 @@ import { useEffect, useRef, useState } from "react";
 import { searchProducts } from "@/components/search/actions";
 import { search as trackSearch } from "@/lib/pixel";
 import { usePWAInstall } from "@/hooks/use-pwa-install";
+import { SocialLinks } from "@/components/layout/social-links";
 
 const CartDrawer = dynamic(
   () =>
@@ -155,6 +156,11 @@ export function Header() {
               <Phone className="h-3.5 w-3.5" />
               Contact
             </Link>
+            <SocialLinks
+              className="gap-1.5 border-l border-white/20 pl-4"
+              itemClassName="flex h-6 w-6 items-center justify-center rounded-full text-white/80 transition hover:bg-white/10 hover:text-[#f6a45d]"
+              iconClassName="h-3.5 w-3.5"
+            />
           </div>
         </div>
       </div>

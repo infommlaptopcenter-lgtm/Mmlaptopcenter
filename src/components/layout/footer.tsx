@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Facebook, Instagram, Twitter, Mail, MapPin, Phone } from "@esmate/shadcn/pkgs/lucide-react";
+import { Mail, MapPin, Phone } from "@esmate/shadcn/pkgs/lucide-react";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
+import { SocialLinks } from "@/components/layout/social-links";
 
 export async function Footer() {
   const categories = await prisma.category
@@ -45,17 +46,11 @@ export async function Footer() {
               Your Trusted Tech Destination — premium laptops, gaming gear, and accessories with genuine warranty support.
             </p>
 
-            <div className="flex space-x-4">
-              <Link href="#" className="text-[#d8a928] hover:text-[#b57910] transition-colors">
-                <Facebook className="h-5 w-5" />
-              </Link>
-              <Link href="#" className="text-[#d8a928] hover:text-[#b57910] transition-colors">
-                <Instagram className="h-5 w-5" />
-              </Link>
-              <Link href="#" className="text-[#d8a928] hover:text-[#b57910] transition-colors">
-                <Twitter className="h-5 w-5" />
-              </Link>
-            </div>
+            <SocialLinks
+              className="gap-2.5"
+              itemClassName="flex h-9 w-9 items-center justify-center rounded-full border border-[#d8a928]/25 bg-white text-[#b57910] shadow-sm transition hover:-translate-y-0.5 hover:border-[#d8a928] hover:bg-[#d8a928] hover:text-white"
+              iconClassName="h-4 w-4"
+            />
           </div>
 
           {/* Quick Links */}
