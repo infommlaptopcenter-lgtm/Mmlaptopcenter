@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-auth";
+import { syncProductCollections } from "@/lib/collection-membership";
 
 const productSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -107,12 +108,21 @@ export async function POST(request: Request) {
     if (!productData.categoryId) delete (productData as any).categoryId;
     if (!productData.subcategoryId) delete (productData as any).subcategoryId;
 
-    const product = await prisma.product.create({
-      data: {
-        ...productData,
-        details: details,
-        variations: { create: variants.map(({ id, ...variant }) => ({ id, ...variant, value: variant.name })) },
-      },
+    const product = await prisma.$transaction(async (transaction) => {
+      const createdProduct = await transaction.product.create({
+        data: {
+          ...productData,
+          details: details,
+          variations: { create: variants.map(({ id, ...variant }) => ({ id, ...variant, value: variant.name })) },
+        },
+      });
+
+      await syncProductCollections(transaction, {
+        productHandle: createdProduct.handle,
+        collectionIds: productData.collectionIds,
+      });
+
+      return createdProduct;
     });
 
     return NextResponse.json({ product }, { status: 201 });

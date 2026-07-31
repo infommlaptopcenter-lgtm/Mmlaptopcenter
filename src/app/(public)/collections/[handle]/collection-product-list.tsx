@@ -52,7 +52,7 @@ export function CollectionProductList(props: Props) {
             This collection is ready, and products will appear here as soon as
             they are published.
           </p>
-          <Button asChild className="mt-6 rounded-full bg-[#8b1a1a] hover:bg-[#a52020]">
+          <Button asChild className="mt-6 rounded-full bg-[#d8a928] text-white hover:bg-[#b57910]">
             <Link href="/products">Browse All Products</Link>
           </Button>
         </div>
@@ -61,8 +61,12 @@ export function CollectionProductList(props: Props) {
   }
 
   return (
-    <section className="mx-auto max-w-7xl px-6 pb-20 lg:px-8">
-      <div className="mb-6 flex items-center justify-between">
+    <section className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-16">
+      <div className="mb-8 flex items-end justify-between gap-4">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#b57910]">Collection products</p>
+          <h2 className="mt-2 text-2xl font-bold text-[#172533] sm:text-3xl">Shop this collection</h2>
+        </div>
         <p className="text-sm font-medium text-[#5A5E55]">
           Showing {products.length} product{products.length === 1 ? "" : "s"}
         </p>

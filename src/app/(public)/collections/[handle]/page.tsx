@@ -51,7 +51,7 @@ export default async function Page({ params }: Props) {
   const heroImage = collection.image?.url;
 
   return (
-    <main className="min-h-screen bg-[#fbf7ef]">
+    <main className="min-h-screen bg-[#f5f5f5]">
       <JsonLd data={[
         breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Collections", path: "/collections" }, { name: collection.title, path: `/collections/${collectionHandle}` }]),
         {
@@ -72,7 +72,7 @@ export default async function Page({ params }: Props) {
           },
         },
       ]} />
-      <section className="relative overflow-hidden bg-[#1a1308] text-white">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#fff7df] via-[#fcf5e8] to-[#f4e2b7] text-[#172533]">
         {heroImage && (
           <Image
             src={heroImage}
@@ -80,31 +80,33 @@ export default async function Page({ params }: Props) {
             fill
             priority
             sizes="100vw"
-            className="object-cover opacity-35"
+            className="object-cover opacity-20"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#1a1308] via-[#1a1308]/85 to-[#1a1308]/50" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#fff7df]/95 via-[#fcf5e8]/85 to-[#f4e2b7]/55" />
+        <div className="absolute -left-20 bottom-0 h-64 w-64 rounded-full bg-[#d8a928]/15 blur-3xl" />
+        <div className="absolute -right-16 top-0 h-72 w-72 rounded-full bg-[#f6a45d]/15 blur-3xl" />
 
-        <div className="relative mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-28">
+        <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
           <div className="max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-[0.24em] text-[#f6a45d]">
-              MM Laptop Center
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#b57910]">
+              MM Laptop Center Collection
             </p>
             <h1 className="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
               {collection.title}
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-white/80 sm:text-lg">
+            <p className="mt-5 max-w-2xl text-base leading-7 text-[#5A5E55] sm:text-lg">
               {collection.description ||
                 "Explore carefully selected laptops, gaming gear, and accessories from MM Laptop Center."}
             </p>
             <div className="mt-8 flex flex-wrap gap-3 text-sm font-semibold">
-              <span className="rounded-full bg-white px-4 py-2 text-[#1a1308]">
+              <span className="rounded-full bg-[#d8a928] px-4 py-2 text-white shadow-sm">
                 {productCount} product{productCount === 1 ? "" : "s"}
               </span>
-              <span className="rounded-full border border-white/25 px-4 py-2 text-white">
+              <span className="rounded-full bg-white/80 px-4 py-2 text-[#6b4b0b] shadow-sm">
                 Fast local support
               </span>
-              <span className="rounded-full border border-white/25 px-4 py-2 text-white">
+              <span className="rounded-full bg-white/80 px-4 py-2 text-[#6b4b0b] shadow-sm">
                 Secure checkout
               </span>
             </div>

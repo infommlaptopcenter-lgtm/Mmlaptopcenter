@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@esmate/shadcn/components/ui/button";
 import { Card, CardFooter, CardHeader } from "@esmate/shadcn/components/ui/card";
-import { Loader2 } from "@esmate/shadcn/pkgs/lucide-react";
+import { ArrowUpRight, Loader2 } from "@esmate/shadcn/pkgs/lucide-react";
 import { useState } from "react";
 import { getCollectionList } from "./service";
 import { useRequest } from "@esmate/react/ahooks";
@@ -30,15 +30,20 @@ export function CollectionList(props: Props) {
   );
 
   return (
-    <section className="container mx-auto p-10 mt-10 mb-10">
+    <div>
       <h1 className="sr-only">Collections</h1>
+      {pages.every(({ edges }) => edges.length === 0) ? (
+        <div className="rounded-2xl border border-[#d8a928]/20 bg-white p-10 text-center text-[#5A5E55]">
+          Collections will appear here when they are published.
+        </div>
+      ) : null}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {pages
           .flatMap(({ edges }) => edges)
           .map(({ node }) => (
             <Link key={node.handle} href={`/collections/${node.handle}`} className="group flex">
-              <Card className="border-gray-200 flex w-full flex-col overflow-hidden pt-0">
-                <CardHeader className="m-0 p-0">
+              <Card className="flex w-full flex-col overflow-hidden border-[#d8a928]/20 bg-white pt-0 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl">
+                <CardHeader className="m-0 overflow-hidden bg-[#fcf5e8] p-0">
                   {node.image ? (
                     <Image
                       src={node.image.url as string}
@@ -46,17 +51,19 @@ export function CollectionList(props: Props) {
                       height={node.image.height as number}
                       width={node.image.width as number}
                       loading="eager"
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 aspect-[4/3]"
+                      className="aspect-[4/3] h-full w-full object-contain p-3 transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
-                     <div className="flex h-[300px] w-full items-center justify-center bg-gray-200 text-gray-400">
+                     <div className="flex aspect-[4/3] w-full items-center justify-center bg-[#fcf5e8] text-[#9a8967]">
                         No Image
                      </div>
                   )}
                 </CardHeader>
-                <CardFooter className="mt-auto flex flex-col items-start justify-center gap-2 p-4">
-                  <h3 className="text-md font-bold">{titleize(node.title)}</h3>
-                  {/* Optional: Add description snippet if needed, but keeping it clean for now */}
+                <CardFooter className="mt-auto flex items-center justify-between gap-3 border-t border-[#d8a928]/10 p-4">
+                  <h3 className="text-base font-bold text-[#172533]">{titleize(node.title)}</h3>
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#d8a928]/15 text-[#9b6b0c] transition group-hover:bg-[#d8a928] group-hover:text-white">
+                    <ArrowUpRight className="h-4 w-4" />
+                  </span>
                 </CardFooter>
               </Card>
             </Link>
@@ -76,7 +83,7 @@ export function CollectionList(props: Props) {
           </Button>
         </div>
       )}
-    </section>
+    </div>
   );
 }
 

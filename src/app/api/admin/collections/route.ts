@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-auth";
+import { syncCollectionProducts } from "@/lib/collection-membership";
 
 const collectionSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -31,7 +32,18 @@ export async function POST(request: Request) {
     await requireAdmin();
     const body = await request.json();
     const validated = collectionSchema.parse(body);
-    const collection = await prisma.collection.create({ data: validated });
+    const collection = await prisma.$transaction(async (transaction) => {
+      const createdCollection = await transaction.collection.create({
+        data: validated,
+      });
+
+      await syncCollectionProducts(transaction, {
+        collectionId: createdCollection.id,
+        productHandles: validated.productHandles,
+      });
+
+      return createdCollection;
+    });
     return NextResponse.json({ collection }, { status: 201 });
   } catch (error: unknown) {
     if (error instanceof z.ZodError) return NextResponse.json({ error: "Validation failed", details: error.issues }, { status: 400 });

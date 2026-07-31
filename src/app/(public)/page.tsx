@@ -164,6 +164,7 @@ export default async function Page() {
             featuredImage: true,
             images: true,
             tags: true,
+            collectionIds: true,
             categoryId: true,
             subcategoryId: true,
             isFeatured: true,
@@ -177,7 +178,16 @@ export default async function Page() {
 
   const homeCollections = featuredCollections.map((collection) => ({
     ...collection,
-    productHandles: parseStringArray(collection.productHandles),
+    productHandles: [
+      ...new Set([
+        ...parseStringArray(collection.productHandles),
+        ...recentProducts
+          .filter((product) =>
+            parseStringArray(product.collectionIds).includes(collection.id),
+          )
+          .map((product) => product.handle),
+      ]),
+    ],
   }));
 
   const collectionProductHandles = homeCollections

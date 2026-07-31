@@ -2,6 +2,17 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-auth";
+import {
+  removeCollectionFromProducts,
+  syncCollectionProducts,
+} from "@/lib/collection-membership";
+import type { Prisma } from "@prisma/client";
+
+function stringArray(value: Prisma.JsonValue | null | undefined): string[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
+}
 
 const collectionSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -33,7 +44,26 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const { id } = await params;
     const body = await request.json();
     const validated = collectionSchema.parse(body);
-    const collection = await prisma.collection.update({ where: { id }, data: validated });
+    const existing = await prisma.collection.findUnique({
+      where: { id },
+      select: { productHandles: true },
+    });
+    if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    const collection = await prisma.$transaction(async (transaction) => {
+      const updatedCollection = await transaction.collection.update({
+        where: { id },
+        data: validated,
+      });
+
+      await syncCollectionProducts(transaction, {
+        collectionId: id,
+        previousProductHandles: stringArray(existing.productHandles),
+        productHandles: validated.productHandles,
+      });
+
+      return updatedCollection;
+    });
     return NextResponse.json(collection);
   } catch (error: unknown) {
     if (error instanceof z.ZodError) return NextResponse.json({ error: "Validation failed", details: error.issues }, { status: 400 });
@@ -45,7 +75,10 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
   try {
     await requireAdmin();
     const { id } = await params;
-    await prisma.collection.delete({ where: { id } });
+    await prisma.$transaction(async (transaction) => {
+      await removeCollectionFromProducts(transaction, id);
+      await transaction.collection.delete({ where: { id } });
+    });
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });

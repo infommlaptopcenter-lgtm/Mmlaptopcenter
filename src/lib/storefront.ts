@@ -512,6 +512,7 @@ export async function getCollectionProducts(
   const collection = await prisma.collection.findUnique({
     where: { handle },
     select: {
+      id: true,
       productHandles: true,
     },
   });
@@ -520,17 +521,14 @@ export async function getCollectionProducts(
     return null;
   }
 
-  const productHandles = parseStringArray(collection.productHandles);
+  const explicitHandles = parseStringArray(collection.productHandles);
   const skip = parseCursor(cursor);
-  const pagedHandles = productHandles.slice(skip, skip + take);
 
   const products = await prisma.product.findMany({
     where: {
-      handle: {
-        in: pagedHandles,
-      },
       status: "ACTIVE",
     },
+    orderBy: [{ displayOrder: "asc" }, { updatedAt: "desc" }],
     select: {
       id: true,
       handle: true,
@@ -541,15 +539,33 @@ export async function getCollectionProducts(
       featuredImage: true,
       images: true,
       tags: true,
+      collectionIds: true,
     },
   });
 
+  const explicitHandleSet = new Set(explicitHandles);
+  const assignedProducts = products.filter(
+    (product) =>
+      explicitHandleSet.has(product.handle) ||
+      parseStringArray(product.collectionIds).includes(collection.id),
+  );
+  const productsByHandle = new Map(
+    assignedProducts.map((product) => [product.handle, product]),
+  );
+  const orderedHandles = [
+    ...explicitHandles.filter((productHandle) => productsByHandle.has(productHandle)),
+    ...assignedProducts
+      .map((product) => product.handle)
+      .filter((productHandle) => !explicitHandleSet.has(productHandle)),
+  ];
+  const pagedHandles = [...new Set(orderedHandles)].slice(skip, skip + take);
+
   const orderedProducts = pagedHandles
-    .map((productHandle) => products.find((product) => product.handle === productHandle))
+    .map((productHandle) => productsByHandle.get(productHandle))
     .filter((product): product is (typeof products)[number] => Boolean(product))
     .map((product) => buildProductCardNode(product));
 
-  return toConnection(orderedProducts, skip, productHandles.length);
+  return toConnection(orderedProducts, skip, new Set(orderedHandles).size);
 }
 
 export async function searchProducts(query: string) {

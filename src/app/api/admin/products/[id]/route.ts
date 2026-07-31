@@ -2,6 +2,17 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-auth";
+import {
+  removeProductFromCollections,
+  syncProductCollections,
+} from "@/lib/collection-membership";
+import type { Prisma } from "@prisma/client";
+
+function stringArray(value: Prisma.JsonValue | null | undefined): string[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
+}
 
 const productSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -95,20 +106,31 @@ export async function PUT(
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    const product = await prisma.product.update({
-      where: { id },
-      data: {
-        ...productData,
-        details: details,
-        variations: {
-          deleteMany: { id: { notIn: variants.map((variant) => variant.id) } },
-          upsert: variants.map(({ id, ...variant }) => ({
-            where: { id },
-            create: { id, ...variant, value: variant.name },
-            update: { ...variant, value: variant.name },
-          })),
+    const product = await prisma.$transaction(async (transaction) => {
+      const updatedProduct = await transaction.product.update({
+        where: { id },
+        data: {
+          ...productData,
+          details: details,
+          variations: {
+            deleteMany: { id: { notIn: variants.map((variant) => variant.id) } },
+            upsert: variants.map(({ id, ...variant }) => ({
+              where: { id },
+              create: { id, ...variant, value: variant.name },
+              update: { ...variant, value: variant.name },
+            })),
+          },
         },
-      },
+      });
+
+      await syncProductCollections(transaction, {
+        productHandle: updatedProduct.handle,
+        previousHandle: existing.handle,
+        previousCollectionIds: stringArray(existing.collectionIds),
+        collectionIds: productData.collectionIds,
+      });
+
+      return updatedProduct;
     });
 
     return NextResponse.json(product);
@@ -135,8 +157,18 @@ export async function DELETE(
     await requireAdmin();
     const { id } = await params;
     
-    await prisma.product.delete({
+    const existing = await prisma.product.findUnique({
       where: { id },
+      select: { handle: true },
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+
+    await prisma.$transaction(async (transaction) => {
+      await removeProductFromCollections(transaction, existing.handle);
+      await transaction.product.delete({ where: { id } });
     });
 
     return NextResponse.json({ success: true });
