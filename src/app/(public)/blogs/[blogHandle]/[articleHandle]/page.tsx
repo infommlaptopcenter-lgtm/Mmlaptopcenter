@@ -4,7 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Calendar } from "@esmate/shadcn/pkgs/lucide-react"
 import { Metadata } from "next"
-import DOMPurify from "dompurify"
+import sanitizeHtml from "sanitize-html"
 import { JsonLd } from "@/components/seo/json-ld"
 import { absoluteUrl, breadcrumbSchema, createSeoMetadata } from "@/lib/seo"
 
@@ -80,7 +80,14 @@ export default async function ArticlePage({ params }: Props) {
     notFound()
   }
 
-  const cleanHtml = DOMPurify.sanitize(article.content ?? "")
+  const cleanHtml = sanitizeHtml(article.content ?? "", {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
+    allowedAttributes: {
+      ...sanitizeHtml.defaults.allowedAttributes,
+      img: ["src", "alt", "title", "width", "height", "loading"],
+    },
+    allowedSchemes: ["http", "https", "mailto", "tel"],
+  })
   const [category, relatedProducts] = await Promise.all([
     article.categoryId
       ? prisma.category.findUnique({ where: { id: article.categoryId }, select: { name: true, slug: true } })

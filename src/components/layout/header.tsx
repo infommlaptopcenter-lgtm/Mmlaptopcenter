@@ -39,11 +39,9 @@ const CartDrawer = dynamic(
 
 const mainMenuItems = [
   { text: "Home", href: "/" },
-  { text: "Laptops", href: "/products" },
-  { text: "Accessories", href: "/category/accessories" },
-  { text: "Deals", href: "/collections/hot-deals" },
   { text: "About", href: "/about-us" },
   { text: "Contact", href: "/contact" },
+  { text: "Videos", href: "/videos" },
 ];
 
 const topBarLeft = [
