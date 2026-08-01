@@ -55,13 +55,13 @@ export function HomeContentSections({
         products={products}
         collections={collections}
       />
+      <WhyChooseUsSection />
+      <CollectionsSection collections={collections} />
       <FeaturedVideoSection
         videos={homeVideos}
         heading="See the latest from MM Laptop Center"
         description="Watch featured laptop showcases, buying advice, and shop updates selected by the admin team."
       />
-      <CollectionsSection collections={collections} />
-      <WhyChooseUsSection />
       <FeaturedBlogSection articles={featuredBlogs} />
       <CustomerVoicesSection />
     </>
