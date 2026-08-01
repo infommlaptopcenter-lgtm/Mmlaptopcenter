@@ -32,9 +32,9 @@ const socialLinks = [
     icon: FaYoutube,
   },
   {
-    name: "WhatsApp",
-    href: "https://wa.me/923048928282",
-    label: "Chat with us on WhatsApp",
+    name: "WhatsApp Channel",
+    href: "https://whatsapp.com/channel/0029VbCLX9N7dmeW21o56l0b",
+    label: "Follow our WhatsApp channel",
     icon: FaWhatsapp,
   },
 ] as const;
