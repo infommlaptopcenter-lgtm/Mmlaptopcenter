@@ -6,6 +6,7 @@ import {
 import { WhyChooseUsSection } from "@/components/features/home/why-choose-us";
 import { FeaturedBlogSection } from "@/components/features/home/featured-blog-section";
 import { CustomerVoicesSection } from "@/components/features/home/customer-voices-section";
+import { TopBrandsSection } from "@/components/features/home/top-brands-section";
 import { FeaturedVideoSection } from "@/components/features/videos/featured-video-section";
 import type { PublicVideo } from "@/lib/video-utils";
 import type { HomeProduct } from "@/components/features/home/products-section";
@@ -63,6 +64,7 @@ export function HomeContentSections({
         description="Watch featured laptop showcases, buying advice, and shop updates selected by the admin team."
       />
       <FeaturedBlogSection articles={featuredBlogs} />
+      <TopBrandsSection />
       <CustomerVoicesSection />
     </>
   );

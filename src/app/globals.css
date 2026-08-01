@@ -116,6 +116,26 @@
   animation: kenburns 7s ease-out forwards;
 }
 
+@keyframes brand-marquee-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.brand-marquee {
+  animation: brand-marquee-left 28s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-marquee {
+    animation: none;
+  }
+}
+
 .legal-copy p + p,
 .legal-copy p + ul,
 .legal-copy p + ol,
