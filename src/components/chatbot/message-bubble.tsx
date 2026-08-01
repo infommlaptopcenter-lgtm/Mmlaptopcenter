@@ -19,6 +19,13 @@ export function MessageBubble({
 
   const handleClick = async (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
+    const externalLink = target.closest<HTMLAnchorElement>("a[href]");
+    if (externalLink && /^https?:\/\//i.test(externalLink.href)) {
+      e.preventDefault();
+      window.open(externalLink.href, "_blank", "noopener,noreferrer");
+      return;
+    }
+
     if (target.tagName === "BUTTON" && target.getAttribute("data-add-to-cart")) {
       e.preventDefault();
       const variantId = target.getAttribute("data-variant-id") || "";
