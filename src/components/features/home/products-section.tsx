@@ -490,6 +490,13 @@ export function CollectionsSection({
         <h2 className="font-serif text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
           Curated Collections
         </h2>
+        <Link
+          href="/collections"
+          className="group inline-flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-orange-600 hover:shadow-md"
+        >
+          View All Collections
+          <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        </Link>
       </div>
       <CollectionSlider
         collections={collections.filter(

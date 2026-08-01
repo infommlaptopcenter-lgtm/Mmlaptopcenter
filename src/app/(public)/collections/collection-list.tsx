@@ -33,7 +33,7 @@ export function CollectionList(props: Props) {
     <div>
       <h1 className="sr-only">Collections</h1>
       {pages.every(({ edges }) => edges.length === 0) ? (
-        <div className="rounded-2xl border border-[#d8a928]/20 bg-white p-10 text-center text-[#5A5E55]">
+        <div className="rounded-2xl border border-orange-100 bg-white p-10 text-center text-stone-600">
           Collections will appear here when they are published.
         </div>
       ) : null}
@@ -42,8 +42,8 @@ export function CollectionList(props: Props) {
           .flatMap(({ edges }) => edges)
           .map(({ node }) => (
             <Link key={node.handle} href={`/collections/${node.handle}`} className="group flex">
-              <Card className="flex w-full flex-col overflow-hidden border-[#d8a928]/20 bg-white pt-0 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl">
-                <CardHeader className="m-0 overflow-hidden bg-[#fcf5e8] p-0">
+              <Card className="flex w-full flex-col overflow-hidden border-orange-100 bg-white pt-0 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:border-orange-200 group-hover:shadow-xl">
+                <CardHeader className="m-0 overflow-hidden bg-orange-50 p-0">
                   {node.image ? (
                     <Image
                       src={node.image.url as string}
@@ -54,14 +54,14 @@ export function CollectionList(props: Props) {
                       className="aspect-[4/3] h-full w-full object-contain p-3 transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
-                     <div className="flex aspect-[4/3] w-full items-center justify-center bg-[#fcf5e8] text-[#9a8967]">
+                     <div className="flex aspect-[4/3] w-full items-center justify-center bg-orange-50 text-stone-500">
                         No Image
                      </div>
                   )}
                 </CardHeader>
-                <CardFooter className="mt-auto flex items-center justify-between gap-3 border-t border-[#d8a928]/10 p-4">
-                  <h3 className="text-base font-bold text-[#172533]">{titleize(node.title)}</h3>
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#d8a928]/15 text-[#9b6b0c] transition group-hover:bg-[#d8a928] group-hover:text-white">
+                <CardFooter className="mt-auto flex items-center justify-between gap-3 border-t border-orange-100 p-4">
+                  <h3 className="font-serif text-base font-bold text-[#17130d]">{titleize(node.title)}</h3>
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-50 text-orange-500 transition group-hover:bg-orange-500 group-hover:text-white">
                     <ArrowUpRight className="h-4 w-4" />
                   </span>
                 </CardFooter>
@@ -76,7 +76,7 @@ export function CollectionList(props: Props) {
             variant={request.error ? "destructive" : "default"}
             onClick={request.run}
             disabled={request.loading}
-            className="min-w-50"
+            className="min-w-50 rounded-xl bg-orange-500 text-white hover:bg-orange-600"
           >
             {request.loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {request.loading ? "Loading..." : request.error ? "Try Again" : "Load More Collections"}

@@ -41,18 +41,18 @@ export function CollectionProductList(props: Props) {
   if (!products.length) {
     return (
       <section className="mx-auto max-w-3xl px-6 py-16 text-center lg:px-8">
-        <div className="rounded-2xl border border-[#d8a928]/20 bg-white p-10 shadow-sm">
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#b57910]">
+        <div className="rounded-2xl border border-orange-100 bg-white p-10 shadow-sm">
+          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-orange-500">
             Coming Soon
           </p>
-          <h2 className="mt-3 text-2xl font-bold text-[#0a0a0a]">
+          <h2 className="mt-3 font-serif text-2xl font-extrabold text-[#ea580c]">
             Products are being added
           </h2>
-          <p className="mt-3 text-[#5A5E55]">
+          <p className="mt-3 text-stone-600">
             This collection is ready, and products will appear here as soon as
             they are published.
           </p>
-          <Button asChild className="mt-6 rounded-full bg-[#d8a928] text-white hover:bg-[#b57910]">
+          <Button asChild className="mt-6 rounded-xl bg-orange-500 text-white hover:bg-orange-600">
             <Link href="/products">Browse All Products</Link>
           </Button>
         </div>
@@ -61,13 +61,13 @@ export function CollectionProductList(props: Props) {
   }
 
   return (
-    <section className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-16">
+    <section className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
       <div className="mb-8 flex items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#b57910]">Collection products</p>
-          <h2 className="mt-2 text-2xl font-bold text-[#172533] sm:text-3xl">Shop this collection</h2>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-500">Collection products</p>
+          <h2 className="mt-2 font-serif text-2xl font-extrabold text-[#ea580c] sm:text-3xl">Shop this collection</h2>
         </div>
-        <p className="text-sm font-medium text-[#5A5E55]">
+        <p className="text-sm font-medium text-stone-600">
           Showing {products.length} product{products.length === 1 ? "" : "s"}
         </p>
       </div>
@@ -100,7 +100,7 @@ export function CollectionProductList(props: Props) {
             variant={request.error ? "destructive" : "default"}
             onClick={request.run}
             disabled={request.loading}
-            className="min-w-50 cursor-pointer rounded-full"
+            className="min-w-50 cursor-pointer rounded-xl bg-orange-500 text-white hover:bg-orange-600"
           >
             {request.loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {request.loading ? "Loading..." : request.error ? "Try Again" : "Load More Products"}

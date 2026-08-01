@@ -51,7 +51,7 @@ export default async function Page({ params }: Props) {
   const heroImage = collection.image?.url;
 
   return (
-    <main className="min-h-screen bg-[#f5f5f5]">
+    <main className="min-h-screen bg-[#f4f1e8] text-[#17130d]">
       <JsonLd data={[
         breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Collections", path: "/collections" }, { name: collection.title, path: `/collections/${collectionHandle}` }]),
         {
@@ -72,7 +72,7 @@ export default async function Page({ params }: Props) {
           },
         },
       ]} />
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#fff7df] via-[#fcf5e8] to-[#f4e2b7] text-[#172533]">
+      <section className="relative isolate overflow-hidden bg-[#f4f1e8] text-[#17130d]">
         {heroImage && (
           <Image
             src={heroImage}
@@ -80,33 +80,31 @@ export default async function Page({ params }: Props) {
             fill
             priority
             sizes="100vw"
-            className="object-cover opacity-20"
+            className="object-cover opacity-[0.08] grayscale"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#fff7df]/95 via-[#fcf5e8]/85 to-[#f4e2b7]/55" />
-        <div className="absolute -left-20 bottom-0 h-64 w-64 rounded-full bg-[#d8a928]/15 blur-3xl" />
-        <div className="absolute -right-16 top-0 h-72 w-72 rounded-full bg-[#f6a45d]/15 blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_30%,rgba(249,115,22,.14),transparent_40%),linear-gradient(110deg,rgba(244,241,232,.98)_20%,rgba(244,241,232,.78))]" />
 
-        <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
+        <div className="relative mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
           <div className="max-w-3xl">
-            <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#b57910]">
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-orange-400">
               MM Laptop Center Collection
             </p>
-            <h1 className="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
+            <h1 className="mt-4 font-serif text-4xl font-extrabold tracking-normal text-[#ea580c] sm:text-6xl lg:text-7xl">
               {collection.title}
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-[#5A5E55] sm:text-lg">
+            <p className="mt-6 max-w-2xl text-base leading-7 text-stone-600 sm:text-lg">
               {collection.description ||
                 "Explore carefully selected laptops, gaming gear, and accessories from MM Laptop Center."}
             </p>
             <div className="mt-8 flex flex-wrap gap-3 text-sm font-semibold">
-              <span className="rounded-full bg-[#d8a928] px-4 py-2 text-white shadow-sm">
+              <span className="rounded-full bg-orange-500 px-4 py-2 text-white shadow-sm">
                 {productCount} product{productCount === 1 ? "" : "s"}
               </span>
-              <span className="rounded-full bg-white/80 px-4 py-2 text-[#6b4b0b] shadow-sm">
+              <span className="rounded-full border border-orange-100 bg-white/70 px-4 py-2 text-stone-700">
                 Fast local support
               </span>
-              <span className="rounded-full bg-white/80 px-4 py-2 text-[#6b4b0b] shadow-sm">
+              <span className="rounded-full border border-orange-100 bg-white/70 px-4 py-2 text-stone-700">
                 Secure checkout
               </span>
             </div>
