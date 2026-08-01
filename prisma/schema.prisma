@@ -110,7 +110,7 @@ model Order {
   id              String      @id @default(cuid())
   orderNumber     String      @unique
   customerName    String
-  customerEmail   String
+  customerEmail   String?
   customerPhone   String?
   customerAddress Json        // { line1, line2, city, state, pincode, country }
   items           Json        // array of { productId, title, price, quantity, image }
@@ -129,6 +129,8 @@ model Order {
   notes           String?
   trackingNumber  String?
   trackingUrl     String?
+  courierName     String?
+  estimatedDelivery DateTime?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 }

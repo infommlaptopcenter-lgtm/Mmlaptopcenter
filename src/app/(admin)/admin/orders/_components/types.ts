@@ -2,7 +2,7 @@ export type OrderListItem = {
   id: string;
   orderNumber: string;
   customerName: string;
-  customerEmail: string;
+  customerEmail?: string | null;
   customerPhone?: string | null;
   total: number;
   orderStatus: string;
@@ -28,4 +28,6 @@ export type OrderDetail = OrderListItem & {
   notes?: string | null;
   trackingNumber?: string | null;
   trackingUrl?: string | null;
+  courierName?: string | null;
+  estimatedDelivery?: string | null;
 };

@@ -11,7 +11,9 @@ export function useOrderDetail(id?: string) {
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [sendingWhatsApp, setSendingWhatsApp] = useState(false);
   const [whatsAppSuccess, setWhatsAppSuccess] = useState<string | null>(null);
-  const [form, setForm] = useState({ orderStatus: "pending", paymentStatus: "pending", trackingNumber: "", trackingUrl: "", notes: "" });
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [form, setForm] = useState({ orderStatus: "pending", paymentStatus: "pending", trackingNumber: "", trackingUrl: "", courierName: "", estimatedDelivery: "", notes: "" });
 
   useEffect(() => {
     if (!id) return;
@@ -24,7 +26,7 @@ export function useOrderDetail(id?: string) {
         if (!res.ok) throw new Error(data?.error || "Failed to load order");
         if (cancelled) return;
         setOrder(data);
-        setForm({ orderStatus: data.orderStatus ?? "pending", paymentStatus: data.paymentStatus ?? "pending", trackingNumber: data.trackingNumber ?? "", trackingUrl: data.trackingUrl ?? "", notes: data.notes ?? "" });
+        setForm({ orderStatus: data.orderStatus ?? "pending", paymentStatus: data.paymentStatus ?? "pending", trackingNumber: data.trackingNumber ?? "", trackingUrl: data.trackingUrl ?? "", courierName: data.courierName ?? "", estimatedDelivery: data.estimatedDelivery?.slice(0, 10) ?? "", notes: data.notes ?? "" });
       } catch (e: any) {
         if (!cancelled) setError(e?.message || "Failed to load order");
       } finally {
@@ -43,12 +45,26 @@ export function useOrderDetail(id?: string) {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Failed to update order");
       setOrder((o) => (o ? { ...o, ...data } : o));
-      if (data.emailWarning) setError(`Order updated, but ${data.emailWarning}`);
+      setNotice("Order changes saved successfully.");
     } catch (e: any) {
       setError(e?.message || "Failed to update order");
     } finally {
       setSaving(false);
     }
+  }
+
+  async function sendConfirmationEmail() {
+    if (!id || !order?.customerEmail) return;
+    setSendingEmail(true); setError(null); setNotice(null);
+    try {
+      const response = await fetch(`/api/admin/orders/${id}/status`, { method: "POST" });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.error || "Email could not be sent");
+      setOrder((current) => current ? { ...current, confirmationEmailSentAt: data.confirmationEmailSentAt } : current);
+      setNotice(`Confirmation email sent to ${order.customerEmail}.`);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Email could not be sent");
+    } finally { setSendingEmail(false); }
   }
 
   function openCustomerWhatsApp() {
@@ -75,5 +91,5 @@ export function useOrderDetail(id?: string) {
     return false;
   }
 
-  return { loading, saving, error, order, form, setForm, save, sendingWhatsApp, whatsAppSuccess, openCustomerWhatsApp, sendOrderConfirmation };
+  return { loading, saving, sendingEmail, error, notice, order, form, setForm, save, sendConfirmationEmail, sendingWhatsApp, whatsAppSuccess, openCustomerWhatsApp, sendOrderConfirmation };
 }

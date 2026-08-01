@@ -17,6 +17,7 @@ const reqSchema = z.object({
       customerName: z.string().optional(),
       customerPhone: z.string().optional(),
       customerAddress: z.string().optional(),
+      locale: z.enum(["en", "ur"]).optional(),
       expectedField: z.enum(["confirm", "name", "phone", "address"]).optional(),
     })
     .optional(),
@@ -107,8 +108,8 @@ function buildOrderDecisionHtml(productTitle: string, productPrice: number, urdu
   </div>
   <p style="margin:2px 0 0; font-size:14px; color:${C.muted}; line-height:1.6;">${urdu ? "کیا آپ اس پراڈکٹ کا آرڈر جاری رکھنا چاہتے ہیں؟" : "Would you like to continue with this order?"}</p>
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-    <button type="button" data-chat-reply="confirm order" style="border:0; border-radius:10px; padding:11px; background:#25a244; color:white; font-size:13px; font-weight:700; cursor:pointer;">${urdu ? "آرڈر کی تصدیق" : "Confirm Order"}</button>
-    <button type="button" data-chat-reply="cancel order" style="border:1px solid #dc2626; border-radius:10px; padding:11px; background:white; color:#dc2626; font-size:13px; font-weight:700; cursor:pointer;">${urdu ? "آرڈر منسوخ کریں" : "Cancel Order"}</button>
+    <button type="button" data-chat-reply="${urdu ? "آرڈر کی تصدیق" : "confirm order"}" style="border:0; border-radius:10px; padding:11px; background:#25a244; color:white; font-size:13px; font-weight:700; cursor:pointer;">${urdu ? "آرڈر کی تصدیق" : "Confirm Order"}</button>
+    <button type="button" data-chat-reply="${urdu ? "آرڈر منسوخ کریں" : "cancel order"}" style="border:1px solid #dc2626; border-radius:10px; padding:11px; background:white; color:#dc2626; font-size:13px; font-weight:700; cursor:pointer;">${urdu ? "آرڈر منسوخ کریں" : "Cancel Order"}</button>
   </div>
 </div>`;
 }
@@ -121,25 +122,25 @@ function buildNameHtml(urdu = false): string {
   </div>`;
 }
 
-function buildPhoneHtml(name: string): string {
+function buildPhoneHtml(name: string, urdu = false): string {
   return `
 <div style="display:flex; flex-direction:column; gap:12px;">
   <p style="margin:0; font-size:14px; color:${C.muted}; line-height:1.6;">
-    Thanks, <strong style="color:${C.text};">${name}</strong>! Lovely name 😊 One step done!
+    ${urdu ? `شکریہ، <strong style="color:${C.text};">${name}</strong>! پہلا مرحلہ مکمل ہوگیا۔` : `Thanks, <strong style="color:${C.text};">${name}</strong>! One step is complete.`}
   </p>
   ${orderStepBar(1)}
-  ${inputPrompt("📱", "Your WhatsApp / Phone Number?", "e.g. 0300-1234567 — we'll send order updates here")}
+  ${inputPrompt("📱", urdu ? "آپ کا واٹس ایپ یا فون نمبر؟" : "Your WhatsApp / Phone Number?", urdu ? "مثال: 0300-1234567" : "e.g. 0300-1234567 — we'll send order updates here")}
 </div>`;
 }
 
-function buildAddressHtml(name: string): string {
+function buildAddressHtml(name: string, urdu = false): string {
   return `
 <div style="display:flex; flex-direction:column; gap:12px;">
   <p style="margin:0; font-size:14px; color:${C.muted}; line-height:1.6;">
-    Almost there, <strong style="color:${C.text};">${name}</strong>! 🚚 Just the delivery address and we're done!
+    ${urdu ? `بس آخری مرحلہ، <strong style="color:${C.text};">${name}</strong>! اپنا ڈیلیوری ایڈریس بتائیں۔` : `Almost there, <strong style="color:${C.text};">${name}</strong>! Just the delivery address is left.`}
   </p>
   ${orderStepBar(2)}
-  ${inputPrompt("📍", "Your Full Delivery Address?", "Include city, area, and street — so we deliver right to your door!")}
+  ${inputPrompt("📍", urdu ? "آپ کا مکمل ڈیلیوری ایڈریس؟" : "Your Full Delivery Address?", urdu ? "شہر، علاقہ اور گلی شامل کریں۔" : "Include city, area, and street — so we can deliver to your door")}
 </div>`;
 }
 
@@ -306,6 +307,8 @@ export async function POST(request: Request) {
     const text = body.message.trim();
     const lower = text.toLowerCase();
     let draftOrder = body.draftOrder || {};
+    const isUrdu = /[\u0600-\u06ff]/.test(text) || /\burdu\b/i.test(text);
+    const respondInUrdu = isUrdu || draftOrder.locale === "ur";
     const shouldShowContactDetails =
       /\b(contact|address|location|phone|number|email|facebook|instagram|tiktok|youtube|social media|whatsapp channel|where.*shop|find you|follow you|goodbye|bye|thanks|thank you|that.*all)\b/i.test(
         lower
@@ -318,19 +321,69 @@ export async function POST(request: Request) {
 
     if (socialMediaIntent) {
       return NextResponse.json({
-        reply: "Follow MM Laptop Center on social media using the buttons below.",
-        replyHtml: `<p style="font-size:14px; color:${C.muted}; line-height:1.65; margin:0;">Follow MM Laptop Center for new products, offers, and helpful updates.</p>${contactDetailsHtml()}`,
+        reply: respondInUrdu
+          ? "نیچے دیے گئے بٹنوں سے ایم ایم لیپ ٹاپ سینٹر کو فالو کریں۔"
+          : "Follow MM Laptop Center on social media using the buttons below.",
+        replyHtml: `<p style="font-size:14px; color:${C.muted}; line-height:1.65; margin:0;">${respondInUrdu ? "نئی مصنوعات، آفرز اور مفید معلومات کے لیے ایم ایم لیپ ٹاپ سینٹر کو فالو کریں۔" : "Follow MM Laptop Center for new products, offers, and helpful updates."}</p>${contactDetailsHtml()}`,
         draftOrder,
         intent: "contact",
       });
     }
 
     // ── Order State Machine ──────────────────────────────────────────────────
+    const cancelIntent =
+      /\b(cancel|stop|no|nope|not now|don'?t want|do not want|don'?t order|do not order|change product)\b/i.test(
+        lower
+      ) || /نہیں|منسوخ|آرڈر نہیں/.test(text);
+
+    if (draftOrder.expectedField && cancelIntent) {
+      draftOrder = {};
+      return NextResponse.json({
+        reply: respondInUrdu
+          ? "ٹھیک ہے، آرڈر منسوخ کر دیا گیا ہے۔"
+          : "No problem—your order has been cancelled.",
+        replyHtml: `<p style="font-size:14px; color:${C.muted}; line-height:1.65; margin:0;">${respondInUrdu ? "ٹھیک ہے، آرڈر منسوخ کر دیا گیا ہے۔ جب چاہیں کوئی دوسرا پراڈکٹ دیکھ سکتے ہیں۔" : "No problem—your order has been cancelled. You can browse another product whenever you're ready."}</p>`,
+        draftOrder,
+        intent: "order_cancelled",
+      });
+    }
+
+    if (draftOrder.expectedField === "confirm") {
+      const confirmIntent =
+        /\b(confirm|yes|proceed|continue|place order|confirm order)\b/i.test(lower) ||
+        /ہاں|تصدیق|جاری/.test(text);
+
+      if (confirmIntent) {
+        draftOrder = { ...draftOrder, expectedField: "name" };
+        return NextResponse.json({
+          reply: respondInUrdu
+            ? "براہ کرم اپنا پورا نام بتائیں۔"
+            : "Please share your full name.",
+          replyHtml: buildNameHtml(respondInUrdu),
+          draftOrder,
+          intent: "order",
+        });
+      }
+
+      return NextResponse.json({
+        reply: respondInUrdu
+          ? "براہ کرم آرڈر کی تصدیق یا منسوخی کا بٹن منتخب کریں۔"
+          : "Please choose Confirm Order or Cancel Order.",
+        replyHtml: buildOrderDecisionHtml(
+          draftOrder.productTitle || "Selected product",
+          draftOrder.productPrice || 0,
+          respondInUrdu
+        ),
+        draftOrder,
+        intent: "order_confirmation",
+      });
+    }
+
     if (draftOrder.expectedField === "name") {
       draftOrder = { ...draftOrder, customerName: text, expectedField: "phone" };
       return NextResponse.json({
-        reply: `Thanks ${text}! Now please share your phone number.`,
-        replyHtml: buildPhoneHtml(text),
+        reply: respondInUrdu ? `شکریہ ${text}! اب اپنا فون نمبر بتائیں۔` : `Thanks ${text}! Now please share your phone number.`,
+        replyHtml: buildPhoneHtml(text, respondInUrdu),
         draftOrder,
         intent: "order",
       });
@@ -339,8 +392,8 @@ export async function POST(request: Request) {
     if (draftOrder.expectedField === "phone") {
       draftOrder = { ...draftOrder, customerPhone: text, expectedField: "address" };
       return NextResponse.json({
-        reply: "Got it! Last step — what's your delivery address?",
-        replyHtml: buildAddressHtml(draftOrder.customerName || "there"),
+        reply: respondInUrdu ? "آخری مرحلہ—اپنا ڈیلیوری ایڈریس بتائیں۔" : "Got it! Last step — what's your delivery address?",
+        replyHtml: buildAddressHtml(draftOrder.customerName || "there", respondInUrdu),
         draftOrder,
         intent: "order",
       });
@@ -350,7 +403,7 @@ export async function POST(request: Request) {
       draftOrder = { ...draftOrder, customerAddress: text, expectedField: undefined };
       if (draftOrder.productId && draftOrder.customerName && draftOrder.customerPhone) {
         return NextResponse.json({
-          reply: "Order placed! Our team will confirm via WhatsApp shortly.",
+          reply: respondInUrdu ? "آرڈر مکمل ہوگیا! ہماری ٹیم جلد واٹس ایپ پر تصدیق کرے گی۔" : "Order placed! Our team will confirm via WhatsApp shortly.",
           replyHtml: buildOrderConfirmHtml(draftOrder),
           draftOrder,
           intent: "order_confirm",
@@ -360,7 +413,12 @@ export async function POST(request: Request) {
     }
 
     // ── Buy Intent ───────────────────────────────────────────────────────────
-    const buyIntent = /\b(buy|order|purchase|place order|book|i want|want to order)\b/i.test(lower);
+    const negativeBuyIntent =
+      /\b(don'?t|do not|not|cancel|no)\b.{0,24}\b(buy|order|purchase|book|want)\b/i.test(lower);
+    const buyIntent =
+      !negativeBuyIntent &&
+      (/\b(buy|order|purchase|place order|book|i want|want to order)\b/i.test(lower) ||
+        /خرید|آرڈر/.test(text));
 
     if (buyIntent) {
       const products = await prisma.product.findMany({
@@ -380,11 +438,14 @@ export async function POST(request: Request) {
           productId: selected.id,
           productTitle: selected.title,
           productPrice: selected.price,
-          expectedField: "name",
+          locale: isUrdu ? "ur" : "en",
+          expectedField: "confirm",
         };
         return NextResponse.json({
-          reply: `Awesome! Let's place your order for ${selected.title}. What's your name?`,
-          replyHtml: buildOrderStartHtml(selected.title, selected.price),
+          reply: respondInUrdu
+            ? `${selected.title} کا آرڈر جاری رکھنا ہے یا منسوخ کرنا ہے؟`
+            : `Would you like to confirm or cancel the order for ${selected.title}?`,
+          replyHtml: buildOrderDecisionHtml(selected.title, selected.price, respondInUrdu),
           draftOrder,
           intent: "order",
           recommendations: products.map((p) => ({

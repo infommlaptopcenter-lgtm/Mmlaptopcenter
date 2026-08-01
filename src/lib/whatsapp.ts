@@ -14,11 +14,8 @@ export const ADMIN_WHATSAPP_NUMBER = "923234567890";
  */
 export function isValidWhatsAppNumber(phone: string): boolean {
   if (!phone) return false;
-  // Remove spaces, dashes, and parentheses
   const cleaned = phone.replace(/[\s\-\(\)]/g, "");
-  // Should be 10-15 digits, optionally starting with +
-  const phoneRegex = /^\+?[0-9]{10,15}$/;
-  return phoneRegex.test(cleaned);
+  return /^(?:\+92|0092|92|0)?3\d{9}$/.test(cleaned);
 }
 
 /**
@@ -69,7 +66,7 @@ export interface Order {
   id: string;
   orderNumber: string;
   customerName: string;
-  customerEmail: string;
+  customerEmail?: string | null;
   customerPhone?: string | null;
   customerAddress?: OrderAddress;
   items?: OrderItem[];
@@ -82,6 +79,10 @@ export interface Order {
   paymentStatus?: string;
   orderStatus?: string;
   createdAt?: string;
+  trackingNumber?: string | null;
+  trackingUrl?: string | null;
+  courierName?: string | null;
+  estimatedDelivery?: string | null;
 }
 
 /**
@@ -98,6 +99,9 @@ export function buildOrderConfirmationMessage(order: Order): string {
   const addressStr = [address.line1, address.line2, address.city, address.state, address.pincode]
     .filter(Boolean)
     .join(", ");
+  const tracking = order.trackingNumber
+    ? `\n*Courier:* ${order.courierName || "Delivery partner"}\n*Tracking ID:* ${order.trackingNumber}${order.trackingUrl ? `\n*Track:* ${order.trackingUrl}` : ""}${order.estimatedDelivery ? `\n*Estimated delivery:* ${new Date(order.estimatedDelivery).toLocaleDateString("en-PK")}` : ""}\n`
+    : "";
 
   return `Assalam-o-Alaikum ${order.customerName}! 🌿
 
@@ -113,6 +117,7 @@ ${addressStr}
 
 *Payment:* ${order.paymentMethod?.replaceAll("_", " ").toUpperCase() || "N/A"}
 *Order Status:* ${order.orderStatus || "confirmed"}
+${tracking}
 
 We're preparing your order for dispatch. You'll receive tracking updates soon.
 

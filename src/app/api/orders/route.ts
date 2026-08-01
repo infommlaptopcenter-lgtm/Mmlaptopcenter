@@ -5,8 +5,8 @@ import { calculateOrderPricing } from "@/lib/order-pricing";
 
 const orderCreateSchema = z.object({
   customerName: z.string().min(1),
-  customerEmail: z.string().email(),
-  customerPhone: z.string().min(10, "Phone number is required and must be at least 10 digits"),
+  customerEmail: z.union([z.string().email(), z.literal("")]).optional(),
+  customerPhone: z.string().trim().regex(/^(?:\+92|0092|92|0)?3\d{9}$/, "Enter a valid Pakistani mobile or WhatsApp number"),
   customerAddress: z.object({
     line1: z.string().min(1),
     line2: z.string().optional(),
@@ -124,7 +124,7 @@ export async function POST(request: Request) {
         data: {
           orderNumber,
           customerName: input.customerName,
-          customerEmail: input.customerEmail,
+          customerEmail: input.customerEmail || null,
           customerPhone: input.customerPhone,
           customerAddress: input.customerAddress,
           items: enrichedItems,

@@ -30,7 +30,7 @@ function OrderRow({ order }: { order: OrderListItem }) {
   return (
     <tr className="hover:bg-gray-50">
       <td className="px-2 py-2 text-sm font-medium md:px-4 md:py-3">{order.orderNumber}</td>
-      <td className="px-2 py-2 text-xs md:px-4 md:py-3 md:text-sm">{order.customerName}</td>
+      <td className="px-2 py-2 text-xs md:px-4 md:py-3 md:text-sm"><div className="font-semibold text-gray-900">{order.customerName}</div><div className="max-w-44 truncate text-xs text-gray-500">{order.customerPhone || order.customerEmail || "No contact"}</div></td>
       <td className="px-2 py-2 text-xs md:px-4 md:py-3"><div>{order.paymentMethod.replaceAll("_", " ")}</div><div className="text-gray-500">{order.paymentStatus}</div></td>
       <td className="px-2 py-2 md:px-4 md:py-3"><span className={`inline-flex rounded-full px-1.5 py-0.5 text-xs font-medium ${statusColors[order.orderStatus] || "bg-gray-100 text-gray-700"}`}>{order.orderStatus}</span></td>
       <td className="px-2 py-2 text-right text-xs font-medium md:px-4 md:py-3 md:text-sm">Rs. {order.total.toLocaleString()}</td>

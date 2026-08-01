@@ -11,7 +11,8 @@ type DraftOrder = {
   customerName?: string;
   customerPhone?: string;
   customerAddress?: string;
-  expectedField?: "name" | "phone" | "address";
+  locale?: "en" | "ur";
+  expectedField?: "confirm" | "name" | "phone" | "address";
 };
 
 export function ChatPopup({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -129,7 +130,13 @@ export function ChatPopup({ open, onClose }: { open: boolean; onClose: () => voi
       </div>
       <div className="max-h-[420px] space-y-3 overflow-y-auto p-3">
         {messages.map((m, idx) => (
-          <MessageBubble key={`${idx}-${m.role}`} role={m.role} text={m.content} html={m.html} />
+          <MessageBubble
+            key={`${idx}-${m.role}`}
+            role={m.role}
+            text={m.content}
+            html={m.html}
+            onQuickReply={send}
+          />
         ))}
         {typing ? <MessageBubble role="assistant" text="Typing..." /> : null}
         <div ref={bottomRef} />

@@ -7,7 +7,7 @@ import { requireAdmin } from "@/lib/admin-auth";
 const orderSchema = z.object({
   orderNumber: z.string().min(1),
   customerName: z.string().min(1),
-  customerEmail: z.string().email(),
+  customerEmail: z.union([z.string().email(), z.literal("")]).optional(),
   customerPhone: z.string().optional(),
   customerAddress: z.any(),
   items: z.any(),

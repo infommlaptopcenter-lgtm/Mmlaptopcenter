@@ -8,10 +8,12 @@ export function MessageBubble({
   role,
   text,
   html,
+  onQuickReply,
 }: {
   role: "user" | "assistant";
   text: string;
   html?: string;
+  onQuickReply?: (message: string) => void;
 }) {
   const user = role === "user";
   const safeHtml = html ? DOMPurify.sanitize(html) : "";
@@ -19,6 +21,14 @@ export function MessageBubble({
 
   const handleClick = async (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
+    const quickReply = target.closest<HTMLElement>("[data-chat-reply]");
+    if (quickReply) {
+      e.preventDefault();
+      const message = quickReply.getAttribute("data-chat-reply");
+      if (message) onQuickReply?.(message);
+      return;
+    }
+
     const externalLink = target.closest<HTMLAnchorElement>("a[href]");
     if (externalLink && /^https?:\/\//i.test(externalLink.href)) {
       e.preventDefault();
