@@ -46,16 +46,15 @@ export function TopBrandsSection() {
         <SectionHeading
           eyebrow="Top Brands"
           title="Shop Your Favourite Brands"
-          description="Explore trusted technology from the world's leading brands."
-          action={(
-            <Link
-              href="/products"
-              className="inline-flex h-11 items-center justify-center whitespace-nowrap rounded-md bg-[#f47b20] px-5 text-sm font-bold text-white transition-colors hover:bg-[#ea580c]"
-            >
-              Explore Products
-            </Link>
-          )}
         />
+        <div className="mt-4 flex justify-center">
+          <Link
+            href="/products"
+            className="inline-flex h-11 items-center justify-center whitespace-nowrap rounded-md bg-[#f47b20] px-5 text-sm font-bold text-white transition-colors hover:bg-[#ea580c]"
+          >
+            Explore Products
+          </Link>
+        </div>
       </div>
 
       <div className="relative left-1/2 mt-9 w-screen -translate-x-1/2 overflow-hidden">
