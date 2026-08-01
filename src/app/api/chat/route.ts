@@ -58,6 +58,23 @@ const inputPrompt = (icon: string, label: string, hint: string) =>
     <div style="font-size:12px; color:${C.muted};">${hint}</div>
   </div>`;
 
+const contactDetailsHtml = () => `
+<div style="margin-top:12px; border:1px solid ${C.border}; border-radius:14px; overflow:hidden; background:${C.white};">
+  <div style="background:${C.goldLight}; padding:10px 12px; font-size:12px; font-weight:700; color:${C.text};">Stay connected with MM Laptop Center</div>
+  <div style="padding:10px 12px; font-size:12px; line-height:1.7; color:${C.muted};">
+    <div><strong style="color:${C.text};">Shop:</strong> Sardheri Bazar, Charsadda Mardan Road, KPK, Pakistan</div>
+    <div><strong style="color:${C.text};">Phone / WhatsApp:</strong> <a href="https://wa.me/923048928282" target="_blank" style="color:${C.green}; font-weight:600; text-decoration:none;">+92 304 8928282</a></div>
+    <div><strong style="color:${C.text};">Email:</strong> <a href="mailto:info.mmlaptopcenter@gmail.com" style="color:${C.green}; font-weight:600; text-decoration:none;">info.mmlaptopcenter@gmail.com</a></div>
+    <div style="margin-top:7px; display:flex; flex-wrap:wrap; gap:6px;">
+      <a href="https://www.facebook.com/profile.php?id=61567513306151" target="_blank" style="color:#1877f2; font-weight:700; text-decoration:none;">Facebook</a><span>•</span>
+      <a href="https://www.instagram.com/mmlaptopcenter1/" target="_blank" style="color:#c13584; font-weight:700; text-decoration:none;">Instagram</a><span>•</span>
+      <a href="https://www.tiktok.com/@mmlaptopcenter" target="_blank" style="color:${C.text}; font-weight:700; text-decoration:none;">TikTok</a><span>•</span>
+      <a href="https://www.youtube.com/@MMLaptopCenter-CHD" target="_blank" style="color:#ff0000; font-weight:700; text-decoration:none;">YouTube</a><span>•</span>
+      <a href="https://whatsapp.com/channel/0029VbCLX9N7dmeW21o56l0b" target="_blank" style="color:#128c7e; font-weight:700; text-decoration:none;">WhatsApp Channel</a>
+    </div>
+  </div>
+</div>`;
+
 const orderStepBar = (active: 0 | 1 | 2) => {
   const steps = ["Your Name", "Phone Number", "Delivery Address"];
   const dots = steps
@@ -147,6 +164,7 @@ function buildOrderConfirmHtml(draft: {
     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.195.194 1.628.122.602-.1 1.64-.641 1.87-1.26.173-.423.233-.724.233-.989 0-.213-.01-.402-.01-.548z"/></svg>
     Confirm on WhatsApp
   </a>
+  ${contactDetailsHtml()}
 </div>`;
 }
 
@@ -246,11 +264,18 @@ KEY PRODUCTS:
 - Chargers → laptop power adapters, USB-C chargers, universal chargers  
 - Keyboards & Mouse → wireless, mechanical, ergonomic options
 
-CONTACT INFORMATION (share when asked):
-- Address: Sardri Bazar Charsadda Mardan Road KPK Pakistan | All Pakistan delivery available
+CONTACT AND SOCIAL INFORMATION (answer accurately whenever asked):
+- Shop address: Sardheri Bazar, Charsadda Mardan Road, KPK, Pakistan
+- Delivery: Available across Pakistan
 - Phone: +92 304 8928282
-- Email: info@mmlaptopcenter.com
-- Founder: Mudasser Meer
+- WhatsApp chat: https://wa.me/923048928282
+- Email: info.mmlaptopcenter@gmail.com
+- Founder: Mudassir Meer
+- Facebook: https://www.facebook.com/profile.php?id=61567513306151
+- Instagram: https://www.instagram.com/mmlaptopcenter1/
+- TikTok: https://www.tiktok.com/@mmlaptopcenter
+- YouTube: https://www.youtube.com/@MMLaptopCenter-CHD
+- WhatsApp Channel: https://whatsapp.com/channel/0029VbCLX9N7dmeW21o56l0b
 
 RULES:
 - Never dump all products unless asked — ask what problem they want to solve first
@@ -273,6 +298,10 @@ export async function POST(request: Request) {
     const text = body.message.trim();
     const lower = text.toLowerCase();
     let draftOrder = body.draftOrder || {};
+    const shouldShowContactDetails =
+      /\b(contact|address|location|phone|number|email|facebook|instagram|tiktok|youtube|social media|whatsapp channel|where.*shop|find you|follow you|goodbye|bye|thanks|thank you|that.*all)\b/i.test(
+        lower
+      );
 
     // ── Order State Machine ──────────────────────────────────────────────────
     if (draftOrder.expectedField === "name") {
@@ -375,7 +404,8 @@ export async function POST(request: Request) {
         reply: "Ask me about laptops, MacBooks, or accessories!",
         replyHtml: `
           <p style="font-size:14px; color:${C.muted}; line-height:1.65; margin:0 0 8px;">I'm here to help you find the perfect laptop! 💻</p>
-          <p style="font-size:14px; color:${C.text}; margin:0;">Ask me about ${hl("Laptops")}, ${hl("MacBooks")}, or our ${hl("Accessories")} — or say <span style="color:${C.gold}; font-weight:600;">"show me products"</span> to browse!</p>`,
+          <p style="font-size:14px; color:${C.text}; margin:0;">Ask me about ${hl("Laptops")}, ${hl("MacBooks")}, or our ${hl("Accessories")} — or say <span style="color:${C.gold}; font-weight:600;">"show me products"</span> to browse!</p>
+          ${shouldShowContactDetails ? contactDetailsHtml() : ""}`,
         draftOrder,
       });
     }
@@ -429,7 +459,7 @@ export async function POST(request: Request) {
     const replyHtml =
       aiWantsProducts && products.length > 0
         ? aiHtml + buildProductCards(products)
-        : aiHtml;
+        : aiHtml + (shouldShowContactDetails ? contactDetailsHtml() : "");
 
     return NextResponse.json({
       reply: aiHtml.replace(/<[^>]*>/g, ""),
