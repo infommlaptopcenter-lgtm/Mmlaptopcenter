@@ -17,7 +17,7 @@ const reqSchema = z.object({
       customerName: z.string().optional(),
       customerPhone: z.string().optional(),
       customerAddress: z.string().optional(),
-      expectedField: z.enum(["name", "phone", "address"]).optional(),
+      expectedField: z.enum(["confirm", "name", "phone", "address"]).optional(),
     })
     .optional(),
 });
@@ -65,12 +65,12 @@ const contactDetailsHtml = () => `
     <div><strong style="color:${C.text};">Shop:</strong> Sardheri Bazar, Charsadda Mardan Road, KPK, Pakistan</div>
     <div><strong style="color:${C.text};">Phone / WhatsApp:</strong> <a href="https://wa.me/923048928282" target="_blank" rel="noopener noreferrer" style="color:${C.green}; font-weight:600; text-decoration:none;">+92 304 8928282</a></div>
     <div><strong style="color:${C.text};">Email:</strong> <a href="mailto:info.mmlaptopcenter@gmail.com" target="_blank" rel="noopener noreferrer" style="color:${C.green}; font-weight:600; text-decoration:none;">info.mmlaptopcenter@gmail.com</a></div>
-    <div style="margin-top:7px; display:flex; flex-wrap:wrap; gap:6px;">
-      <a href="https://www.facebook.com/profile.php?id=61567513306151" target="_blank" rel="noopener noreferrer" style="color:#1877f2; font-weight:700; text-decoration:none;">Facebook</a><span>•</span>
-      <a href="https://www.instagram.com/mmlaptopcenter1/" target="_blank" rel="noopener noreferrer" style="color:#c13584; font-weight:700; text-decoration:none;">Instagram</a><span>•</span>
-      <a href="https://www.tiktok.com/@mmlaptopcenter" target="_blank" rel="noopener noreferrer" style="color:${C.text}; font-weight:700; text-decoration:none;">TikTok</a><span>•</span>
-      <a href="https://www.youtube.com/@MMLaptopCenter-CHD" target="_blank" rel="noopener noreferrer" style="color:#ff0000; font-weight:700; text-decoration:none;">YouTube</a><span>•</span>
-      <a href="https://whatsapp.com/channel/0029VbCLX9N7dmeW21o56l0b" target="_blank" rel="noopener noreferrer" style="color:#128c7e; font-weight:700; text-decoration:none;">WhatsApp Channel</a>
+    <div style="margin-top:10px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px;">
+      <a href="https://www.facebook.com/profile.php?id=61567513306151" target="_blank" rel="noopener noreferrer" style="border-radius:9px; background:#1877f2; color:white; padding:8px 10px; text-align:center; font-weight:700; text-decoration:none;">Facebook</a>
+      <a href="https://www.instagram.com/mmlaptopcenter1/" target="_blank" rel="noopener noreferrer" style="border-radius:9px; background:#c13584; color:white; padding:8px 10px; text-align:center; font-weight:700; text-decoration:none;">Instagram</a>
+      <a href="https://www.tiktok.com/@mmlaptopcenter" target="_blank" rel="noopener noreferrer" style="border-radius:9px; background:#17130d; color:white; padding:8px 10px; text-align:center; font-weight:700; text-decoration:none;">TikTok</a>
+      <a href="https://www.youtube.com/@MMLaptopCenter-CHD" target="_blank" rel="noopener noreferrer" style="border-radius:9px; background:#ff0000; color:white; padding:8px 10px; text-align:center; font-weight:700; text-decoration:none;">YouTube</a>
+      <a href="https://whatsapp.com/channel/0029VbCLX9N7dmeW21o56l0b" target="_blank" rel="noopener noreferrer" style="grid-column:1/-1; border-radius:9px; background:#25d366; color:white; padding:8px 10px; text-align:center; font-weight:700; text-decoration:none;">Follow WhatsApp Channel</a>
     </div>
   </div>
 </div>`;
@@ -97,7 +97,7 @@ const orderStepBar = (active: 0 | 1 | 2) => {
 
 // ─── Order HTML Builders ───────────────────────────────────────────────────────
 
-function buildOrderStartHtml(productTitle: string, productPrice: number): string {
+function buildOrderDecisionHtml(productTitle: string, productPrice: number, urdu = false): string {
   return `
 <div style="display:flex; flex-direction:column; gap:12px;">
   <div style="background:${C.greenLight}; border-radius:14px; padding:14px 16px;">
@@ -105,13 +105,20 @@ function buildOrderStartHtml(productTitle: string, productPrice: number): string
     ${infoRow("Product", `<span style="color:${C.green}; font-weight:700;">${productTitle}</span>`)}
     ${infoRow("Price", priceTag(productPrice))}
   </div>
-  ${divider()}
-  ${orderStepBar(0)}
-  <p style="margin:4px 0 0; font-size:14px; color:${C.muted}; line-height:1.6;">
-    Great choice! Let's get this shipped to you. I just need a few quick details 😊
-  </p>
-  ${inputPrompt("👤", "What's your full name?", "e.g. Ahmed Khan — so we can personalize your order")}
+  <p style="margin:2px 0 0; font-size:14px; color:${C.muted}; line-height:1.6;">${urdu ? "کیا آپ اس پراڈکٹ کا آرڈر جاری رکھنا چاہتے ہیں؟" : "Would you like to continue with this order?"}</p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+    <button type="button" data-chat-reply="confirm order" style="border:0; border-radius:10px; padding:11px; background:#25a244; color:white; font-size:13px; font-weight:700; cursor:pointer;">${urdu ? "آرڈر کی تصدیق" : "Confirm Order"}</button>
+    <button type="button" data-chat-reply="cancel order" style="border:1px solid #dc2626; border-radius:10px; padding:11px; background:white; color:#dc2626; font-size:13px; font-weight:700; cursor:pointer;">${urdu ? "آرڈر منسوخ کریں" : "Cancel Order"}</button>
+  </div>
 </div>`;
+}
+
+function buildNameHtml(urdu = false): string {
+  return `<div style="display:flex; flex-direction:column; gap:12px;">
+    ${orderStepBar(0)}
+    <p style="margin:0; font-size:14px; color:${C.muted}; line-height:1.6;">${urdu ? "بہترین! آرڈر مکمل کرنے کے لیے چند تفصیلات درکار ہیں۔" : "Great! I just need a few details to complete your order."}</p>
+    ${inputPrompt("👤", urdu ? "آپ کا پورا نام؟" : "What's your full name?", urdu ? "مثال: احمد خان" : "e.g. Ahmed Khan")}
+  </div>`;
 }
 
 function buildPhoneHtml(name: string): string {
@@ -239,6 +246,7 @@ PERSONALITY:
 - Warm, confident, short replies (2–4 sentences max)
 - Ask ONE question at a time to understand the user's need
 - Use the user's name if you know it
+- If the user writes in Urdu, uses Urdu script, or asks for Urdu, reply naturally in Urdu. Do not mix English unless a product name requires it.
 
 RESPONSE FORMAT — Return ONLY valid HTML. No markdown. No backtick blocks. No preamble.
 
@@ -302,6 +310,20 @@ export async function POST(request: Request) {
       /\b(contact|address|location|phone|number|email|facebook|instagram|tiktok|youtube|social media|whatsapp channel|where.*shop|find you|follow you|goodbye|bye|thanks|thank you|that.*all)\b/i.test(
         lower
       );
+
+    const socialMediaIntent =
+      /\b(social|facebook|instagram|tiktok|youtube|whatsapp channel|follow.*(page|channel|us)|social media links?)\b/i.test(
+        lower
+      );
+
+    if (socialMediaIntent) {
+      return NextResponse.json({
+        reply: "Follow MM Laptop Center on social media using the buttons below.",
+        replyHtml: `<p style="font-size:14px; color:${C.muted}; line-height:1.65; margin:0;">Follow MM Laptop Center for new products, offers, and helpful updates.</p>${contactDetailsHtml()}`,
+        draftOrder,
+        intent: "contact",
+      });
+    }
 
     // ── Order State Machine ──────────────────────────────────────────────────
     if (draftOrder.expectedField === "name") {
