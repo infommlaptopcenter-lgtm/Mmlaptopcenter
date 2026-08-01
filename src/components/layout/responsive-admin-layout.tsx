@@ -46,6 +46,7 @@ const navItems = [
   { href: "/admin/inquiries", icon: FiMessageSquare, label: "Inquiries" },
   { href: "/admin/blog", icon: FiFileText, label: "Blog" },
   { href: "/admin/videos", icon: FiVideo, label: "Videos" },
+  { href: "/admin/legal-pages", icon: FiFileText, label: "Legal Pages" },
   { href: "/admin/homepage/section-management", icon: FiHome, label: "Homepage Sections" },
   { href: "/admin/media", icon: FiImage, label: "Media" },
   { href: "/admin/settings", icon: FiSettings, label: "Settings" },
@@ -190,6 +191,7 @@ export function AdminMobileHeader({ admin }: { admin: any }) {
     if (pathname?.startsWith("/admin/orders")) return "Orders";
     if (pathname?.startsWith("/admin/inquiries")) return "Inquiries";
     if (pathname?.startsWith("/admin/blog")) return "Blog";
+    if (pathname?.startsWith("/admin/legal-pages")) return "Legal Pages";
     if (pathname?.startsWith("/admin/media")) return "Media";
     if (pathname?.startsWith("/admin/settings")) return "Settings";
     if (pathname?.startsWith("/admin/profile")) return "Profile";

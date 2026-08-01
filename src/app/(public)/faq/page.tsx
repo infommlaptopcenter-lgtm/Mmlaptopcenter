@@ -1,4 +1,6 @@
-import { FaqPageContent } from "./_components/faq-page-content";
+import { FaqList } from "./_components/faq-list";
+import { LegalPageShell } from "../_components/legal-page-shell";
+import { getLegalPage } from "@/lib/legal-pages";
 import { JsonLd } from "@/components/seo/json-ld";
 import { breadcrumbSchema, createSeoMetadata } from "@/lib/seo";
 
@@ -9,15 +11,11 @@ export const metadata = createSeoMetadata({
   keywords: ["Laptop FAQ Pakistan", "Buy Laptop Pakistan", "Laptop warranty Pakistan"],
 });
 
-const faqItems = [
-  ["What types of laptops do you sell?", "We stock Apple MacBooks, business laptops, gaming laptops, and premium accessories from trusted brands such as Dell, HP, Lenovo, ASUS, and Apple."],
-  ["Are your devices tested before sale?", "Yes. Each laptop is inspected for battery health, keyboard responsiveness, display quality, ports, and charging performance before listing."],
-  ["Do you offer warranty support?", "We provide warranty-backed support for eligible products and help with after-sales questions related to setup, repairs, and replacement concerns."],
-  ["Do you deliver across Pakistan?", "Yes. We ship to customers across Pakistan and also assist with pickup and delivery coordination where available."],
-  ["Do you sell accessories too?", "Yes. We stock chargers, laptop bags, mice, keyboards, USB-C hubs, storage, memory, and other laptop accessories."],
-];
+export const dynamic = "force-dynamic";
 
-export default function FAQPage() {
+export default async function FAQPage() {
+  const page = await getLegalPage("faq");
+  const faqItems = page.faqs ?? [];
   return (
     <>
       <JsonLd data={[
@@ -25,14 +23,14 @@ export default function FAQPage() {
         {
           "@context": "https://schema.org",
           "@type": "FAQPage",
-          mainEntity: faqItems.map(([question, answer]) => ({
+          mainEntity: faqItems.map(({ question, answer }) => ({
             "@type": "Question",
             name: question,
             acceptedAnswer: { "@type": "Answer", text: answer },
           })),
         },
       ]} />
-      <FaqPageContent />
+      <LegalPageShell page={page}><FaqList items={faqItems} /></LegalPageShell>
     </>
   );
 }

@@ -1,32 +1,15 @@
-import { getPolicyContent } from "@/lib/site-settings";
+import { getLegalPage, type LegalPageSlug } from "@/lib/legal-pages";
+import { LegalPageShell, PolicySections } from "../../_components/legal-page-shell";
 
 export const dynamic = "force-dynamic";
 
 interface PolicyPageContentProps {
-  keyName: "privacyPolicy" | "termsOfService" | "refundPolicy";
-  title: string;
-  fallbackBody: string;
+  slug: Exclude<LegalPageSlug, "faq">;
 }
 
 export async function PolicyPageContent({
-  keyName,
-  title,
-  fallbackBody,
+  slug,
 }: PolicyPageContentProps) {
-  const policy = await getPolicyContent(keyName, {
-    title,
-    body: fallbackBody,
-  });
-
-  return (
-    <div className="bg-background px-6 py-24 sm:py-32 lg:px-8">
-      <div className="mx-auto max-w-3xl text-muted-foreground">
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">{policy.title}</h1>
-        <div
-          className="prose prose-gray mt-6 max-w-none text-base leading-7 dark:prose-invert"
-          dangerouslySetInnerHTML={{ __html: policy.body }}
-        />
-      </div>
-    </div>
-  );
+  const page = await getLegalPage(slug);
+  return <LegalPageShell page={page}><PolicySections page={page} /></LegalPageShell>;
 }

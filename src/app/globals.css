@@ -115,3 +115,23 @@
 .animate-kenburns {
   animation: kenburns 7s ease-out forwards;
 }
+
+.legal-copy p + p,
+.legal-copy p + ul,
+.legal-copy p + ol,
+.legal-copy ul + p,
+.legal-copy ol + p {
+  margin-top: 1rem;
+}
+.legal-copy ul,
+.legal-copy ol {
+  padding-left: 1.35rem;
+}
+.legal-copy ul { list-style: disc; }
+.legal-copy ol { list-style: decimal; }
+.legal-copy a {
+  color: #ea580c;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
