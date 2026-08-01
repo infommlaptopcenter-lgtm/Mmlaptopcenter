@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FaWhatsapp } from "react-icons/fa";
-import { FiShoppingCart } from "react-icons/fi";
+import { FiZap } from "react-icons/fi";
 import { useCart } from "@/lib/commerce";
 import { toast } from "sonner";
 import { useState, useEffect, useMemo } from "react";
@@ -132,6 +133,7 @@ export function StoreProductCard({
   productId,
   initialReviewStats,
 }: ProductCardProps) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [failedImages, setFailedImages] = useState<string[]>([]);
   const [reviewStats, setReviewStats] = useState<ReviewStats | null>(
@@ -237,8 +239,8 @@ export function StoreProductCard({
   }, [productImages.length]);
   */
 
-  // ── Add to cart ──
-  const handleAddToCart = async () => {
+  // ── Buy now ──
+  const handleBuyNow = async () => {
     if (!effectiveVariantId) return;
     setLoading(true);
     try {
@@ -251,7 +253,6 @@ export function StoreProductCard({
           imageUrl: featuredImageUrl,
         },
       ]);
-      toast.success("Added to cart", { description: title });
       trackAddToCart({
         content_ids: [productId || effectiveVariantId],
         contents: [
@@ -269,8 +270,9 @@ export function StoreProductCard({
         currency: "PKR",
         num_items: 1,
       });
+      router.push("/checkout");
     } catch {
-      toast.error("Failed to add to cart");
+      toast.error("Failed to start checkout");
     } finally {
       setLoading(false);
     }
@@ -373,23 +375,23 @@ export function StoreProductCard({
 
         {/* Product actions */}
         <div className="mt-2 grid grid-cols-[minmax(0,1fr)_2.75rem] gap-2">
-          {/* Add directly when a variant is available; otherwise open the product. */}
+          {/* Buy directly when a variant is available; otherwise open the product. */}
           {effectiveVariantId ? (
             <button
-              onClick={handleAddToCart}
+              onClick={handleBuyNow}
               disabled={loading}
-              className="inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md bg-[#f6a45d]/75 px-3 text-sm font-bold text-white shadow-[0_8px_18px_rgba(246,164,93,0.14)] transition-all hover:-translate-y-0.5 hover:bg-[#f47b20] hover:shadow-[0_10px_22px_rgba(244,123,32,0.28)] active:scale-95 disabled:opacity-60"
+              className="inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md bg-[#f47b20] px-3 text-sm font-bold text-white transition-colors hover:bg-[#ea580c] active:bg-[#d95513] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <FiShoppingCart className="h-5 w-5" />
-              {loading ? "Adding…" : "Add to Cart"}
+              <FiZap className="h-5 w-5" />
+              {loading ? "Processing…" : "Buy Now"}
             </button>
           ) : (
             <Link
               href={`/products/${handle}`}
-              className="inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md bg-[#f6a45d]/75 px-3 text-sm font-bold text-white shadow-[0_8px_18px_rgba(246,164,93,0.14)] transition-all hover:-translate-y-0.5 hover:bg-[#f47b20] hover:shadow-[0_10px_22px_rgba(244,123,32,0.28)] active:scale-95"
+              className="inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-md bg-[#f47b20] px-3 text-sm font-bold text-white transition-colors hover:bg-[#ea580c] active:bg-[#d95513]"
             >
-              <FiShoppingCart className="h-5 w-5" />
-              Add to Cart
+              <FiZap className="h-5 w-5" />
+              Buy Now
             </Link>
           )}
           <a
