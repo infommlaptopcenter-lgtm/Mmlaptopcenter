@@ -15,8 +15,10 @@ const businessSchemas = [
     url: SITE_URL,
     logo: `${SITE_URL}/logo/new%20logo.png?v=20260731`,
     sameAs: [
-      "https://www.facebook.com/mmlaptopcenter",
-      "https://www.instagram.com/mmlaptopcenter",
+      "https://www.facebook.com/profile.php?id=61567513306151",
+      "https://www.instagram.com/mmlaptopcenter1/",
+      "https://www.tiktok.com/@mmlaptopcenter",
+      "https://www.youtube.com/@MMLaptopCenter-CHD",
     ],
   },
   {
