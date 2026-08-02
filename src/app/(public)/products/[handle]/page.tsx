@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { JsonLd } from "@/components/seo/json-ld";
 import { absoluteUrl, breadcrumbSchema, createSeoMetadata } from "@/lib/seo";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 interface Props {
   params: Promise<{ handle: string }>;

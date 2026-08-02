@@ -1,8 +1,6 @@
 import { getActiveHeroSlides } from "@/lib/hero-service";
 import HeroCarousel from "@/components/features/home/hero-carousel";
 
-export const revalidate = 60;
-
 export default async function HeroSection() {
   const slides = await getActiveHeroSlides();
 

@@ -2,7 +2,7 @@ import { getCollectionList } from "./service";
 import { CollectionsPageContent } from "./_components/collections-page-content";
 import { createSeoMetadata } from "@/lib/seo";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export const metadata = createSeoMetadata({
   title: "Laptop and Tech Collections Pakistan",

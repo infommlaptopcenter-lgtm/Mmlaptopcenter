@@ -8,8 +8,6 @@ import { absoluteUrl, breadcrumbSchema, createSeoMetadata } from "@/lib/seo";
 
 const FALLBACK_IMAGE = "/logo/new logo.png";
 
-export const revalidate = 60;
-
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({

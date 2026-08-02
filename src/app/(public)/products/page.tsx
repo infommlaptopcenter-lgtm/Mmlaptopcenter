@@ -3,7 +3,7 @@ import type { JsonValue } from "@prisma/client/runtime/library";
 import { getCategoriesForFilters, getAllProductsForFilter } from "./service";
 import { ProductsPageContent } from "./_components/products-page-content";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 /* ---------------- SEO METADATA ---------------- */
 
@@ -61,17 +61,13 @@ export default async function Page({
 }) {
   const initialCategorySlug = (searchParams?.category ?? "").trim();
 
-  let categories: Array<{ id: string; name: string; slug: string; order: number; subcategories: Array<{ id: string; name: string; slug: string; parentId: string | null; order: number }> }> = [];
-  let allProducts: Array<{ id: string; handle: string; title: string; price: number; compareAtPrice: number | null; featuredImage: string | null; images: JsonValue | null; tags: JsonValue | null; description: string | null; sku: string | null; productType: string | null; vendor: string; categoryId: string | null; subcategoryId: string | null; isFeatured: boolean }> = [];
-
-  try {
-    [categories, allProducts] = await Promise.all([
-      getCategoriesForFilters(),
-      getAllProductsForFilter(),
-    ]);
-  } catch (error) {
-    console.error("Failed to load products:", error);
-  }
+  const [categories, allProducts]: [
+    Array<{ id: string; name: string; slug: string; order: number; subcategories: Array<{ id: string; name: string; slug: string; parentId: string | null; order: number }> }>,
+    Array<{ id: string; handle: string; title: string; price: number; compareAtPrice: number | null; featuredImage: string | null; images: JsonValue | null; tags: JsonValue | null; description: string | null; sku: string | null; productType: string | null; vendor: string; categoryId: string | null; subcategoryId: string | null; isFeatured: boolean }>,
+  ] = await Promise.all([
+    getCategoriesForFilters(),
+    getAllProductsForFilter(),
+  ]);
 
   return (
     <ProductsPageContent
