@@ -23,7 +23,17 @@ export async function getDashboardData() {
     prisma.order.count(),
     prisma.inquiry.count(),
     prisma.product.findMany({ where: { inventory: { lte: 5 } }, select: { id: true, title: true, inventory: true }, take: 5 }),
-    prisma.order.findMany({ orderBy: { createdAt: "desc" }, take: 5 }),
+    prisma.order.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      select: {
+        id: true,
+        orderNumber: true,
+        customerName: true,
+        orderStatus: true,
+        total: true,
+      },
+    }),
     prisma.inquiry.findMany({ orderBy: { createdAt: "desc" }, take: 5 }),
     prisma.order.groupBy({ by: ["createdAt"], where: { createdAt: { gte: sevenDaysAgo } }, _count: true }),
     prisma.order.aggregate({ where: { createdAt: { gte: thirtyDaysAgo } }, _sum: { total: true } }),
