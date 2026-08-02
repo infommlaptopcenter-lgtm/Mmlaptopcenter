@@ -6,9 +6,37 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   try {
     await requireAdmin();
     const { id } = await params;
-    const order = await prisma.order.findUnique({ where: { id } });
+    const order = await prisma.order.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        orderNumber: true,
+        customerName: true,
+        customerEmail: true,
+        customerPhone: true,
+        customerAddress: true,
+        items: true,
+        subtotal: true,
+        shippingCost: true,
+        tax: true,
+        total: true,
+        discount: true,
+        couponCode: true,
+        paymentMethod: true,
+        paymentStatus: true,
+        paymentProofUrl: true,
+        transactionReference: true,
+        confirmationEmailSentAt: true,
+        orderStatus: true,
+        notes: true,
+        trackingNumber: true,
+        trackingUrl: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
     if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
-    return NextResponse.json(order);
+    return NextResponse.json({ ...order, courierName: null, estimatedDelivery: null });
   } catch (error: unknown) {
     return NextResponse.json({ error: (error as Error).message }, { status: 401 });
   }
