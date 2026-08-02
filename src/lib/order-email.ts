@@ -14,6 +14,7 @@ type EmailOrder = {
   trackingUrl?: string | null;
   courierName?: string | null;
   estimatedDelivery?: Date | null;
+  notes?: string | null;
 };
 
 function escapeHtml(value: string) {
@@ -43,12 +44,15 @@ export async function sendOrderConfirmationEmail(order: EmailOrder) {
   const fulfillmentHtml = order.trackingNumber
     ? `<h3>Delivery tracking</h3><p><strong>Courier:</strong> ${escapeHtml(order.courierName || "Delivery partner")}<br><strong>Tracking ID:</strong> ${escapeHtml(order.trackingNumber)}${order.estimatedDelivery ? `<br><strong>Estimated delivery:</strong> ${escapeHtml(order.estimatedDelivery.toLocaleDateString("en-PK"))}` : ""}${order.trackingUrl ? `<br><a href="${escapeHtml(order.trackingUrl)}">Track your shipment</a>` : ""}</p>`
     : "";
+  const notesHtml = order.notes
+    ? `<h3>Additional information</h3><p>${escapeHtml(order.notes)}</p>`
+    : "";
 
   await transporter.sendMail({
     from: `MM Laptop Center <${user}>`,
     to: order.customerEmail,
     replyTo: user,
     subject: `Order ${order.orderNumber} update`,
-    html: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto;color:#1a1308"><div style="background:#f6a45d;padding:20px;color:white"><h1 style="margin:0;font-size:24px">Order update</h1></div><div style="padding:24px;border:1px solid #eee"><p>Assalam-o-Alaikum ${escapeHtml(order.customerName)},</p><p>Here are the latest details for order <strong>${escapeHtml(order.orderNumber)}</strong>.</p><h3>Products</h3><ul>${itemHtml}</ul><p><strong>Total:</strong> PKR ${order.total.toLocaleString()}</p><p><strong>Payment method:</strong> ${escapeHtml(order.paymentMethod.replaceAll("_", " "))}</p><p><strong>Payment status:</strong> ${escapeHtml(order.paymentStatus)}</p><p><strong>Order status:</strong> ${escapeHtml(order.orderStatus)}</p><p><strong>Delivery address:</strong><br>${escapeHtml(addressText || "Not provided")}</p>${fulfillmentHtml}<p>Thank you for choosing MM Laptop Center.</p></div></div>`,
+    html: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto;color:#1a1308"><div style="background:#f6a45d;padding:20px;color:white"><h1 style="margin:0;font-size:24px">Order update</h1></div><div style="padding:24px;border:1px solid #eee"><p>Assalam-o-Alaikum ${escapeHtml(order.customerName)},</p><p>Here are the latest details for order <strong>${escapeHtml(order.orderNumber)}</strong>.</p><h3>Products</h3><ul>${itemHtml}</ul><p><strong>Total:</strong> PKR ${order.total.toLocaleString()}</p><p><strong>Payment method:</strong> ${escapeHtml(order.paymentMethod.replaceAll("_", " "))}</p><p><strong>Payment status:</strong> ${escapeHtml(order.paymentStatus)}</p><p><strong>Order status:</strong> ${escapeHtml(order.orderStatus)}</p><p><strong>Delivery address:</strong><br>${escapeHtml(addressText || "Not provided")}</p>${fulfillmentHtml}${notesHtml}<p>Thank you for choosing MM Laptop Center.</p></div></div>`,
   });
 }

@@ -48,11 +48,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         orderStatus: true,
         trackingNumber: true,
         trackingUrl: true,
+        courierName: true,
+        estimatedDelivery: true,
+        notes: true,
       },
     });
     if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
     if (!order.customerEmail) return NextResponse.json({ error: "This customer did not provide an email address." }, { status: 400 });
-    await sendOrderConfirmationEmail({ ...order, courierName: null, estimatedDelivery: null });
+    await sendOrderConfirmationEmail(order);
     const updated = await prisma.order.update({
       where: { id },
       data: { confirmationEmailSentAt: new Date() },

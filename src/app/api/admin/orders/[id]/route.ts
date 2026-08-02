@@ -31,12 +31,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         notes: true,
         trackingNumber: true,
         trackingUrl: true,
+        courierName: true,
+        estimatedDelivery: true,
         createdAt: true,
         updatedAt: true,
       },
     });
     if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
-    return NextResponse.json({ ...order, courierName: null, estimatedDelivery: null });
+    return NextResponse.json(order);
   } catch (error: unknown) {
     return NextResponse.json({ error: (error as Error).message }, { status: 401 });
   }
