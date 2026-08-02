@@ -34,11 +34,30 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   try {
     await requireAdmin();
     const { id } = await params;
-    const order = await prisma.order.findUnique({ where: { id } });
+    const order = await prisma.order.findUnique({
+      where: { id },
+      select: {
+        orderNumber: true,
+        customerName: true,
+        customerEmail: true,
+        customerAddress: true,
+        items: true,
+        total: true,
+        paymentMethod: true,
+        paymentStatus: true,
+        orderStatus: true,
+        trackingNumber: true,
+        trackingUrl: true,
+      },
+    });
     if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
     if (!order.customerEmail) return NextResponse.json({ error: "This customer did not provide an email address." }, { status: 400 });
-    await sendOrderConfirmationEmail(order);
-    const updated = await prisma.order.update({ where: { id }, data: { confirmationEmailSentAt: new Date() } });
+    await sendOrderConfirmationEmail({ ...order, courierName: null, estimatedDelivery: null });
+    const updated = await prisma.order.update({
+      where: { id },
+      data: { confirmationEmailSentAt: new Date() },
+      select: { confirmationEmailSentAt: true },
+    });
     return NextResponse.json({ confirmationEmailSentAt: updated.confirmationEmailSentAt });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Email failed" }, { status: 500 });
