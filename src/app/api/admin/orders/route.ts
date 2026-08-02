@@ -4,6 +4,8 @@ import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-auth";
 
+export const dynamic = "force-dynamic";
+
 const orderSchema = z.object({
   orderNumber: z.string().min(1),
   customerName: z.string().min(1),
@@ -68,7 +70,10 @@ export async function GET(request: Request) {
       prisma.order.count({ where }),
     ]);
 
-    return NextResponse.json({ orders, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } });
+    return NextResponse.json(
+      { orders, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } },
+      { headers: { "Cache-Control": "no-store, max-age=0" } },
+    );
   } catch (error: unknown) {
     return NextResponse.json({ error: (error as Error).message }, { status: 401 });
   }

@@ -19,7 +19,15 @@ export function useOrders() {
       if (search.trim()) params.set("search", search.trim());
       if (status) params.set("status", status);
       if (paymentStatus) params.set("paymentStatus", paymentStatus);
-      const response = await fetch(`/api/admin/orders?${params}`);
+      const response = await fetch(`/api/admin/orders?${params}`, {
+        cache: "no-store",
+        credentials: "same-origin",
+        headers: { Accept: "application/json" },
+      });
+      const contentType = response.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        throw new Error(`Unexpected server response (${response.status})`);
+      }
       const data = await response.json();
       if (!response.ok) {
         setOrders([]);
@@ -27,9 +35,9 @@ export function useOrders() {
         return;
       }
       setOrders(data.orders ?? []);
-    } catch {
+    } catch (caught) {
       setOrders([]);
-      setError("Unable to load orders");
+      setError(caught instanceof Error ? caught.message : "Unable to load orders");
     } finally {
       setLoading(false);
     }
