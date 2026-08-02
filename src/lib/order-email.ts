@@ -23,7 +23,7 @@ function escapeHtml(value: string) {
 export async function sendOrderConfirmationEmail(order: EmailOrder) {
   if (!order.customerEmail) throw new Error("This customer did not provide an email address.");
   const user = (process.env.GMAIL_USER || process.env.ADMIN_EMAIL || process.env.ADMIN_USER)?.trim();
-  const appPassword = (process.env.GMAIL_APP_PASSWORD || process.env.googleapppassword)
+  const appPassword = process.env.GMAIL_APP_PASSWORD
     ?.trim()
     .replace(/^['"]|['"]$/g, "")
     .replaceAll(" ", "");
