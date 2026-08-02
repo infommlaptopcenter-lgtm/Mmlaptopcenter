@@ -13,7 +13,7 @@ export default function OrdersPage() {
       <Filter label="Order status" value={state.status} setValue={state.setStatus} options={["pending", "confirmed", "processing", "shipped", "completed", "cancelled"]} />
       <Filter label="Payment status" value={state.paymentStatus} setValue={state.setPaymentStatus} options={["pending", "verified", "failed", "refunded"]} />
     </div>
-    {state.loading ? <p className="text-sm text-gray-500">Loading...</p> : state.error ? <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{state.error}</p> : state.orders.length === 0 ? <p className="text-sm text-gray-500">No matching orders</p> : <OrdersTable orders={state.orders} />}
+    {state.loading ? <p className="text-sm text-gray-500">Loading...</p> : state.error ? <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{state.error}</p> : state.orders.length === 0 ? <p className="text-sm text-gray-500">No matching orders</p> : <OrdersTable orders={state.orders} onChanged={state.fetchOrders} />}
   </div>;
 }
 

@@ -40,5 +40,5 @@ export function useOrders() {
     return () => clearTimeout(timeout);
   }, [fetchOrders]);
 
-  return { orders, loading, error, search, setSearch, status, setStatus, paymentStatus, setPaymentStatus };
+  return { orders, loading, error, search, setSearch, status, setStatus, paymentStatus, setPaymentStatus, fetchOrders };
 }
