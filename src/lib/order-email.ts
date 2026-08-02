@@ -22,15 +22,18 @@ function escapeHtml(value: string) {
 
 export async function sendOrderConfirmationEmail(order: EmailOrder) {
   if (!order.customerEmail) throw new Error("This customer did not provide an email address.");
-  const user = process.env.GMAIL_USER || process.env.ADMIN_EMAIL || process.env.ADMIN_USER;
-  const appPassword = process.env.GMAIL_APP_PASSWORD || process.env.googleapppassword;
+  const user = (process.env.GMAIL_USER || process.env.ADMIN_EMAIL || process.env.ADMIN_USER)?.trim();
+  const appPassword = (process.env.GMAIL_APP_PASSWORD || process.env.googleapppassword)
+    ?.trim()
+    .replace(/^['"]|['"]$/g, "")
+    .replaceAll(" ", "");
   if (!user || !user.includes("@") || !appPassword) {
     throw new Error("Gmail confirmation email is not configured. Add GMAIL_USER and GMAIL_APP_PASSWORD to .env, then restart the server.");
   }
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
-    auth: { user, pass: appPassword.replaceAll(" ", "") },
+    auth: { user, pass: appPassword },
   });
   const items = Array.isArray(order.items) ? order.items as Array<{ title?: unknown; quantity?: unknown; price?: unknown }> : [];
   const address = order.customerAddress && typeof order.customerAddress === "object" ? order.customerAddress as Record<string, unknown> : {};
