@@ -47,7 +47,24 @@ export async function GET(request: Request) {
     }
 
     const [orders, total] = await Promise.all([
-      prisma.order.findMany({ where, skip: (page - 1) * limit, take: limit, orderBy: { createdAt: "desc" } }),
+      prisma.order.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          orderNumber: true,
+          customerName: true,
+          customerEmail: true,
+          customerPhone: true,
+          total: true,
+          orderStatus: true,
+          paymentMethod: true,
+          paymentStatus: true,
+          createdAt: true,
+        },
+      }),
       prisma.order.count({ where }),
     ]);
 
