@@ -185,9 +185,12 @@ export function NewArrivalsSection({
   return (
     <section className="mx-auto w-full max-w-7xl overflow-hidden bg-white px-6 py-16 lg:px-8">
       <div className="mx-auto mb-10 max-w-3xl text-center">
-        <h2 className="font-serif text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
+        <Link
+          href="/collections/new-arrivals"
+          className="font-serif text-3xl font-extrabold text-gray-900 transition-colors hover:text-orange-500 focus-visible:text-orange-500 sm:text-4xl lg:text-5xl"
+        >
           New Arrivals
-        </h2>
+        </Link>
       </div>
       <div
         ref={carouselRef}
