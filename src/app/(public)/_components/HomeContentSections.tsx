@@ -1,6 +1,7 @@
 import {
   CategoriesSection,
   CollectionsSection,
+  NewArrivalsSection,
   ProductsSection,
 } from "@/components/features/home/products-section";
 import { WhyChooseUsSection } from "@/components/features/home/why-choose-us";
@@ -56,6 +57,7 @@ export function HomeContentSections({
         products={products}
         collections={collections}
       />
+      <NewArrivalsSection products={products} collections={collections} />
       <WhyChooseUsSection />
       <CollectionsSection collections={collections} />
       <FeaturedVideoSection

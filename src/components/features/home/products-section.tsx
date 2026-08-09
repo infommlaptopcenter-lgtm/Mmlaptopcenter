@@ -110,6 +110,122 @@ function ProductGrid({
   );
 }
 
+export function NewArrivalsSection({
+  products,
+  collections,
+}: {
+  products: HomeProduct[];
+  collections: Collection[];
+}) {
+  const carouselRef = useRef<HTMLDivElement | null>(null);
+  const productsByHandle = new Map(
+    products.map((product) => [product.handle, product]),
+  );
+  const newArrivals = (collections.find(
+    (collection) => collection.handle === "new-arrivals",
+  )?.productHandles || [])
+    .map((handle) => productsByHandle.get(handle))
+    .filter((product): product is HomeProduct => Boolean(product));
+
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel || newArrivals.length <= 1) return;
+
+    let frame = 0;
+    let previousTime = 0;
+    let isPaused = false;
+    let isVisible = false;
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    const move = (time: number) => {
+      if (previousTime && isVisible && !isPaused && !reducedMotion) {
+        carousel.scrollLeft += ((time - previousTime) / 1000) * 20;
+        const loopPoint = carousel.scrollWidth / 2;
+        if (carousel.scrollLeft >= loopPoint) carousel.scrollLeft -= loopPoint;
+      }
+      previousTime = time;
+      frame = requestAnimationFrame(move);
+    };
+    const pause = () => {
+      isPaused = true;
+    };
+    const resume = () => {
+      isPaused = false;
+      previousTime = performance.now();
+    };
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+        previousTime = performance.now();
+      },
+      { rootMargin: "200px 0px" },
+    );
+
+    observer.observe(carousel);
+    carousel.addEventListener("pointerenter", pause);
+    carousel.addEventListener("pointerleave", resume);
+    carousel.addEventListener("focusin", pause);
+    carousel.addEventListener("focusout", resume);
+    frame = requestAnimationFrame(move);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      carousel.removeEventListener("pointerenter", pause);
+      carousel.removeEventListener("pointerleave", resume);
+      carousel.removeEventListener("focusin", pause);
+      carousel.removeEventListener("focusout", resume);
+    };
+  }, [newArrivals.length]);
+
+  if (!newArrivals.length) return null;
+
+  return (
+    <section className="mx-auto w-full max-w-7xl overflow-hidden bg-white px-6 py-16 lg:px-8">
+      <div className="mx-auto mb-10 max-w-3xl text-center">
+        <h2 className="font-serif text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
+          New Arrivals
+        </h2>
+      </div>
+      <div
+        ref={carouselRef}
+        className="scrollbar-hide flex gap-4 overflow-x-auto pb-2 sm:gap-5"
+      >
+        {[0, 1].map((copy) =>
+          newArrivals.map((product) => {
+            const imageUrls = Array.isArray(product.images)
+              ? product.images.filter((image): image is string => typeof image === "string")
+              : [];
+            return (
+              <Link
+                key={`${product.handle}-${copy}`}
+                href={`/products/${encodeURIComponent(product.handle)}`}
+                tabIndex={copy === 1 ? -1 : undefined}
+                aria-hidden={copy === 1}
+                aria-label={product.title}
+                className="group relative aspect-square w-[calc((100vw-3.5rem)/2)] shrink-0 overflow-hidden rounded-2xl bg-gray-50 sm:w-56 lg:w-64"
+              >
+                <Image
+                  src={product.featuredImage || imageUrls[0] || FALLBACK_IMAGE}
+                  alt={product.title}
+                  fill
+                  sizes="(max-width: 639px) calc((100vw - 3.5rem) / 2), (max-width: 1023px) 224px, 256px"
+                  className="object-contain p-3 transition-transform duration-500 ease-out group-hover:scale-105"
+                />
+                <span className="absolute inset-0 flex items-end bg-gradient-to-t from-black/75 via-black/20 to-transparent p-4 text-sm font-bold text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 sm:text-base">
+                  {product.title}
+                </span>
+              </Link>
+            );
+          }),
+        )}
+      </div>
+    </section>
+  );
+}
+
 export function CategoriesSection({ categories }: { categories: Category[] }) {
   const mainCategories = categories.filter((category) => !category.parentId);
   if (!mainCategories.length) return null;
@@ -404,7 +520,6 @@ export function ProductsSection({
       .slice(0, 8);
   };
 
-  const newArrivals = getCollectionProducts("new-arrivals");
   const bestSellers = getCollectionProducts("best-sellers");
 
   const productCard = (product: HomeProduct) => {
@@ -460,12 +575,6 @@ export function ProductsSection({
           </div>
         </section>
       )}
-
-      <ProductGrid
-        products={newArrivals}
-        title="New Arrivals"
-        bgColor="white"
-      />
 
       <ProductGrid
         products={bestSellers}
