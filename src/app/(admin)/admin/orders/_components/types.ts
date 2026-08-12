@@ -11,7 +11,7 @@ export type OrderListItem = {
   createdAt: string;
 };
 
-export type OrderItem = { productId?: string; title?: string; productTitle?: string; price?: number; quantity?: number; image?: string | null };
+export type OrderItem = { productId?: string; variationId?: string; variationName?: string; title?: string; productTitle?: string; price?: number; quantity?: number; image?: string | null };
 export type OrderAddress = { line1?: string; line2?: string; city?: string; state?: string; pincode?: string; country?: string };
 
 export type OrderDetail = OrderListItem & {

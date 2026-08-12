@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin-auth";
 import { sendOrderConfirmationEmail } from "@/lib/order-email";
+import { withExactVariationNames } from "@/lib/order-items";
 
 const schema = z.object({
   orderStatus: z.enum(["pending", "confirmed", "processing", "shipped", "completed", "cancelled"]).optional(),
@@ -23,7 +24,19 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if (!existing) return NextResponse.json({ error: "Order not found" }, { status: 404 });
     const { estimatedDelivery, ...fields } = input;
     const order = await prisma.order.update({ where: { id }, data: { ...fields, estimatedDelivery: estimatedDelivery ? new Date(`${estimatedDelivery}T12:00:00.000Z`) : null } });
-    return NextResponse.json(order);
+    const items = await withExactVariationNames(order.items);
+    let emailSent = false;
+    let emailError: string | null = null;
+    if (order.orderStatus === "confirmed" && order.trackingNumber && order.customerEmail) {
+      try {
+        await sendOrderConfirmationEmail({ ...order, items });
+        await prisma.order.update({ where: { id }, data: { confirmationEmailSentAt: new Date() } });
+        emailSent = true;
+      } catch (error) {
+        emailError = error instanceof Error ? error.message : "Email could not be sent";
+      }
+    }
+    return NextResponse.json({ ...order, items, emailSent, emailError });
   } catch (error) {
     if (error instanceof z.ZodError) return NextResponse.json({ error: "Invalid order update", details: error.issues }, { status: 400 });
     return NextResponse.json({ error: error instanceof Error ? error.message : "Update failed" }, { status: 500 });
@@ -55,7 +68,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     });
     if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
     if (!order.customerEmail) return NextResponse.json({ error: "This customer did not provide an email address." }, { status: 400 });
-    await sendOrderConfirmationEmail(order);
+    await sendOrderConfirmationEmail({ ...order, items: await withExactVariationNames(order.items) });
     const updated = await prisma.order.update({
       where: { id },
       data: { confirmationEmailSentAt: new Date() },

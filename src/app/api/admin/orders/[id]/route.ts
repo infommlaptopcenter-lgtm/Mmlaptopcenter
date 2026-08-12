@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin-auth";
+import { withExactVariationNames } from "@/lib/order-items";
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -38,7 +39,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       },
     });
     if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
-    return NextResponse.json(order);
+    return NextResponse.json({ ...order, items: await withExactVariationNames(order.items) });
   } catch (error: unknown) {
     return NextResponse.json({ error: (error as Error).message }, { status: 401 });
   }

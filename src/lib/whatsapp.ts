@@ -48,6 +48,7 @@ export function openWhatsAppChat(phone: string, message?: string): void {
 // Order-related types
 export interface OrderItem {
   title: string;
+  variationName?: string;
   quantity: number;
   price: number;
   productId?: string;
@@ -88,7 +89,7 @@ export interface Order {
 /**
  * Build order confirmation message for sending to customers
  */
-export function buildOrderConfirmationMessage(order: Order): string {
+export function buildLegacyOrderConfirmationMessage(order: Order): string {
   const items = (Array.isArray(order.items) ? order.items : [])
     .map((item) => {
       return `• ${item.title} x${item.quantity} - Rs. ${(item.price * item.quantity).toLocaleString()}`;
@@ -201,4 +202,14 @@ export async function checkWhatsAppAvailability(phone: string): Promise<boolean>
   // Note: This is a basic check. For production, you might want to use
   // WhatsApp Business API to verify if a number is registered on WhatsApp
   return isValidWhatsAppNumber(phone);
+}
+
+export function buildOrderConfirmationMessage(order: Order): string {
+  const items = (Array.isArray(order.items) ? order.items : [])
+    .map((item) => `- ${item.variationName || item.title} x${item.quantity}`)
+    .join("\n");
+  const tracking = order.trackingNumber
+    ? `\n*Courier:* ${order.courierName || "Delivery partner"}\n*Tracking ID:* ${order.trackingNumber}${order.trackingUrl ? `\n*Track:* ${order.trackingUrl}` : ""}${order.estimatedDelivery ? `\n*Estimated delivery:* ${new Date(order.estimatedDelivery).toLocaleDateString("en-PK")}` : ""}`
+    : "";
+  return `Order *${order.orderNumber}*\n\n*Ordered item:*\n${items}${tracking}`;
 }

@@ -82,7 +82,7 @@ export async function POST(request: Request) {
       }
       if (variation) {
         const images = Array.isArray(variation.images) ? (variation.images as unknown[]).filter((image): image is string => typeof image === "string") : [];
-        return { productId: variation.id, title: `${variation.product.title} - ${variation.name}`, price: variation.price, quantity: item.quantity, image: images[0] ?? variation.product.featuredImage ?? null, variationId: variation.id };
+        return { productId: variation.id, title: variation.name, productTitle: variation.product.title, price: variation.price, quantity: item.quantity, image: images[0] ?? variation.product.featuredImage ?? null, variationId: variation.id };
       }
       if (!product) throw new Error("Product is not available.");
       // if (product.inventory < item.quantity) {
