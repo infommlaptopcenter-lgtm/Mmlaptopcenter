@@ -44,13 +44,8 @@ export function useOrderDetail(id?: string) {
       const res = await fetch(`/api/admin/orders/${id}/status`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Failed to update order");
-      const updatedOrder = order ? { ...order, ...data } : null;
-      setOrder(updatedOrder);
-      const openTrackingMessage = updatedOrder?.orderStatus === "confirmed" && !!updatedOrder.trackingNumber && !!updatedOrder.customerPhone;
-      if (openTrackingMessage && assertWhatsAppPhone(updatedOrder.customerPhone!)) {
-        window.open(`https://wa.me/${formatPhoneForWhatsApp(updatedOrder.customerPhone!)}?text=${encodeURIComponent(buildOrderConfirmationMessage(updatedOrder as Order))}`, "_blank");
-      }
-      setNotice(data.emailSent ? "Tracking saved and email sent. WhatsApp message opened." : data.emailError ? `Tracking saved. Email failed: ${data.emailError}` : openTrackingMessage ? "Tracking saved. WhatsApp message opened." : "Order changes saved successfully.");
+      setOrder((o) => (o ? { ...o, ...data } : o));
+      setNotice("Order changes saved successfully.");
     } catch (e: any) {
       setError(e?.message || "Failed to update order");
     } finally {

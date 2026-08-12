@@ -24,19 +24,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if (!existing) return NextResponse.json({ error: "Order not found" }, { status: 404 });
     const { estimatedDelivery, ...fields } = input;
     const order = await prisma.order.update({ where: { id }, data: { ...fields, estimatedDelivery: estimatedDelivery ? new Date(`${estimatedDelivery}T12:00:00.000Z`) : null } });
-    const items = await withExactVariationNames(order.items);
-    let emailSent = false;
-    let emailError: string | null = null;
-    if (order.orderStatus === "confirmed" && order.trackingNumber && order.customerEmail) {
-      try {
-        await sendOrderConfirmationEmail({ ...order, items });
-        await prisma.order.update({ where: { id }, data: { confirmationEmailSentAt: new Date() } });
-        emailSent = true;
-      } catch (error) {
-        emailError = error instanceof Error ? error.message : "Email could not be sent";
-      }
-    }
-    return NextResponse.json({ ...order, items, emailSent, emailError });
+    return NextResponse.json(order);
   } catch (error) {
     if (error instanceof z.ZodError) return NextResponse.json({ error: "Invalid order update", details: error.issues }, { status: 400 });
     return NextResponse.json({ error: error instanceof Error ? error.message : "Update failed" }, { status: 500 });
