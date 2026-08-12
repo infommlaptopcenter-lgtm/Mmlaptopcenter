@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { calculateOrderPricing } from "@/lib/order-pricing";
+import { sendAdminNewOrderEmail } from "@/lib/order-email";
 
 const orderCreateSchema = z.object({
   customerName: z.string().min(1),
@@ -142,6 +143,8 @@ export async function POST(request: Request) {
         },
       });
     });
+
+    await sendAdminNewOrderEmail(order).catch((error) => console.error("Admin order email failed:", error));
 
     return NextResponse.json({ order }, { status: 201 });
   } catch (error: unknown) {

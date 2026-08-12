@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { sendAdminNewOrderEmail } from "@/lib/order-email";
 
 const orderSchema = z.object({
   productId: z.string().min(1),
@@ -63,6 +64,8 @@ export async function POST(request: Request) {
         notes: "Created from AI chatbot",
       },
     });
+
+    await sendAdminNewOrderEmail(order).catch((error) => console.error("Admin order email failed:", error));
 
     return NextResponse.json({ order }, { status: 201 });
   } catch (error: unknown) {

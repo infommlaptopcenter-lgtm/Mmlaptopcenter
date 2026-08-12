@@ -4,6 +4,7 @@ import { useState, createContext, useContext } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import OrderAppBadge from "@/components/admin/order-app-badge";
 import {
   FiGrid,
   FiPackage,
@@ -253,6 +254,7 @@ export function ResponsiveAdminLayout({
 }) {
   return (
     <div className="min-h-screen bg-[#fcf5e8]">
+      <OrderAppBadge />
       <div className="hidden md:block fixed left-0 top-0 w-64 h-screen">
         <AdminSidebar admin={admin} />
       </div>
