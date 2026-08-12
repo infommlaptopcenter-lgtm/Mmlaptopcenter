@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import OrderAppBadge from "@/components/admin/order-app-badge";
+import { LogoutButton } from "@/components/admin/logout-button";
 import {
   FiGrid,
   FiPackage,
@@ -15,7 +16,6 @@ import {
   FiImage,
   FiSettings,
   FiUser,
-  FiLogOut,
   FiMenu,
   FiX,
   FiHome,
@@ -292,13 +292,7 @@ function AdminTopbarSimple() {
           <span>Profile</span>
         </Link>
 
-        <Link
-          href="/api/auth/signout"
-          className="inline-flex items-center gap-2 rounded-lg bg-red-500/20 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-500/30"
-        >
-          <FiLogOut className="h-4 w-4" />
-          <span>Logout</span>
-        </Link>
+        <LogoutButton />
       </div>
     </header>
   );
