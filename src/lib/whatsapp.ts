@@ -101,28 +101,20 @@ export function buildOrderConfirmationMessage(order: Order): string {
     .filter(Boolean)
     .join(", ");
   const tracking = order.trackingNumber
-    ? `\n*Courier:* ${order.courierName || "Delivery partner"}\n*Tracking ID:* ${order.trackingNumber}${order.trackingUrl ? `\n*Track:* ${order.trackingUrl}` : ""}${order.estimatedDelivery ? `\n*Estimated delivery:* ${new Date(order.estimatedDelivery).toLocaleDateString("en-PK")}` : ""}\n`
+    ? `*Courier:* ${order.courierName || "Delivery partner"}\n*Tracking ID:* ${order.trackingNumber}${order.trackingUrl ? `\n*Track:* ${order.trackingUrl}` : ""}${order.estimatedDelivery ? `\n*Estimated delivery:* ${new Date(order.estimatedDelivery).toLocaleDateString("en-PK")}` : ""}`
     : "";
 
-  return `Assalam-o-Alaikum ${order.customerName}! 🌿
-
-Your order *${order.orderNumber}* has been confirmed!
-
-*Order Details:*
-${items}
-
-*Total: Rs. ${order.total.toLocaleString()}*
-
-*Delivery Address:*
-${addressStr}
-
-*Payment:* ${order.paymentMethod?.replaceAll("_", " ").toUpperCase() || "N/A"}
-*Order Status:* ${order.orderStatus || "confirmed"}
-${tracking}
-
-Thank you for choosing MM Laptop Center! 💚
-
-For queries, reply to this message.`;
+  return [
+    `Assalam-o-Alaikum ${order.customerName}! 🌿`,
+    `Your order *${order.orderNumber}* has been confirmed!`,
+    `*Order Details:*\n${items}`,
+    `*Total: Rs. ${order.total.toLocaleString()}*`,
+    `*Delivery Address:*\n${addressStr}`,
+    `*Payment:* ${order.paymentMethod?.replaceAll("_", " ").toUpperCase() || "N/A"}\n*Order Status:* ${order.orderStatus || "confirmed"}`,
+    tracking,
+    "Thank you for choosing MM Laptop Center! 💚",
+    "For queries, reply to this message.",
+  ].filter(Boolean).join("\n\n");
 }
 
 /**
