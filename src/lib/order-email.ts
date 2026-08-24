@@ -29,13 +29,25 @@ function escapeHtml(value: string) {
   return value.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[character] ?? character);
 }
 
-function gmailTransport() {
+export function gmailTransport() {
   const user = (process.env.GMAIL_USER || process.env.ADMIN_EMAIL || process.env.ADMIN_USER)?.trim();
   const appPassword = process.env.GMAIL_APP_PASSWORD?.trim().replace(/^['"]|['"]$/g, "").replaceAll(" ", "");
   if (!user || !user.includes("@") || !appPassword) {
     throw new Error("Gmail email is not configured. Add GMAIL_USER and GMAIL_APP_PASSWORD to .env, then restart the server.");
   }
   return { user, transporter: nodemailer.createTransport({ service: "gmail", auth: { user, pass: appPassword } }) };
+}
+
+export async function sendAdminPasswordResetEmail(email: string, otp: string) {
+  const { user, transporter } = gmailTransport();
+  await transporter.sendMail({
+    from: `MM Laptop Center <${user}>`,
+    to: email,
+    replyTo: user,
+    subject: "Your MM Laptop Center password reset code",
+    text: `Your password reset code is ${otp}. It expires in 10 minutes. If you did not request this, ignore this email.`,
+    html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;color:#1a1308"><h1 style="background:#1a1308;color:#d8a928;padding:18px">Password reset</h1><div style="padding:24px;border:1px solid #eee"><p>Use this one-time code to reset your admin password:</p><p style="font-size:32px;font-weight:bold;letter-spacing:8px;text-align:center">${otp}</p><p>This code expires in 10 minutes and can only be used once.</p></div></div>`,
+  });
 }
 
 export async function sendOrderConfirmationEmail(order: EmailOrder) {

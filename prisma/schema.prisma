@@ -99,6 +99,19 @@ model AdminUser {
   createdAt DateTime @default(now())
 }
 
+model AdminPasswordReset {
+  id        String    @id @default(cuid())
+  email     String
+  otpHash   String
+  expiresAt DateTime
+  attempts  Int       @default(0)
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([email, createdAt])
+  @@index([expiresAt])
+}
+
 model SiteSetting {
   id        String   @id @default(cuid())
   key       String   @unique
