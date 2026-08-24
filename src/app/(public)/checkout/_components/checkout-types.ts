@@ -12,7 +12,7 @@ export type CheckoutDetails = {
   notes: string;
 };
 
-export const COD_LIMIT = 50_000;
+export const COD_LIMIT = 20_000;
 export const JAZZCASH_LIMIT = 10_000;
 
 export const bankAccount = {
