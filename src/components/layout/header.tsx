@@ -171,6 +171,7 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="icon"
+                aria-label="Open navigation menu"
                 className="h-10 w-10 text-[#1a1308] hover:text-[#b57910]"
               >
                 <Menu className="h-5 w-5" />
@@ -315,6 +316,7 @@ export function Header() {
                     <Button
                       variant="ghost"
                       size="icon"
+                      aria-label="Open search dialog"
                       className="h-10 w-10 text-[#1a1308] hover:text-[#b57910]"
                       onClick={() => {
                         setMobileMenuOpen(false);
@@ -325,6 +327,8 @@ export function Header() {
                     </Button>
 
                     <button
+                      type="button"
+                      aria-label="Shopping Cart"
                       className="relative text-[#1a1308] transition-colors hover:text-[#b57910]"
                       onClick={() => {
                         setMobileMenuOpen(false);
@@ -371,6 +375,7 @@ export function Header() {
           <Button
             variant="ghost"
             size="icon"
+            aria-label="Open search"
             className="h-10 w-10 text-[#1a1308] hover:text-[#b57910]"
             onClick={() => setSearchOpen(true)}
           >
@@ -380,6 +385,7 @@ export function Header() {
           <Button
             variant="ghost"
             size="icon"
+            aria-label="Shopping Cart"
             className="relative h-10 w-10 text-[#1a1308] hover:text-[#b57910]"
             onClick={() => setCartOpen(true)}
           >
@@ -623,6 +629,7 @@ export function Header() {
           <Button
             variant="ghost"
             size="icon"
+            aria-label="Shopping Cart"
             className="relative h-10 w-10 text-[#1a1308] hover:text-[#b57910]"
             onClick={() => setCartOpen(true)}
           >
@@ -655,6 +662,8 @@ export function Header() {
               />
               {searchQuery && (
                 <button
+                  type="button"
+                  aria-label="Clear search input"
                   onClick={() => {
                     setSearchQuery("");
                     setSearchResults([]);
@@ -665,6 +674,7 @@ export function Header() {
                 </button>
               )}
               <button
+                type="button"
                 onClick={() => setSearchOpen(false)}
                 className="border-l border-[#d8a928]/20 px-3 text-[#5A5E55] hover:text-[#0a0a0a]"
               >

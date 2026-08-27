@@ -54,6 +54,8 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                  {cart?.totalQuantity ?? 0} {(cart?.totalQuantity ?? 0) !== 1 ? "items" : "item"}
                </Badge>
                <button
+                 type="button"
+                 aria-label="Close cart"
                  onClick={() => onOpenChange(false)}
                  className="rounded-full p-1.5 text-[#5A5E55] transition-all hover:bg-[#d8a928]/10 hover:text-[#0a0a0a] hover:scale-110 active:scale-95 sm:p-2"
                >
@@ -108,6 +110,8 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                                  {line?.merchandise?.product?.title}
                                </Link>
                               <button
+                                type="button"
+                                aria-label="Remove item from cart"
                                 onClick={() => line?.id && cart.removeLine(line.id)}
                                 className="shrink-0 rounded-full p-1 text-[#5A5E55] transition-all hover:bg-red-50 hover:text-red-500 hover:scale-110 active:scale-95"
                               >
@@ -130,6 +134,8 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                             <div className="flex items-center justify-between gap-2">
                               <div className="flex items-center gap-1 sm:gap-2">
                                 <button
+                                  type="button"
+                                  aria-label="Decrease quantity"
                                   onClick={() => line?.id && cart.updateQuantity(line.id, line.quantity - 1)}
                                   className="h-5 w-5 rounded-full border-2 border-[#d8a928]/30 flex items-center justify-center text-[#5A5E55] transition-all hover:border-[#f6a45d] hover:bg-[#f6a45d] hover:text-white hover:scale-110 active:scale-95 text-[10px] sm:h-6 sm:w-6 sm:text-xs"
                                 >
@@ -139,6 +145,8 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                                   <CartLineQuantity />
                                 </span>
                                 <button
+                                  type="button"
+                                  aria-label="Increase quantity"
                                   onClick={() => line?.id && cart.updateQuantity(line.id, line.quantity + 1)}
                                   className="h-5 w-5 rounded-full border-2 border-[#d8a928]/30 flex items-center justify-center text-[#5A5E55] transition-all hover:border-[#f6a45d] hover:bg-[#f6a45d] hover:text-white hover:scale-110 active:scale-95 text-[10px] sm:h-6 sm:w-6 sm:text-xs"
                                 >
