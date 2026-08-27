@@ -1,0 +1,6 @@
+{
+  "name": "MM Laptop Center",
+  "description": "A full-stack laptop e-commerce store built with Next.js, Prisma, NextAuth, and Cloudinary.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

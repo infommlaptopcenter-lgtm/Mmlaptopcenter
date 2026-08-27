@@ -1,6 +1,6 @@
 import { StoreProductCard } from "@/components/features/products/store-product-card-wrapper";
 import { ProductReviews } from "@/components/features/products/product-reviews";
-import { titleize } from "@esmate/utils/string";
+import { titleize } from "@/lib/string-utils";
 
 type RelatedProduct = {
   id: string;

@@ -8,7 +8,7 @@ import { ArrowUpRight, Loader2 } from "@esmate/shadcn/pkgs/lucide-react";
 import { useState } from "react";
 import { getCollectionList } from "./service";
 import { useRequest } from "@esmate/react/ahooks";
-import { titleize } from "@esmate/utils/string";
+import { titleize } from "@/lib/string-utils";
 
 interface Props {
   data: Awaited<ReturnType<typeof getCollectionList>>;

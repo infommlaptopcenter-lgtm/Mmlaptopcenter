@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
+import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 
@@ -481,8 +482,11 @@ export async function POST(request: Request) {
       });
     }
 
-// ── No API key fallback ──────────────────────────────────────────────────
-    if (!process.env.OPENAI_API_KEY) {
+    const geminiKey = process.env.GEMINI_API_KEY;
+    const openAiKey = process.env.OPENAI_API_KEY;
+
+    // ── No API key fallback ──────────────────────────────────────────────────
+    if (!geminiKey && !openAiKey) {
       return NextResponse.json({
         reply: "Ask me about laptops, MacBooks, or accessories!",
         replyHtml: `
@@ -511,30 +515,66 @@ export async function POST(request: Request) {
         .join("\n");
     }
 
-    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    let aiHtml = "";
 
-    const completion = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      temperature: 0.55,
-      max_tokens: 250,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        ...(productContext
-          ? [
-              {
-                role: "system" as const,
-                content: `Current product catalog:\n${productContext}\n\nProduct cards are rendered separately — you ONLY return the conversational HTML reply. Always highlight product names in <strong style="color:#f6a45d;"> and prices in <span style="color:#d8a928; font-weight:700;">.`,
-              },
-            ]
-          : []),
-        ...(body.history || []).slice(-6).map((m) => ({ role: m.role, content: m.content })),
-        { role: "user", content: text },
-      ],
-    });
+    if (geminiKey) {
+      try {
+        const ai = new GoogleGenAI({ apiKey: geminiKey });
+        const historyText = (body.history || [])
+          .slice(-6)
+          .map((m) => `${m.role === "user" ? "User" : "Zara"}: ${m.content}`)
+          .join("\n");
 
-    const aiHtml =
-      completion.choices[0]?.message?.content?.trim() ||
-      `<p style="font-size:14px; color:${C.muted}; margin:0;">How can I help you today? 😊</p>`;
+        const prompt = `${SYSTEM_PROMPT}
+
+${productContext ? `Current product catalog:\n${productContext}\n\nProduct cards are rendered separately — you ONLY return the conversational HTML reply. Always highlight product names in <strong style="color:#f6a45d;"> and prices in <span style="color:#d8a928; font-weight:700;">.\n` : ""}
+${historyText ? `Conversation History:\n${historyText}\n` : ""}
+User: ${text}
+Zara:`;
+
+        const response = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: prompt,
+        });
+
+        aiHtml = response.text?.trim() || "";
+      } catch (geminiErr) {
+        console.warn("[Gemini API Error]", geminiErr);
+      }
+    }
+
+    if (!aiHtml && openAiKey) {
+      try {
+        const client = new OpenAI({ apiKey: openAiKey });
+
+        const completion = await client.chat.completions.create({
+          model: "gpt-4o-mini",
+          temperature: 0.55,
+          max_tokens: 250,
+          messages: [
+            { role: "system", content: SYSTEM_PROMPT },
+            ...(productContext
+              ? [
+                  {
+                    role: "system" as const,
+                    content: `Current product catalog:\n${productContext}\n\nProduct cards are rendered separately — you ONLY return the conversational HTML reply. Always highlight product names in <strong style="color:#f6a45d;"> and prices in <span style="color:#d8a928; font-weight:700;">.`,
+                  },
+                ]
+              : []),
+            ...(body.history || []).slice(-6).map((m) => ({ role: m.role, content: m.content })),
+            { role: "user", content: text },
+          ],
+        });
+
+        aiHtml = completion.choices[0]?.message?.content?.trim() || "";
+      } catch (openAiErr) {
+        console.warn("[OpenAI API Error]", openAiErr);
+      }
+    }
+
+    if (!aiHtml) {
+      aiHtml = `<p style="font-size:14px; color:${C.muted}; margin:0;">How can I help you today? 😊</p>`;
+    }
 
     const aiWantsProducts =
       /here are|check out|take a look|our products|these products|show you/i.test(aiHtml);

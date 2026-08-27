@@ -4,7 +4,7 @@ import {
   getCollectionProducts as getCollectionProductsFromDb,
 } from "@/lib/storefront";
 import { prisma } from "@/lib/prisma";
-import { invariant } from "@esmate/utils";
+import { invariant } from "@/lib/string-utils";
 import type { Prisma } from "@prisma/client";
 
 const DEFAULT_CURRENCY = "PKR";

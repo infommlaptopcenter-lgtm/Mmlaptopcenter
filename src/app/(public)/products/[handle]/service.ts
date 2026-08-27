@@ -1,5 +1,5 @@
 import { getProduct } from "@/lib/storefront";
-import { invariant } from "@esmate/utils";
+import { invariant } from "@/lib/string-utils";
 import { prisma } from "@/lib/prisma";
 
 export async function getProductSingle(handle: string) {

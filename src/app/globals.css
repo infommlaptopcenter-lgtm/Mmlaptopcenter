@@ -1,18 +1,7 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-@source "../../node_modules/@esmate/shadcn/dist/components/ui/badge.js";
-@source "../../node_modules/@esmate/shadcn/dist/components/ui/button.js";
-@source "../../node_modules/@esmate/shadcn/dist/components/ui/card.js";
-@source "../../node_modules/@esmate/shadcn/dist/components/ui/command.js";
-@source "../../node_modules/@esmate/shadcn/dist/components/ui/dialog.js";
-@source "../../node_modules/@esmate/shadcn/dist/components/ui/input.js";
-@source "../../node_modules/@esmate/shadcn/dist/components/ui/label.js";
-@source "../../node_modules/@esmate/shadcn/dist/components/ui/select.js";
-@source "../../node_modules/@esmate/shadcn/dist/components/ui/separator.js";
-@source "../../node_modules/@esmate/shadcn/dist/components/ui/sheet.js";
-@source "../../node_modules/@esmate/shadcn/dist/components/ui/skeleton.js";
-@source "../../node_modules/@esmate/shadcn/dist/components/ui/textarea.js";
-@import "@esmate/shadcn/styles/new-york.css";
+@custom-variant dark (&:is(.dark *));
 
 @theme {
   --color-primary: hsl(28, 90%, 66%);
@@ -28,23 +17,75 @@
   --color-accent-foreground: hsl(0, 0%, 4%);
 }
 
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
 :root {
-  --primary: 28 90% 66%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 40 60% 96%;
-  --secondary-foreground: 0 0% 4%;
-  --muted: 40 40% 94%;
-  --muted-foreground: 0 0% 35%;
-  --accent: 45 70% 50%;
-  --accent-foreground: 0 0% 4%;
-  --background: 40 55% 97%;
-  --foreground: 0 0% 4%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 4%;
-  --border: 45 70% 50%;
-  --input: 40 40% 92%;
-  --ring: 28 90% 66%;
+  --background: #fdfaf2;
+  --foreground: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0a;
+  --primary: #f6a45d;
+  --primary-foreground: #ffffff;
+  --secondary: #fdfaf2;
+  --secondary-foreground: #0a0a0a;
+  --muted: #f7f1e5;
+  --muted-foreground: #595959;
+  --accent: #d8a928;
+  --accent-foreground: #0a0a0a;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #f6a45d;
   --radius: 0.75rem;
+}
+
+.dark {
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
+  --popover: #1e293b;
+  --popover-foreground: #f8fafc;
+  --primary: #f6a45d;
+  --primary-foreground: #ffffff;
+  --secondary: #1e293b;
+  --secondary-foreground: #f8fafc;
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
+  --accent: #d8a928;
+  --accent-foreground: #0a0a0a;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #334155;
+  --input: #334155;
+  --ring: #f6a45d;
+}
+
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
 }
 
 /* Keep storefront content comfortably wide on desktop while preserving the

@@ -22,30 +22,70 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const user = await prisma.adminUser.findUnique({
+        const inputEmail = credentials.email.trim().toLowerCase();
+        const inputPassword = credentials.password;
+
+        const configuredAdminUser = (process.env.ADMIN_USER || process.env.ADMIN_EMAIL || "").trim().toLowerCase();
+        const configuredAdminPass = process.env.ADMIN_PASS?.trim();
+
+        // 1. Check in database
+        let user = await prisma.adminUser.findFirst({
           where: {
-            email: credentials.email,
+            email: inputEmail,
           },
         });
 
-        if (!user) {
-          return null;
+        // 2. If user exists in DB, compare passwords
+        if (user) {
+          const passwordMatches = await bcrypt.compare(
+            inputPassword,
+            user.password,
+          );
+
+          if (passwordMatches) {
+            return {
+              id: user.id,
+              email: user.email,
+              name: user.name ?? user.email,
+            };
+          }
         }
 
-        const passwordMatches = await bcrypt.compare(
-          credentials.password,
-          user.password,
-        );
+        // 3. Fallback / Sync from configured ADMIN_USER & ADMIN_PASS in environment
+        if (
+          configuredAdminUser &&
+          inputEmail === configuredAdminUser &&
+          configuredAdminPass &&
+          inputPassword === configuredAdminPass
+        ) {
+          try {
+            const hashedPassword = await bcrypt.hash(inputPassword, 10);
+            if (user) {
+              user = await prisma.adminUser.update({
+                where: { id: user.id },
+                data: { password: hashedPassword },
+              });
+            } else {
+              user = await prisma.adminUser.create({
+                data: {
+                  email: inputEmail,
+                  password: hashedPassword,
+                  name: "MM Laptop Center Admin",
+                },
+              });
+            }
+          } catch {
+            // ignore fallback DB error
+          }
 
-        if (!passwordMatches) {
-          return null;
+          return {
+            id: user?.id ?? "admin-1",
+            email: inputEmail,
+            name: user?.name ?? "MM Laptop Center Admin",
+          };
         }
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name ?? user.email,
-        };
+        return null;
       },
     }),
   ],

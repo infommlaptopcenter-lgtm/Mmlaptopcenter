@@ -1,6 +1,6 @@
 
 import { getAllCollections } from "@/lib/storefront";
-import { invariant } from "@esmate/utils";
+import { invariant } from "@/lib/string-utils";
 
 export async function getCollectionList(cursor?: string) {
   const collections = await getAllCollections(cursor);

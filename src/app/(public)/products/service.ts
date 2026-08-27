@@ -1,5 +1,5 @@
 import { getAllProducts, searchProducts as searchProductsInDb } from "@/lib/storefront";
-import { invariant } from "@esmate/utils";
+import { invariant } from "@/lib/string-utils";
 import { prisma } from "@/lib/prisma";
 
 function getProductImage(product: { featuredImage: string | null; images: unknown }) {

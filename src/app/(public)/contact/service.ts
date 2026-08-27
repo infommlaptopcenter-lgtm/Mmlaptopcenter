@@ -1,5 +1,5 @@
 import { getPage as getPageFromDb } from "@/lib/storefront";
-import { invariant } from "@esmate/utils";
+import { invariant } from "@/lib/string-utils";
 
 export async function getPage(handle: string) {
   const page = await getPageFromDb(handle);

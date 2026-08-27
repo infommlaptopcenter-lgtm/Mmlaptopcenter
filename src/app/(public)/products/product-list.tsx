@@ -4,7 +4,7 @@ import { Loader2 } from "@esmate/shadcn/pkgs/lucide-react";
 import { useState } from "react";
 import { getProductList } from "./service";
 import { useRequest } from "@esmate/react/ahooks";
-import { titleize } from "@esmate/utils/string";
+import { titleize } from "@/lib/string-utils";
 import { StoreProductCard } from "@/components/features/products/store-product-card-wrapper";
 
 const FALLBACK_IMAGE = "/logo/new logo.png";
