@@ -163,7 +163,6 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
                       <Link
                         href={slide.ctaPrimaryHref || "#"}
                         tabIndex={isActive ? 0 : -1}
-                        aria-label={`${slide.ctaPrimaryLabel}: ${slide.title}`}
                         className="group inline-flex min-h-10 items-center justify-center gap-1.5 whitespace-nowrap rounded-md bg-orange-500 px-3 text-xs font-bold text-white shadow-[0_14px_30px_rgba(249,115,22,0.28)] transition-all duration-300 hover:-translate-y-1 hover:bg-orange-600 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-orange-300 sm:min-h-12 sm:gap-2 sm:px-6 sm:text-sm"
                       >
                         {slide.ctaPrimaryLabel}

@@ -16,6 +16,12 @@ export async function middleware(request: NextRequest) {
   }
 
   const pathname = request.nextUrl.pathname;
+  const isPasswordResetApiRoute = pathname.startsWith("/api/admin/password-reset");
+
+  if (isPasswordResetApiRoute) {
+    return NextResponse.next();
+  }
+
   const isAdminPageRoute = pathname.startsWith("/admin");
   const isAdminApiRoute = pathname.startsWith("/api/admin");
   const isLoginRoute = request.nextUrl.pathname === "/admin/login";

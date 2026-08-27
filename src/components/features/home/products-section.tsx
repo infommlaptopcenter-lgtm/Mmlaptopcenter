@@ -412,7 +412,6 @@ function FeaturedProductRow({
         ) : null}
         <Link
           href={`/category/${encodeURIComponent(categorySlug)}`}
-          aria-label={`Shop now for ${title}`}
           className="group inline-flex shrink-0 items-center gap-1.5 rounded-full border border-orange-500 bg-orange-500 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white shadow-[0_8px_18px_rgba(249,115,22,0.22)] transition hover:-translate-y-0.5 hover:border-orange-600 hover:bg-orange-600 hover:shadow-md sm:text-sm"
         >
           Shop Now
