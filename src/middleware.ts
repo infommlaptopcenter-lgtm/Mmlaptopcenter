@@ -3,6 +3,13 @@ import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  const isPasswordResetApiRoute = pathname.startsWith("/api/admin/password-reset");
+
+  if (isPasswordResetApiRoute) {
+    return NextResponse.next();
+  }
+
   let token;
   try {
     token = await getToken({
@@ -13,13 +20,6 @@ export async function middleware(request: NextRequest) {
   } catch {
     // If token decryption fails, treat as no token
     token = null;
-  }
-
-  const pathname = request.nextUrl.pathname;
-  const isPasswordResetApiRoute = pathname.startsWith("/api/admin/password-reset");
-
-  if (isPasswordResetApiRoute) {
-    return NextResponse.next();
   }
 
   const isAdminPageRoute = pathname.startsWith("/admin");

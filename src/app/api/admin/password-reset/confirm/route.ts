@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => ({}));
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
     const otp = typeof body.otp === "string" ? body.otp.trim() : "";
     const newPassword = typeof body.newPassword === "string" ? body.newPassword : "";
@@ -50,20 +50,33 @@ export async function POST(request: Request) {
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    const existingAdmin = await prisma.adminUser.findFirst({ where: { email } });
-    if (existingAdmin) {
-      await prisma.adminUser.update({
-        where: { id: existingAdmin.id },
-        data: { password: hashedPassword },
-      });
-    } else {
-      await prisma.adminUser.create({
-        data: {
+    try {
+      await prisma.adminUser.upsert({
+        where: { email },
+        update: { password: hashedPassword },
+        create: {
           email,
           password: hashedPassword,
           name: "MM Laptop Center Admin",
         },
       });
+    } catch (dbErr) {
+      console.error("[Admin Password Reset DB Error]:", dbErr);
+      const existingAdmin = await prisma.adminUser.findFirst({ where: { email } });
+      if (existingAdmin) {
+        await prisma.adminUser.update({
+          where: { id: existingAdmin.id },
+          data: { password: hashedPassword },
+        });
+      } else {
+        await prisma.adminUser.create({
+          data: {
+            email,
+            password: hashedPassword,
+            name: "MM Laptop Center Admin",
+          },
+        });
+      }
     }
 
     await prisma.adminPasswordReset.update({
@@ -76,6 +89,10 @@ export async function POST(request: Request) {
       message: "Password updated successfully. You can now sign in with your new password.",
     });
   } catch (error: unknown) {
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    console.error("[Admin Password Reset Confirm Error]:", error);
+    return NextResponse.json(
+      { error: (error as Error)?.message || "Internal server error occurred." },
+      { status: 500 }
+    );
   }
 }

@@ -59,9 +59,15 @@ export default function LoginForm() {
         body: JSON.stringify({ email: email.trim() }),
       });
 
-      const data = await response.json();
+      let data: { error?: string; message?: string } = {};
+      try {
+        data = await response.json();
+      } catch {
+        // Fallback for non-JSON responses
+      }
+
       if (!response.ok) {
-        throw new Error(data.error || "Failed to send reset code.");
+        throw new Error(data.error || "Failed to send reset code. Please try again.");
       }
 
       setResetStep("confirm");
@@ -102,9 +108,15 @@ export default function LoginForm() {
         }),
       });
 
-      const data = await response.json();
+      let data: { error?: string; message?: string } = {};
+      try {
+        data = await response.json();
+      } catch {
+        // Fallback for non-JSON responses
+      }
+
       if (!response.ok) {
-        throw new Error(data.error || "Password reset failed.");
+        throw new Error(data.error || "Password reset failed. Please verify your OTP code.");
       }
 
       setResetMode(false);
