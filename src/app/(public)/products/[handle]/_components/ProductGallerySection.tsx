@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Image from "next/image";
 import { Badge } from "@esmate/shadcn/components/ui/badge";
 import { Button } from "@esmate/shadcn/components/ui/button";
@@ -7,6 +8,8 @@ import {
   ChevronRight,
   Heart,
 } from "@esmate/shadcn/pkgs/lucide-react";
+
+const FALLBACK_IMAGE = "/logo/new logo.png";
 
 type GalleryImage = {
   id: string;
@@ -35,6 +38,7 @@ export function ProductGallerySection({
   wishlistActive,
   discountBadge,
 }: ProductGallerySectionProps) {
+  const [failedUrls, setFailedUrls] = useState<string[]>([]);
   const currentIndex = Math.max(
     0,
     images.findIndex((image) => image.id === currentImage?.id),
@@ -47,6 +51,10 @@ export function ProductGallerySection({
     onSelectImage(images[nextIndex]);
   };
 
+  const currentUrl = currentImage?.url
+    ? (failedUrls.includes(currentImage.url) ? FALLBACK_IMAGE : currentImage.url)
+    : FALLBACK_IMAGE;
+
   return (
     <div className="h-full min-w-0 space-y-3 sm:space-y-4">
       <div className="group/gallery relative mx-auto aspect-square w-full max-w-xl overflow-hidden rounded-2xl bg-[#f7f7f5]">
@@ -54,12 +62,17 @@ export function ProductGallerySection({
           <>
             <Image
               key={currentImage.id}
-              src={currentImage.url}
+              src={currentUrl}
               alt={currentImage.altText || title}
               fill
               priority
               className="animate-in fade-in object-contain p-3 duration-[350ms] ease-out lg:transition-transform lg:duration-500 lg:group-hover/gallery:scale-[1.035] sm:p-5"
               sizes="(max-width: 768px) 100vw, 50vw"
+              onError={() => {
+                if (currentImage?.url && !failedUrls.includes(currentImage.url)) {
+                  setFailedUrls((prev) => [...prev, currentImage.url]);
+                }
+              }}
             />
           </>
         ) : (
@@ -136,12 +149,17 @@ export function ProductGallerySection({
               }`}
             >
               <Image
-                src={img.url}
+                src={failedUrls.includes(img.url) ? FALLBACK_IMAGE : img.url}
                 alt={img.altText || `${title} thumbnail`}
                 fill
                 className="object-contain p-1"
                 sizes="64px"
                 loading="lazy"
+                onError={() => {
+                  if (img.url && !failedUrls.includes(img.url)) {
+                    setFailedUrls((prev) => [...prev, img.url]);
+                  }
+                }}
               />
             </button>
           ))}
