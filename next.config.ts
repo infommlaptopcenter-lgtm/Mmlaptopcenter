@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  ...(process.env.VERCEL ? {} : { output: "standalone" }),
   reactStrictMode: true,
   devIndicators: false,
   serverExternalPackages: ["dompurify"],
