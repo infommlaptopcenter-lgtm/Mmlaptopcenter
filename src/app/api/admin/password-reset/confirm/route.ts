@@ -29,36 +29,50 @@ export async function POST(request: Request) {
     const resets = await prisma.adminPasswordReset.findMany({
       where: { email },
       orderBy: { createdAt: "desc" },
-      take: 5,
+      take: 10,
     });
 
     if (!resets || resets.length === 0) {
       return NextResponse.json(
-        { error: "No password reset request found for this email. Please request a new verification code." },
+        { error: "No password reset request found for this email. Please click 'Forgot password?' to request a verification code." },
         { status: 400 }
       );
     }
 
     const otpHash = createHash("sha256").update(otp).digest("hex");
-    const matchingReset = resets.find((r) => r.otpHash === otpHash);
+    // Prioritize active unused reset record matching the OTP hash
+    let matchingReset = resets.find((r) => r.otpHash === otpHash && r.usedAt === null);
+    
+    if (!matchingReset) {
+      // Check if it matches a used record
+      matchingReset = resets.find((r) => r.otpHash === otpHash);
+    }
 
     if (!matchingReset) {
       // Increment attempt counter on the latest request
-      if (resets[0]) {
+      if (resets[0] && resets[0].usedAt === null) {
         await prisma.adminPasswordReset.update({
           where: { id: resets[0].id },
           data: { attempts: (resets[0].attempts || 0) + 1 },
         }).catch(() => {});
       }
       return NextResponse.json(
-        { error: "Incorrect 6-digit verification code. Please check your latest email and try again." },
+        { error: "Incorrect 6-digit verification code. Please check your newest email and enter the latest code." },
         { status: 400 }
       );
     }
 
     if (matchingReset.usedAt !== null) {
+      const usedTime = new Date(matchingReset.usedAt).getTime();
+      // If marked used in the last 5 minutes (e.g. rapid double click), accept as successful
+      if (Date.now() - usedTime < 5 * 60 * 1000) {
+        return NextResponse.json({
+          success: true,
+          message: "Password updated successfully. You can now sign in with your new password.",
+        });
+      }
       return NextResponse.json(
-        { error: "This verification code has already been used. Please request a new code." },
+        { error: "This verification code has already been used. Please request a new verification code." },
         { status: 400 }
       );
     }

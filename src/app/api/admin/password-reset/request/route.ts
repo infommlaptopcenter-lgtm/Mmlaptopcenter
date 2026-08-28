@@ -48,17 +48,10 @@ export async function POST(request: Request) {
     const otpHash = createHash("sha256").update(otp).digest("hex");
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 60 minutes validity
 
-    // Clean up older or already used reset tokens for this email
-    const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+    // Clean up all existing reset tokens for this email to ensure only the latest OTP is active
     try {
       await prisma.adminPasswordReset.deleteMany({
-        where: {
-          email,
-          OR: [
-            { createdAt: { lt: twoHoursAgo } },
-            { usedAt: { not: null } },
-          ],
-        },
+        where: { email },
       });
     } catch (cleanErr) {
       console.warn("[Admin Password Reset cleanup warning]:", cleanErr);
