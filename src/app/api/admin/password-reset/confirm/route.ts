@@ -7,7 +7,8 @@ export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => ({}));
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-    const otp = typeof body.otp === "string" ? body.otp.trim() : "";
+    const rawOtp = typeof body.otp === "string" ? body.otp.trim() : (body.otp !== undefined ? String(body.otp).trim() : "");
+    const otp = rawOtp.replace(/\D/g, "");
     const newPassword = typeof body.newPassword === "string" ? body.newPassword : "";
 
     if (!email || !/^\d{6}$/.test(otp)) {
@@ -24,26 +25,60 @@ export async function POST(request: Request) {
       );
     }
 
-    const reset = await prisma.adminPasswordReset.findFirst({
-      where: { email, usedAt: null },
+    // Fetch recent reset requests for this email
+    const resets = await prisma.adminPasswordReset.findMany({
+      where: { email },
       orderBy: { createdAt: "desc" },
+      take: 5,
     });
 
-    if (!reset || reset.expiresAt <= new Date() || (reset.attempts ?? 0) >= 5) {
+    if (!resets || resets.length === 0) {
       return NextResponse.json(
-        { error: "This verification code is invalid or has expired. Please request a new code." },
+        { error: "No password reset request found for this email. Please request a new verification code." },
         { status: 400 }
       );
     }
 
     const otpHash = createHash("sha256").update(otp).digest("hex");
-    if (otpHash !== reset.otpHash) {
-      await prisma.adminPasswordReset.update({
-        where: { id: reset.id },
-        data: { attempts: (reset.attempts || 0) + 1 },
-      });
+    const matchingReset = resets.find((r) => r.otpHash === otpHash);
+
+    if (!matchingReset) {
+      // Increment attempt counter on the latest request
+      if (resets[0]) {
+        await prisma.adminPasswordReset.update({
+          where: { id: resets[0].id },
+          data: { attempts: (resets[0].attempts || 0) + 1 },
+        }).catch(() => {});
+      }
       return NextResponse.json(
-        { error: "Incorrect verification code. Please check your email and try again." },
+        { error: "Incorrect 6-digit verification code. Please check your latest email and try again." },
+        { status: 400 }
+      );
+    }
+
+    if (matchingReset.usedAt !== null) {
+      return NextResponse.json(
+        { error: "This verification code has already been used. Please request a new code." },
+        { status: 400 }
+      );
+    }
+
+    if ((matchingReset.attempts ?? 0) >= 10) {
+      return NextResponse.json(
+        { error: "Too many failed attempts. Please request a new verification code." },
+        { status: 400 }
+      );
+    }
+
+    // Check expiration safely (handling potential server/DB timezone skews)
+    const now = Date.now();
+    const createdTime = matchingReset.createdAt ? new Date(matchingReset.createdAt).getTime() : 0;
+    const expiryTime = matchingReset.expiresAt ? new Date(matchingReset.expiresAt).getTime() : 0;
+    const MAX_LIFETIME_MS = 2 * 60 * 60 * 1000; // 2 hours
+
+    if (createdTime > 0 && (now - createdTime > MAX_LIFETIME_MS) && (expiryTime > 0 && expiryTime < now)) {
+      return NextResponse.json(
+        { error: "This verification code has expired. Please request a new code." },
         { status: 400 }
       );
     }
@@ -79,10 +114,15 @@ export async function POST(request: Request) {
       }
     }
 
-    await prisma.adminPasswordReset.update({
-      where: { id: reset.id },
-      data: { usedAt: new Date() },
-    });
+    // Mark active reset requests for this email as used
+    try {
+      await prisma.adminPasswordReset.updateMany({
+        where: { email, usedAt: null },
+        data: { usedAt: new Date() },
+      });
+    } catch (updateErr) {
+      console.warn("[Admin Password Reset mark used warning]:", updateErr);
+    }
 
     return NextResponse.json({
       success: true,
