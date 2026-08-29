@@ -12,7 +12,7 @@ import {
   ChevronDown,
   Clock,
 } from "@esmate/shadcn/pkgs/lucide-react";
-import { contact as trackContact, lead } from "@/lib/pixel";
+import { contact as trackContact, extractNameParts, lead } from "@/lib/pixel";
 
 const faqs = [
   {
@@ -70,8 +70,15 @@ export default function ContactClient() {
         throw new Error(data?.error || "Failed to send message");
       }
 
-      // Track Lead event on successful form submission
-      lead("contact form");
+      // Track Lead event with dynamic customer matching data on successful form submission
+      const { fn, ln } = extractNameParts(name);
+      lead("contact form", {
+        em: email.trim() || undefined,
+        ph: phone.trim() || undefined,
+        fn,
+        ln,
+        country: "pk",
+      });
 
       setSubmitted(true);
       setName("");

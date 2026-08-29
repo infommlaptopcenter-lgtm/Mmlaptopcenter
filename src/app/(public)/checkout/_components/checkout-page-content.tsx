@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FaWhatsapp } from "react-icons/fa";
 import { useCart } from "@/lib/commerce";
-import { addPaymentInfo, contact as trackContact, purchase, type MetaEventParameters } from "@/lib/pixel";
+import { addPaymentInfo, contact as trackContact, extractNameParts, purchase, type MetaEventParameters, type MetaUserData } from "@/lib/pixel";
 import { ADMIN_WHATSAPP_NUMBER, isValidWhatsAppNumber } from "@/lib/whatsapp";
 import { calculateOrderPricing } from "@/lib/order-pricing";
 import { CheckoutCustomerForm } from "./checkout-customer-form";
@@ -46,6 +46,20 @@ export function CheckoutPageContent() {
     num_items: cart.totalQuantity,
   }), [cart.lines, cart.totalQuantity, pricing.total]);
 
+  const customerMatchingData = useMemo<MetaUserData>(() => {
+    const { fn, ln } = extractNameParts(details.customerName);
+    return {
+      em: details.customerEmail.trim() || undefined,
+      ph: details.customerPhone.trim() || undefined,
+      fn,
+      ln,
+      ct: details.city.trim() || undefined,
+      st: details.state.trim() || undefined,
+      zp: details.pincode.trim() || undefined,
+      country: "pk",
+    };
+  }, [details]);
+
   useEffect(() => {
     if (codTotal > COD_LIMIT && paymentMethod === "cod") setPaymentMethod("bank_transfer");
     if (prepaidTotal > JAZZCASH_LIMIT && paymentMethod === "jazzcash") setPaymentMethod("bank_transfer");
@@ -75,7 +89,10 @@ export function CheckoutPageContent() {
       }) });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "Failed to place order");
-      purchase({ ...cartEventParameters, value: data.order.total ?? pricing.total, order_id: data.order.orderNumber });
+      purchase(
+        { ...cartEventParameters, value: data.order.total ?? pricing.total, order_id: data.order.orderNumber },
+        { ...customerMatchingData, external_id: data.order.orderNumber }
+      );
       cart.clear(); router.push(`/checkout/success?orderNumber=${encodeURIComponent(data.order.orderNumber)}`);
     } catch (caught) { setError(caught instanceof Error ? caught.message : "Failed to place order"); setReviewing(false); } finally { setSubmitting(false); }
   }
@@ -88,7 +105,7 @@ export function CheckoutPageContent() {
       <div className="space-y-6">
         {error ? <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</div> : null}
         <CheckoutCustomerForm values={details} setValue={(key, value) => setDetails((current) => ({ ...current, [key]: value }))} />
-        <CheckoutPaymentSection subtotal={subtotal} method={paymentMethod} setMethod={setPaymentMethod} proofUrl={paymentProofUrl} setProofUrl={setPaymentProofUrl} onProofUploaded={() => addPaymentInfo(cartEventParameters)} />
+        <CheckoutPaymentSection subtotal={subtotal} method={paymentMethod} setMethod={setPaymentMethod} proofUrl={paymentProofUrl} setProofUrl={setPaymentProofUrl} onProofUploaded={() => addPaymentInfo(cartEventParameters, customerMatchingData)} />
         <div className="grid grid-cols-2 gap-2 sm:gap-3">
           <button type="submit" disabled={submitting} className="min-w-0 whitespace-nowrap rounded-lg bg-[#f6a45d] px-2 py-2.5 text-[11px] font-bold text-white shadow-sm hover:bg-[#d8861f] disabled:opacity-50 sm:px-3 sm:py-3 sm:text-sm">{submitting ? "Placing order..." : paymentMethod === "cod" ? "Place COD order" : "Submit payment"}</button>
           <a href={`https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${whatsappMessage}`} target="_blank" rel="noopener noreferrer" onClick={() => trackContact("WhatsApp checkout help")} className="flex min-w-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-green-700 px-2 py-2.5 text-[11px] font-bold text-white hover:bg-green-800 sm:gap-2 sm:px-3 sm:py-3 sm:text-sm"><FaWhatsapp className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" /> WhatsApp help</a>
