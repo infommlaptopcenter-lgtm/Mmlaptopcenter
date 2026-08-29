@@ -1,7 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FiMail, FiLock, FiKey, FiArrowLeft, FiCheckCircle } from "react-icons/fi";
 
@@ -19,9 +19,12 @@ export default function LoginForm() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const isSubmittingRef = useRef(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (isSubmittingRef.current || loading) return;
+    isSubmittingRef.current = true;
     setLoading(true);
     setError("");
     setSuccessMessage("");
@@ -43,11 +46,14 @@ export default function LoginForm() {
       setError("An error occurred during sign in. Please try again.");
     } finally {
       setLoading(false);
+      isSubmittingRef.current = false;
     }
   };
 
   const handleResetRequest = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (isSubmittingRef.current || loading) return;
+    isSubmittingRef.current = true;
     setLoading(true);
     setError("");
     setSuccessMessage("");
@@ -76,26 +82,28 @@ export default function LoginForm() {
       setError(caught instanceof Error ? caught.message : "Failed to send reset code.");
     } finally {
       setLoading(false);
+      isSubmittingRef.current = false;
     }
   };
 
   const handleResetConfirm = async (event: React.FormEvent) => {
     event.preventDefault();
-    setLoading(true);
-    setError("");
-    setSuccessMessage("");
+    if (isSubmittingRef.current || loading) return;
 
     if (newPassword !== confirmNewPassword) {
       setError("New passwords do not match.");
-      setLoading(false);
       return;
     }
 
     if (newPassword.length < 6) {
       setError("New password must be at least 6 characters long.");
-      setLoading(false);
       return;
     }
+
+    isSubmittingRef.current = true;
+    setLoading(true);
+    setError("");
+    setSuccessMessage("");
 
     try {
       const response = await fetch("/api/admin/password-reset/confirm", {
@@ -125,11 +133,13 @@ export default function LoginForm() {
       setOtp("");
       setNewPassword("");
       setConfirmNewPassword("");
-      setSuccessMessage("Password successfully updated! You can now sign in with your new password.");
+      setError("");
+      setSuccessMessage(data.message || "Password successfully updated! You can now sign in with your new password.");
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Password reset failed.");
     } finally {
       setLoading(false);
+      isSubmittingRef.current = false;
     }
   };
 

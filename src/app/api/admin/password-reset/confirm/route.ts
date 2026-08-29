@@ -25,82 +25,75 @@ export async function POST(request: Request) {
       );
     }
 
-    // Fetch recent reset requests for this email
-    const resets = await prisma.adminPasswordReset.findMany({
+    // Fetch the latest password reset request for this email with deterministic ordering
+    const latestReset = await prisma.adminPasswordReset.findFirst({
       where: { email },
-      orderBy: { createdAt: "desc" },
-      take: 10,
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     });
 
-    if (!resets || resets.length === 0) {
+    if (!latestReset) {
       return NextResponse.json(
-        { error: "No password reset request found for this email. Please click 'Forgot password?' to request a verification code." },
+        { error: "No password reset request found for this email. Please request a new verification code." },
         { status: 400 }
       );
     }
 
-    const otpHash = createHash("sha256").update(otp).digest("hex");
-    // Prioritize active unused reset record matching the OTP hash
-    let matchingReset = resets.find((r) => r.otpHash === otpHash && r.usedAt === null);
-    
-    if (!matchingReset) {
-      // Check if it matches a used record
-      matchingReset = resets.find((r) => r.otpHash === otpHash);
-    }
-
-    if (!matchingReset) {
-      // Increment attempt counter on the latest request
-      if (resets[0] && resets[0].usedAt === null) {
-        await prisma.adminPasswordReset.update({
-          where: { id: resets[0].id },
-          data: { attempts: (resets[0].attempts || 0) + 1 },
-        }).catch(() => {});
-      }
-      return NextResponse.json(
-        { error: "Incorrect 6-digit verification code. Please check your newest email and enter the latest code." },
-        { status: 400 }
-      );
-    }
-
-    if (matchingReset.usedAt !== null) {
-      const usedTime = new Date(matchingReset.usedAt).getTime();
-      // If marked used in the last 5 minutes (e.g. rapid double click), accept as successful
-      if (Date.now() - usedTime < 5 * 60 * 1000) {
-        return NextResponse.json({
-          success: true,
-          message: "Password updated successfully. You can now sign in with your new password.",
-        });
-      }
+    if (latestReset.usedAt !== null) {
       return NextResponse.json(
         { error: "This verification code has already been used. Please request a new verification code." },
         { status: 400 }
       );
     }
 
-    if ((matchingReset.attempts ?? 0) >= 10) {
+    if ((latestReset.attempts ?? 0) >= 5) {
       return NextResponse.json(
         { error: "Too many failed attempts. Please request a new verification code." },
         { status: 400 }
       );
     }
 
-    // Check expiration safely (handling potential server/DB timezone skews)
-    const now = Date.now();
-    const createdTime = matchingReset.createdAt ? new Date(matchingReset.createdAt).getTime() : 0;
-    const expiryTime = matchingReset.expiresAt ? new Date(matchingReset.expiresAt).getTime() : 0;
-    const MAX_LIFETIME_MS = 2 * 60 * 60 * 1000; // 2 hours
-
-    if (createdTime > 0 && (now - createdTime > MAX_LIFETIME_MS) && (expiryTime > 0 && expiryTime < now)) {
+    // Check expiration against current time
+    const expiryTime = new Date(latestReset.expiresAt).getTime();
+    if (Number.isNaN(expiryTime) || Date.now() > expiryTime) {
       return NextResponse.json(
         { error: "This verification code has expired. Please request a new code." },
         { status: 400 }
       );
     }
 
+    const otpHash = createHash("sha256").update(otp).digest("hex");
+    if (latestReset.otpHash !== otpHash) {
+      // Atomically increment attempt counter on the latest request
+      await prisma.adminPasswordReset.update({
+        where: { id: latestReset.id },
+        data: { attempts: { increment: 1 } },
+      }).catch(() => {});
+
+      return NextResponse.json(
+        { error: "Incorrect 6-digit verification code. Please check your newest email and enter the latest code." },
+        { status: 400 }
+      );
+    }
+
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    try {
-      await prisma.adminUser.upsert({
+    // Atomically claim the OTP (ensuring usedAt was still null) and update the password in a single transaction
+    const updateResult = await prisma.$transaction(async (tx) => {
+      const claim = await tx.adminPasswordReset.updateMany({
+        where: {
+          id: latestReset.id,
+          usedAt: null,
+        },
+        data: {
+          usedAt: new Date(),
+        },
+      });
+
+      if (claim.count === 0) {
+        return { success: false, reason: "ALREADY_CLAIMED" };
+      }
+
+      await tx.adminUser.upsert({
         where: { email },
         update: { password: hashedPassword },
         create: {
@@ -109,33 +102,15 @@ export async function POST(request: Request) {
           name: "MM Laptop Center Admin",
         },
       });
-    } catch (dbErr) {
-      console.error("[Admin Password Reset DB Error]:", dbErr);
-      const existingAdmin = await prisma.adminUser.findFirst({ where: { email } });
-      if (existingAdmin) {
-        await prisma.adminUser.update({
-          where: { id: existingAdmin.id },
-          data: { password: hashedPassword },
-        });
-      } else {
-        await prisma.adminUser.create({
-          data: {
-            email,
-            password: hashedPassword,
-            name: "MM Laptop Center Admin",
-          },
-        });
-      }
-    }
 
-    // Mark active reset requests for this email as used
-    try {
-      await prisma.adminPasswordReset.updateMany({
-        where: { email, usedAt: null },
-        data: { usedAt: new Date() },
-      });
-    } catch (updateErr) {
-      console.warn("[Admin Password Reset mark used warning]:", updateErr);
+      return { success: true };
+    });
+
+    if (!updateResult.success) {
+      return NextResponse.json(
+        { error: "This verification code has already been used. Please request a new verification code." },
+        { status: 400 }
+      );
     }
 
     return NextResponse.json({

@@ -46,16 +46,13 @@ export async function POST(request: Request) {
 
     const otp = randomInt(100000, 1000000).toString();
     const otpHash = createHash("sha256").update(otp).digest("hex");
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 60 minutes validity
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes validity
 
-    // Clean up all existing reset tokens for this email to ensure only the latest OTP is active
-    try {
-      await prisma.adminPasswordReset.deleteMany({
-        where: { email },
-      });
-    } catch (cleanErr) {
-      console.warn("[Admin Password Reset cleanup warning]:", cleanErr);
-    }
+    // Invalidate all previous unused reset tokens for this email to ensure only the new one can be used
+    await prisma.adminPasswordReset.updateMany({
+      where: { email, usedAt: null },
+      data: { usedAt: new Date() },
+    });
 
     await prisma.adminPasswordReset.create({
       data: {
