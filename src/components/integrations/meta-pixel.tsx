@@ -2,7 +2,7 @@
 
 import Script from "next/script";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { META_PIXEL_ID, pageView } from "@/lib/pixel";
 
 let lastTrackedLocation: string | null = null;
@@ -10,42 +10,35 @@ let lastTrackedLocation: string | null = null;
 export function MetaPixel() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [shouldLoad, setShouldLoad] = useState(false);
-  const [pixelReady, setPixelReady] = useState(false);
+  const isFirstRender = useRef(true);
 
-  const query = searchParams.toString();
+  const query = searchParams?.toString();
   const location = query ? `${pathname}?${query}` : pathname;
 
   useEffect(() => {
-    const enablePixel = () => setShouldLoad(true);
-    window.addEventListener("pointerdown", enablePixel, {
-      passive: true,
-      once: true,
-    });
-    window.addEventListener("keydown", enablePixel, { once: true });
+    if (!META_PIXEL_ID) return;
 
-    return () => {
-      window.removeEventListener("pointerdown", enablePixel);
-      window.removeEventListener("keydown", enablePixel);
-    };
-  }, []);
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      lastTrackedLocation = location;
+      return;
+    }
 
-  useEffect(() => {
-    if (!pixelReady || lastTrackedLocation === location) return;
+    if (lastTrackedLocation === location) return;
+
     pageView();
     lastTrackedLocation = location;
-  }, [location, pixelReady]);
+  }, [location]);
 
-  if (!META_PIXEL_ID || !shouldLoad) return null;
+  if (!META_PIXEL_ID) return null;
 
   return (
     <>
       <Script
         id="meta-pixel"
         strategy="afterInteractive"
-        onReady={() => setPixelReady(true)}
       >
-        {`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init',${JSON.stringify(META_PIXEL_ID)});`}
+        {`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init',${JSON.stringify(META_PIXEL_ID)});fbq('track','PageView');`}
       </Script>
       <noscript>
         {/* eslint-disable-next-line @next/next/no-img-element */}
